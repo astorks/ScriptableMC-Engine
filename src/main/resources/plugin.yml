@@ -1,0 +1,3 @@
+name: FlowMC
+version: 1.0-dev
+main: com.pixlfox.graalmc.GraalMCPlugin
