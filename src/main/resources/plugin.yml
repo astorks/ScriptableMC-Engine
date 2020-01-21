@@ -1,3 +1,5 @@
-name: FlowMC
-version: 1.0-dev
-main: com.pixlfox.graalmc.GraalMCPlugin
+name: ScriptablePluginEngine
+version: '1.0.1'
+api-version: '1.15'
+main: com.pixlfox.scriptableplugin.ScriptablePluginMain
+depend: [CommandAPI]
