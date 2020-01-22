@@ -10,27 +10,29 @@ import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
 
 fun main() {
-    val exporter = ApiExporter("./lib/", Regex("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?"))
-    exporter.addDefaultClasses()
-    //exporter.addClass(org.bukkit.enchantments.Enchantment::class.java)
-    exporter.clean()
-    exporter.exportAllClasses()
+    TypescriptApiExporter(
+        "./lib/",
+        Regex("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
+    )
+    .addHelperClasses()
+    .addBukkitClasses()
+    .clean()
+    .exportAllClasses()
 }
 
-@Suppress("MemberVisibilityCanBePrivate")
-class ApiExporter(private val exportPath: String, private val allowedPackagesRegex: Regex) {
+@Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
+class TypescriptApiExporter(private val exportPath: String, private val allowedPackagesRegex: Regex) {
     private val classList = mutableListOf<Class<*>>()
 
-    fun clean() {
+    fun clean(): TypescriptApiExporter {
         deleteDirectory(File(exportPath), true)
+        return this
     }
 
-    fun addDefaultClasses() {
+    fun addHelperClasses(): TypescriptApiExporter {
         addClasses(
-            org.bukkit.Bukkit::class.java,
             ScriptablePluginContext::class.java,
             ScriptablePluginEngine::class.java,
-            org.bukkit.command.PluginCommand::class.java,
             fr.minuskube.inv.SmartInventory::class.java,
             com.pixlfox.scriptableplugin.File::class.java,
             SmartInventoryProvider::class.java,
@@ -38,15 +40,18 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
             SmartInventory::class.java,
             com.google.common.io.ByteStreams::class.java
         )
+        return this
+    }
 
-        addClasses(
+    fun addBukkitClasses(): TypescriptApiExporter {
+        return this.addClasses(
+            org.bukkit.Bukkit::class.java,
+            org.bukkit.command.PluginCommand::class.java,
             org.bukkit.entity.Player::class.java,
             org.bukkit.Server::class.java,
             org.bukkit.event.Event::class.java,
-            org.bukkit.configuration.ConfigurationSection::class.java
-        )
+            org.bukkit.configuration.ConfigurationSection::class.java,
 
-        addClasses(
             org.bukkit.event.block.BlockBreakEvent::class.java,
             org.bukkit.event.block.BlockBurnEvent::class.java,
             org.bukkit.event.block.BlockCanBuildEvent::class.java,
@@ -78,15 +83,11 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
             org.bukkit.event.block.MoistureChangeEvent::class.java,
             org.bukkit.event.block.NotePlayEvent::class.java,
             org.bukkit.event.block.SignChangeEvent::class.java,
-            org.bukkit.event.block.SpongeAbsorbEvent::class.java
-        )
+            org.bukkit.event.block.SpongeAbsorbEvent::class.java,
 
-        addClasses(
             org.bukkit.event.enchantment.EnchantItemEvent::class.java,
-            org.bukkit.event.enchantment.PrepareItemEnchantEvent::class.java
-        )
+            org.bukkit.event.enchantment.PrepareItemEnchantEvent::class.java,
 
-        addClasses(
             org.bukkit.event.entity.AreaEffectCloudApplyEvent::class.java,
             org.bukkit.event.entity.BatToggleSleepEvent::class.java,
             org.bukkit.event.entity.CreatureSpawnEvent::class.java,
@@ -146,17 +147,13 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
             org.bukkit.event.entity.SlimeSplitEvent::class.java,
             org.bukkit.event.entity.VillagerAcquireTradeEvent::class.java,
             org.bukkit.event.entity.VillagerCareerChangeEvent::class.java,
-            org.bukkit.event.entity.VillagerReplenishTradeEvent::class.java
-        )
+            org.bukkit.event.entity.VillagerReplenishTradeEvent::class.java,
 
-        addClasses(
             org.bukkit.event.hanging.HangingBreakByEntityEvent::class.java,
             org.bukkit.event.hanging.HangingBreakEvent::class.java,
             org.bukkit.event.hanging.HangingEvent::class.java,
-            org.bukkit.event.hanging.HangingPlaceEvent::class.java
-        )
+            org.bukkit.event.hanging.HangingPlaceEvent::class.java,
 
-        addClasses(
             org.bukkit.event.inventory.BrewEvent::class.java,
             org.bukkit.event.inventory.BrewingStandFuelEvent::class.java,
             org.bukkit.event.inventory.CraftItemEvent::class.java,
@@ -174,10 +171,8 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
             org.bukkit.event.inventory.InventoryPickupItemEvent::class.java,
             org.bukkit.event.inventory.PrepareAnvilEvent::class.java,
             org.bukkit.event.inventory.PrepareItemCraftEvent::class.java,
-            org.bukkit.event.inventory.TradeSelectEvent::class.java
-        )
+            org.bukkit.event.inventory.TradeSelectEvent::class.java,
 
-        addClasses(
             org.bukkit.event.player.AsyncPlayerChatEvent::class.java,
             org.bukkit.event.player.AsyncPlayerPreLoginEvent::class.java,
             org.bukkit.event.player.PlayerAdvancementDoneEvent::class.java,
@@ -232,10 +227,8 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
             org.bukkit.event.player.PlayerToggleSprintEvent::class.java,
             org.bukkit.event.player.PlayerUnleashEntityEvent::class.java,
             org.bukkit.event.player.PlayerUnregisterChannelEvent::class.java,
-            org.bukkit.event.player.PlayerVelocityEvent::class.java
-        )
+            org.bukkit.event.player.PlayerVelocityEvent::class.java,
 
-        addClasses(
             org.bukkit.event.server.BroadcastMessageEvent::class.java,
             org.bukkit.event.server.MapInitializeEvent::class.java,
             org.bukkit.event.server.PluginDisableEvent::class.java,
@@ -249,10 +242,8 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
             org.bukkit.event.server.ServiceEvent::class.java,
             org.bukkit.event.server.ServiceRegisterEvent::class.java,
             org.bukkit.event.server.ServiceUnregisterEvent::class.java,
-            org.bukkit.event.server.TabCompleteEvent::class.java
-        )
+            org.bukkit.event.server.TabCompleteEvent::class.java,
 
-        addClasses(
             org.bukkit.event.vehicle.VehicleBlockCollisionEvent::class.java,
             org.bukkit.event.vehicle.VehicleCollisionEvent::class.java,
             org.bukkit.event.vehicle.VehicleCreateEvent::class.java,
@@ -263,17 +254,13 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
             org.bukkit.event.vehicle.VehicleEvent::class.java,
             org.bukkit.event.vehicle.VehicleExitEvent::class.java,
             org.bukkit.event.vehicle.VehicleMoveEvent::class.java,
-            org.bukkit.event.vehicle.VehicleUpdateEvent::class.java
-        )
+            org.bukkit.event.vehicle.VehicleUpdateEvent::class.java,
 
-        addClasses(
             org.bukkit.event.weather.LightningStrikeEvent::class.java,
             org.bukkit.event.weather.ThunderChangeEvent::class.java,
             org.bukkit.event.weather.WeatherChangeEvent::class.java,
-            org.bukkit.event.weather.WeatherEvent::class.java
-        )
+            org.bukkit.event.weather.WeatherEvent::class.java,
 
-        addClasses(
             org.bukkit.event.world.ChunkEvent::class.java,
             org.bukkit.event.world.ChunkLoadEvent::class.java,
             org.bukkit.event.world.ChunkPopulateEvent::class.java,
@@ -289,13 +276,15 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
         )
     }
 
-    fun addClasses(vararg _classes: Class<*>) {
+    fun addClasses(vararg _classes: Class<*>): TypescriptApiExporter {
         for (_class in _classes) {
             addClass(_class)
         }
+
+        return this
     }
 
-    fun addClass(_class: Class<*>) {
+    fun addClass(_class: Class<*>): TypescriptApiExporter {
         if (_class.isArray) {
 
         }
@@ -303,7 +292,7 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
             if (!classList.contains(_class) && _class.name.matches(allowedPackagesRegex)) {
                 classList.add(_class)
             } else {
-                return
+                return this
             }
 
             for (_method in _class.methods) {
@@ -351,6 +340,8 @@ class ApiExporter(private val exportPath: String, private val allowedPackagesReg
                 }
             }
         }
+
+        return this
     }
 
     private fun buildClassList(_class: Class<*>): Array<Class<*>> {

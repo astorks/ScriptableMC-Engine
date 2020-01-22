@@ -40,7 +40,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
             }
         })
 
-        // Disabled the in-game command for now, run the main method in ApiExporter.kt to generate typescript libraries
+        // Disabled the in-game command for now, run the main method in TypescriptApiExporter.kt to generate typescript libraries
 //        CommandAPI.getInstance().register("tsdef", CommandPermission.fromString("scriptableplugin.js.reload"), arrayOf("tsd"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
 //            try {
 //                val exporter = ApiExporter("./scripts/mc/", Regex("(com|org|io|fr|net)\\.(.*)?"))

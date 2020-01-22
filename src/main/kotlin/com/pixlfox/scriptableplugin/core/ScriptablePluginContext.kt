@@ -23,6 +23,8 @@ import org.bukkit.command.PluginCommand
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.plugin.messaging.PluginMessageListener
+import org.bukkit.plugin.messaging.PluginMessageListenerRegistration
 import org.graalvm.polyglot.Value
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -37,6 +39,8 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         get() = CommandAPI.getInstance()
 
     private val commands = mutableListOf<PluginCommand>()
+    private val incomingPluginMessageListeners = mutableListOf<PluginMessageListenerRegistration>()
+    private val outgoingPluginMessageListeners = mutableListOf<String>()
 
     internal fun enable() {
         if(engine.debugEnabled) {
@@ -59,12 +63,41 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         for(command in commands) {
             unregisterCommand(command)
         }
+
+        val incomingPluginMessageListeners = incomingPluginMessageListeners.toTypedArray()
+        for(listener in incomingPluginMessageListeners) {
+            unregisterIncomingPluginChannel(listener)
+        }
+
+        val outgoingPluginMessageListeners = outgoingPluginMessageListeners.toTypedArray()
+        for(listener in outgoingPluginMessageListeners) {
+            unregisterOutgoingPluginChannel(listener)
+        }
     }
-
-
 
     fun registerEvent(eventClass: Class<out Event>, executor: EventExecutor) {
         Bukkit.getServer().pluginManager.registerEvent(eventClass, this, EventPriority.NORMAL, executor, engine.bootstrapPlugin)
+    }
+
+    fun registerIncomingPluginChannel(channelName: String, listener: PluginMessageListener): PluginMessageListenerRegistration {
+        val messageListenerRegistration = Bukkit.getMessenger().registerIncomingPluginChannel(engine.bootstrapPlugin, channelName, listener)
+        incomingPluginMessageListeners.add(messageListenerRegistration)
+        return messageListenerRegistration
+    }
+
+    fun unregisterIncomingPluginChannel(messageListenerRegistration: PluginMessageListenerRegistration) {
+        incomingPluginMessageListeners.remove(messageListenerRegistration)
+        Bukkit.getMessenger().unregisterIncomingPluginChannel(engine.bootstrapPlugin, messageListenerRegistration.channel, messageListenerRegistration.listener)
+    }
+
+    fun registerOutgoingPluginChannel(channel: String) {
+        Bukkit.getMessenger().registerOutgoingPluginChannel(engine.bootstrapPlugin, channel)
+        outgoingPluginMessageListeners.add(channel)
+    }
+
+    fun unregisterOutgoingPluginChannel(channel: String) {
+        Bukkit.getMessenger().unregisterOutgoingPluginChannel(engine.bootstrapPlugin, channel)
+        outgoingPluginMessageListeners.remove(channel)
     }
 
     fun newCommand(name: String): PluginCommand? {
@@ -96,9 +129,9 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         val bukkitCommandMap = Bukkit.getServer().javaClass.getDeclaredField("commandMap")
         bukkitCommandMap.isAccessible = true
         val commandMap = bukkitCommandMap.get(Bukkit.getServer()) as CommandMap
-
         commandMap.register(this.pluginName.toLowerCase(), command)
         commands.add(command)
+        bukkitCommandMap.isAccessible = false
     }
 
     fun registerCommandApi(name: String, executor: io.github.jorelali.commandapi.api.CommandExecutor) {
@@ -130,6 +163,9 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
         knownCommands.remove(command.name)
         commands.remove(command)
+
+        commandMapField.isAccessible = false
+        knownCommandsField.isAccessible = false
     }
 
     fun getFile(pathName: String): File {
@@ -153,4 +189,8 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
             return ScriptablePluginContext(engine, pluginName, pluginInstance)
         }
     }
+}
+
+class OutgoingPluginChannelInterface(private val engine: ScriptablePluginEngine, val pluginName: String, val pluginInstance: Value) {
+
 }
