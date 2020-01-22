@@ -6,10 +6,10 @@ import {ConfigurationSerializable} from '../../org/bukkit/configuration/serializ
 export interface FireworkEffect extends ConfigurationSerializable {
 	getType(): FireworkEffect$Type;
 	serialize(): any;
-	getFadeColors(): any;
 	hasFlicker(): boolean;
-	hasTrail(): boolean;
 	getColors(): any;
+	getFadeColors(): any;
+	hasTrail(): boolean;
 }
 
 export class FireworkEffect {

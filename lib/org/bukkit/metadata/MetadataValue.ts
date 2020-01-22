@@ -4,15 +4,15 @@ import {Plugin} from '../../../org/bukkit/plugin/Plugin.js'
 export interface MetadataValue {
 	value(): any;
 	asString(): string;
-	asDouble(): number;
-	asLong(): number;
-	asByte(): number;
-	getOwningPlugin(): Plugin;
 	asFloat(): number;
+	asDouble(): number;
+	asInt(): number;
+	asByte(): number;
 	asShort(): number;
 	asBoolean(): boolean;
+	asLong(): number;
 	invalidate(): void;
-	asInt(): number;
+	getOwningPlugin(): Plugin;
 }
 
 export class MetadataValue {

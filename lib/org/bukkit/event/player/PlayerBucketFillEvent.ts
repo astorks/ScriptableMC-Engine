@@ -10,13 +10,13 @@ import {PlayerBucketEvent} from '../../../../org/bukkit/event/player/PlayerBucke
 export interface PlayerBucketFillEvent extends PlayerBucketEvent {
 	getHandlers(): HandlerList;
 	getBlock(): Block;
-	getItemStack(): ItemStack;
-	setItemStack(itemStack: ItemStack): void;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	setCancelled(cancel: boolean): void;
+	setItemStack(itemStack: ItemStack): void;
+	getItemStack(): ItemStack;
 	getBlockFace(): BlockFace;
-	getBlockClicked(): Block;
 	getBucket(): Material;
+	getBlockClicked(): Block;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

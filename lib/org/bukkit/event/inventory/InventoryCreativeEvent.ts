@@ -1,38 +1,38 @@
 declare var Java: any;
 import {ItemStack} from '../../../../org/bukkit/inventory/ItemStack.js'
 import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
-import {Inventory} from '../../../../org/bukkit/inventory/Inventory.js'
 import {InventoryType$SlotType} from '../../../../org/bukkit/event/inventory/InventoryType$SlotType.js'
-import {ClickType} from '../../../../org/bukkit/event/inventory/ClickType.js'
 import {InventoryAction} from '../../../../org/bukkit/event/inventory/InventoryAction.js'
+import {ClickType} from '../../../../org/bukkit/event/inventory/ClickType.js'
+import {Inventory} from '../../../../org/bukkit/inventory/Inventory.js'
 import {Event$Result} from '../../../../org/bukkit/event/Event$Result.js'
 import {HumanEntity} from '../../../../org/bukkit/entity/HumanEntity.js'
 import {InventoryView} from '../../../../org/bukkit/inventory/InventoryView.js'
 import {InventoryClickEvent} from '../../../../org/bukkit/event/inventory/InventoryClickEvent.js'
 
 export interface InventoryCreativeEvent extends InventoryClickEvent {
-	setCursor(item: ItemStack): void;
 	getCursor(): ItemStack;
+	setCursor(item: ItemStack): void;
 	getSlot(): number;
 	getHandlers(): HandlerList;
-	isShiftClick(): boolean;
-	setCurrentItem(stack: ItemStack): void;
-	getRawSlot(): number;
-	getHotbarButton(): number;
-	getCurrentItem(): ItemStack;
-	isRightClick(): boolean;
-	isLeftClick(): boolean;
-	getClickedInventory(): Inventory;
 	getSlotType(): InventoryType$SlotType;
-	getClick(): ClickType;
+	isLeftClick(): boolean;
+	getHotbarButton(): number;
 	getAction(): InventoryAction;
-	getResult(): Event$Result;
+	setCurrentItem(stack: ItemStack): void;
+	isRightClick(): boolean;
+	getCurrentItem(): ItemStack;
+	isShiftClick(): boolean;
+	getRawSlot(): number;
+	getClick(): ClickType;
+	getClickedInventory(): Inventory;
 	setResult(newResult: Event$Result): void;
-	setCancelled(toCancel: boolean): void;
+	getResult(): Event$Result;
 	isCancelled(): boolean;
+	setCancelled(toCancel: boolean): void;
 	getWhoClicked(): HumanEntity;
-	getViewers(): any;
 	getInventory(): Inventory;
+	getViewers(): any;
 	getView(): InventoryView;
 	getEventName(): string;
 	isAsynchronous(): boolean;

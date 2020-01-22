@@ -1,25 +1,25 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Projectile} from '../../../../org/bukkit/entity/Projectile.js'
 import {Entity} from '../../../../org/bukkit/entity/Entity.js'
 import {ThrownExpBottle} from '../../../../org/bukkit/entity/ThrownExpBottle.js'
-import {BlockFace} from '../../../../org/bukkit/block/BlockFace.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Block} from '../../../../org/bukkit/block/Block.js'
+import {BlockFace} from '../../../../org/bukkit/block/BlockFace.js'
 import {EntityType} from '../../../../org/bukkit/entity/EntityType.js'
 import {ProjectileHitEvent} from '../../../../org/bukkit/event/entity/ProjectileHitEvent.js'
 
 export interface ExpBottleEvent extends ProjectileHitEvent {
-	getHandlers(): HandlerList;
 	getEntity(): Projectile;
 	getEntity(): Entity;
 	getEntity(): ThrownExpBottle;
+	getHandlers(): HandlerList;
 	getShowEffect(): boolean;
 	setShowEffect(showEffect: boolean): void;
 	getExperience(): number;
 	setExperience(exp: number): void;
-	getHitEntity(): Entity;
-	getHitBlockFace(): BlockFace;
 	getHitBlock(): Block;
+	getHitBlockFace(): BlockFace;
+	getHitEntity(): Entity;
 	getEntityType(): EntityType;
 	getEventName(): string;
 	isAsynchronous(): boolean;

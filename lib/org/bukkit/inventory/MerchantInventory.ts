@@ -1,6 +1,6 @@
 declare var Java: any;
-import {Merchant} from '../../../org/bukkit/inventory/Merchant.js'
 import {MerchantRecipe} from '../../../org/bukkit/inventory/MerchantRecipe.js'
+import {Merchant} from '../../../org/bukkit/inventory/Merchant.js'
 import {Material} from '../../../org/bukkit/Material.js'
 import {ItemStack} from '../../../org/bukkit/inventory/ItemStack.js'
 import {Location} from '../../../org/bukkit/Location.js'
@@ -9,9 +9,9 @@ import {InventoryHolder} from '../../../org/bukkit/inventory/InventoryHolder.js'
 import {Inventory} from '../../../org/bukkit/inventory/Inventory.js'
 
 export interface MerchantInventory extends Inventory {
-	getSelectedRecipeIndex(): number;
-	getMerchant(): Merchant;
 	getSelectedRecipe(): MerchantRecipe;
+	getMerchant(): Merchant;
+	getSelectedRecipeIndex(): number;
 	remove(material: Material): void;
 	remove(item: ItemStack): void;
 	clear(): void;
@@ -28,22 +28,22 @@ export interface MerchantInventory extends Inventory {
 	getLocation(): Location;
 	getType(): InventoryType;
 	getSize(): number;
-	getHolder(): InventoryHolder;
-	firstEmpty(): number;
-	getViewers(): any;
-	containsAtLeast(item: ItemStack, amount: number): boolean;
-	getMaxStackSize(): number;
-	setItem(index: number, item: ItemStack): void;
-	addItem(items: Array<ItemStack>): any;
-	removeItem(items: Array<ItemStack>): any;
-	setMaxStackSize(size: number): void;
-	getContents(): Array<ItemStack>;
-	getStorageContents(): Array<ItemStack>;
-	getItem(index: number): ItemStack;
-	setStorageContents(items: Array<ItemStack>): void;
 	all(material: Material): any;
 	all(item: ItemStack): any;
 	setContents(items: Array<ItemStack>): void;
+	getMaxStackSize(): number;
+	getContents(): Array<ItemStack>;
+	getHolder(): InventoryHolder;
+	removeItem(items: Array<ItemStack>): any;
+	firstEmpty(): number;
+	getItem(index: number): ItemStack;
+	setItem(index: number, item: ItemStack): void;
+	getStorageContents(): Array<ItemStack>;
+	containsAtLeast(item: ItemStack, amount: number): boolean;
+	setMaxStackSize(size: number): void;
+	getViewers(): any;
+	setStorageContents(items: Array<ItemStack>): void;
+	addItem(items: Array<ItemStack>): any;
 	spliterator(): any;
 	forEach(arg0: any): void;
 }

@@ -1,15 +1,15 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {BrewerInventory} from '../../../../org/bukkit/inventory/BrewerInventory.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Block} from '../../../../org/bukkit/block/Block.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {BlockEvent} from '../../../../org/bukkit/event/block/BlockEvent.js'
 
 export interface BrewEvent extends BlockEvent, Cancellable {
-	getHandlers(): HandlerList;
 	getContents(): BrewerInventory;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getFuelLevel(): number;
 	getBlock(): Block;
 	getEventName(): string;

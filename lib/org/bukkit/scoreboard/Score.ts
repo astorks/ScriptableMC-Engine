@@ -8,9 +8,9 @@ export interface Score {
 	getPlayer(): OfflinePlayer;
 	getScoreboard(): Scoreboard;
 	getObjective(): Objective;
-	setScore(score: number): void;
-	isScoreSet(): boolean;
 	getScore(): number;
+	isScoreSet(): boolean;
+	setScore(score: number): void;
 }
 
 export class Score {

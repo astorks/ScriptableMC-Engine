@@ -7,10 +7,10 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {EntityEvent} from '../../../../org/bukkit/event/entity/EntityEvent.js'
 
 export interface EntityToggleSwimEvent extends EntityEvent, Cancellable {
-	getHandlers(): HandlerList;
 	isSwimming(): boolean;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getEntity(): Entity;
 	getEntityType(): EntityType;
 	getEventName(): string;

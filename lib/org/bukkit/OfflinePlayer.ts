@@ -9,13 +9,13 @@ export interface OfflinePlayer extends ServerOperator, AnimalTamer, Configuratio
 	getName(): string;
 	getPlayer(): Player;
 	getUniqueId(): string;
-	hasPlayedBefore(): boolean;
-	getFirstPlayed(): number;
 	setWhitelisted(value: boolean): void;
 	getLastPlayed(): number;
 	isOnline(): boolean;
-	isWhitelisted(): boolean;
+	getFirstPlayed(): number;
+	hasPlayedBefore(): boolean;
 	isBanned(): boolean;
+	isWhitelisted(): boolean;
 	getBedSpawnLocation(): Location;
 	isOp(): boolean;
 	setOp(value: boolean): void;

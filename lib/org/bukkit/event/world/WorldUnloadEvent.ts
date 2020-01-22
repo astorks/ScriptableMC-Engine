@@ -5,9 +5,9 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {WorldEvent} from '../../../../org/bukkit/event/world/WorldEvent.js'
 
 export interface WorldUnloadEvent extends WorldEvent, Cancellable {
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
 	getWorld(): World;
 	getEventName(): string;
 	isAsynchronous(): boolean;

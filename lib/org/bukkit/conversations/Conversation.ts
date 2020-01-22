@@ -2,9 +2,9 @@ declare var Java: any;
 import {ConversationContext} from '../../../org/bukkit/conversations/ConversationContext.js'
 import {Conversation$ConversationState} from '../../../org/bukkit/conversations/Conversation$ConversationState.js'
 import {ConversationPrefix} from '../../../org/bukkit/conversations/ConversationPrefix.js'
-import {ConversationAbandonedListener} from '../../../org/bukkit/conversations/ConversationAbandonedListener.js'
 import {Conversable} from '../../../org/bukkit/conversations/Conversable.js'
 import {ConversationAbandonedEvent} from '../../../org/bukkit/conversations/ConversationAbandonedEvent.js'
+import {ConversationAbandonedListener} from '../../../org/bukkit/conversations/ConversationAbandonedListener.js'
 import {Plugin} from '../../../org/bukkit/plugin/Plugin.js'
 import {Prompt} from '../../../org/bukkit/conversations/Prompt.js'
 
@@ -13,17 +13,17 @@ export interface Conversation {
 	getContext(): ConversationContext;
 	getState(): Conversation$ConversationState;
 	getPrefix(): ConversationPrefix;
-	removeConversationAbandonedListener(listener: ConversationAbandonedListener): void;
-	addConversationAbandonedListener(listener: ConversationAbandonedListener): void;
-	setLocalEchoEnabled(localEchoEnabled: boolean): void;
-	isLocalEchoEnabled(): boolean;
-	getForWhom(): Conversable;
 	getCancellers(): any;
 	isModal(): boolean;
-	acceptInput(input: string): void;
-	abandon(): void;
-	abandon(details: ConversationAbandonedEvent): void;
+	isLocalEchoEnabled(): boolean;
 	outputNextPrompt(): void;
+	getForWhom(): Conversable;
+	acceptInput(input: string): void;
+	abandon(details: ConversationAbandonedEvent): void;
+	abandon(): void;
+	setLocalEchoEnabled(localEchoEnabled: boolean): void;
+	addConversationAbandonedListener(listener: ConversationAbandonedListener): void;
+	removeConversationAbandonedListener(listener: ConversationAbandonedListener): void;
 }
 
 export class Conversation {

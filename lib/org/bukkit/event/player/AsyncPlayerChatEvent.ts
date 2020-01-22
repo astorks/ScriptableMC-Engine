@@ -6,12 +6,12 @@ import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface AsyncPlayerChatEvent extends PlayerEvent, Cancellable {
 	getMessage(): string;
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
+	getRecipients(): any;
 	setMessage(message: string): void;
 	setFormat(format: string): void;
-	getRecipients(): any;
 	getFormat(): string;
 	getPlayer(): Player;
 	getEventName(): string;

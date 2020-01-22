@@ -6,10 +6,10 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {BlockEvent} from '../../../../org/bukkit/event/block/BlockEvent.js'
 
 export interface BlockFromToEvent extends BlockEvent, Cancellable {
-	getHandlers(): HandlerList;
-	getFace(): BlockFace;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
+	getFace(): BlockFace;
 	getToBlock(): Block;
 	getBlock(): Block;
 	getEventName(): string;

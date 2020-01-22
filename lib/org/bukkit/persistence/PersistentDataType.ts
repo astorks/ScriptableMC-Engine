@@ -3,9 +3,9 @@ import {PersistentDataAdapterContext} from '../../../org/bukkit/persistence/Pers
 
 export interface PersistentDataType {
 	getPrimitiveType(): any;
+	getComplexType(): any;
 	fromPrimitive(primitive: any, context: PersistentDataAdapterContext): any;
 	toPrimitive(complex: any, context: PersistentDataAdapterContext): any;
-	getComplexType(): any;
 }
 
 export class PersistentDataType {

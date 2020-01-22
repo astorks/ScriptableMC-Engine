@@ -1,17 +1,17 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {ItemStack} from '../../../../org/bukkit/inventory/ItemStack.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Block} from '../../../../org/bukkit/block/Block.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {BlockEvent} from '../../../../org/bukkit/event/block/BlockEvent.js'
 
 export interface BlockDamageEvent extends BlockEvent, Cancellable {
-	getHandlers(): HandlerList;
 	getPlayer(): Player;
 	getItemInHand(): ItemStack;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getInstaBreak(): boolean;
 	setInstaBreak(bool: boolean): void;
 	getBlock(): Block;

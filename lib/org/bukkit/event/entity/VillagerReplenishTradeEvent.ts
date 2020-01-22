@@ -1,20 +1,20 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
-import {Entity} from '../../../../org/bukkit/entity/Entity.js'
 import {AbstractVillager} from '../../../../org/bukkit/entity/AbstractVillager.js'
+import {Entity} from '../../../../org/bukkit/entity/Entity.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {MerchantRecipe} from '../../../../org/bukkit/inventory/MerchantRecipe.js'
 import {EntityType} from '../../../../org/bukkit/entity/EntityType.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {EntityEvent} from '../../../../org/bukkit/event/entity/EntityEvent.js'
 
 export interface VillagerReplenishTradeEvent extends EntityEvent, Cancellable {
-	getHandlers(): HandlerList;
-	getEntity(): Entity;
 	getEntity(): AbstractVillager;
-	setRecipe(recipe: MerchantRecipe): void;
-	getRecipe(): MerchantRecipe;
-	setCancelled(cancel: boolean): void;
+	getEntity(): Entity;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
+	getRecipe(): MerchantRecipe;
+	setRecipe(recipe: MerchantRecipe): void;
 	setBonus(bonus: number): void;
 	getBonus(): number;
 	getEntityType(): EntityType;

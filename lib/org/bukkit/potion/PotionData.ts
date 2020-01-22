@@ -3,8 +3,8 @@ import {PotionType} from '../../../org/bukkit/potion/PotionType.js'
 
 export interface PotionData {
 	getType(): PotionType;
-	isExtended(): boolean;
 	isUpgraded(): boolean;
+	isExtended(): boolean;
 }
 
 export class PotionData {

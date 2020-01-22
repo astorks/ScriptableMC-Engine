@@ -1,14 +1,14 @@
 declare var Java: any;
-import {HelpTopic} from '../../../org/bukkit/help/HelpTopic.js'
 import {HelpTopicFactory} from '../../../org/bukkit/help/HelpTopicFactory.js'
+import {HelpTopic} from '../../../org/bukkit/help/HelpTopic.js'
 
 export interface HelpMap {
 	clear(): void;
-	getHelpTopic(topicName: string): HelpTopic;
-	getHelpTopics(): any;
-	addTopic(topic: HelpTopic): void;
-	getIgnoredPlugins(): any;
 	registerHelpTopicFactory(commandClass: any, factory: HelpTopicFactory): void;
+	addTopic(topic: HelpTopic): void;
+	getHelpTopic(topicName: string): HelpTopic;
+	getIgnoredPlugins(): any;
+	getHelpTopics(): any;
 }
 
 export class HelpMap {

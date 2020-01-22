@@ -10,11 +10,11 @@ export interface ChunkGenerator$ChunkData {
 	setRegion(xMin: number, yMin: number, zMin: number, xMax: number, yMax: number, zMax: number, material: MaterialData): void;
 	getData(x: number, y: number, z: number): number;
 	getMaxHeight(): number;
-	getTypeAndData(x: number, y: number, z: number): MaterialData;
 	getBlockData(x: number, y: number, z: number): BlockData;
 	setBlock(x: number, y: number, z: number, blockData: BlockData): void;
 	setBlock(x: number, y: number, z: number, material: Material): void;
 	setBlock(x: number, y: number, z: number, material: MaterialData): void;
+	getTypeAndData(x: number, y: number, z: number): MaterialData;
 }
 
 export class ChunkGenerator$ChunkData {

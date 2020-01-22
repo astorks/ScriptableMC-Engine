@@ -6,12 +6,12 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {BlockEvent} from '../../../../org/bukkit/event/block/BlockEvent.js'
 
 export interface BlockCookEvent extends BlockEvent, Cancellable {
-	getResult(): ItemStack;
 	setResult(result: ItemStack): void;
-	getHandlers(): HandlerList;
+	getResult(): ItemStack;
 	getSource(): ItemStack;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getBlock(): Block;
 	getEventName(): string;
 	isAsynchronous(): boolean;

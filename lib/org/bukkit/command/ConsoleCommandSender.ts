@@ -1,7 +1,7 @@
 declare var Java: any;
 import {Server} from '../../../org/bukkit/Server.js'
-import {PermissionAttachment} from '../../../org/bukkit/permissions/PermissionAttachment.js'
 import {Permission} from '../../../org/bukkit/permissions/Permission.js'
+import {PermissionAttachment} from '../../../org/bukkit/permissions/PermissionAttachment.js'
 import {Plugin} from '../../../org/bukkit/plugin/Plugin.js'
 import {Conversation} from '../../../org/bukkit/conversations/Conversation.js'
 import {ConversationAbandonedEvent} from '../../../org/bukkit/conversations/ConversationAbandonedEvent.js'
@@ -13,25 +13,25 @@ export interface ConsoleCommandSender extends CommandSender, Conversable {
 	getServer(): Server;
 	sendMessage(messages: Array<string>): void;
 	sendMessage(message: string): void;
+	hasPermission(_name: string): boolean;
+	hasPermission(perm: Permission): boolean;
 	removeAttachment(attachment: PermissionAttachment): void;
 	isPermissionSet(_name: string): boolean;
 	isPermissionSet(perm: Permission): boolean;
-	addAttachment(plugin: Plugin): PermissionAttachment;
-	addAttachment(plugin: Plugin, _name: string, value: boolean, ticks: number): PermissionAttachment;
 	addAttachment(plugin: Plugin, ticks: number): PermissionAttachment;
+	addAttachment(plugin: Plugin, _name: string, value: boolean, ticks: number): PermissionAttachment;
+	addAttachment(plugin: Plugin): PermissionAttachment;
 	addAttachment(plugin: Plugin, _name: string, value: boolean): PermissionAttachment;
-	hasPermission(_name: string): boolean;
-	hasPermission(perm: Permission): boolean;
 	recalculatePermissions(): void;
 	getEffectivePermissions(): any;
 	isOp(): boolean;
 	setOp(value: boolean): void;
+	sendRawMessage(message: string): void;
 	isConversing(): boolean;
 	beginConversation(conversation: Conversation): boolean;
-	sendRawMessage(message: string): void;
-	acceptConversationInput(input: string): void;
-	abandonConversation(conversation: Conversation, details: ConversationAbandonedEvent): void;
 	abandonConversation(conversation: Conversation): void;
+	abandonConversation(conversation: Conversation, details: ConversationAbandonedEvent): void;
+	acceptConversationInput(input: string): void;
 }
 
 export class ConsoleCommandSender {

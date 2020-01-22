@@ -4,8 +4,8 @@ import {MapFont$CharacterSprite} from '../../../org/bukkit/map/MapFont$Character
 export interface MapFont {
 	getChar(ch: string): MapFont$CharacterSprite;
 	setChar(ch: string, sprite: MapFont$CharacterSprite): void;
-	getHeight(): number;
 	isValid(text: string): boolean;
+	getHeight(): number;
 	getWidth(text: string): number;
 }
 

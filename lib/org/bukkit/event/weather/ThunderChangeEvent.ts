@@ -5,9 +5,9 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {WeatherEvent} from '../../../../org/bukkit/event/weather/WeatherEvent.js'
 
 export interface ThunderChangeEvent extends WeatherEvent, Cancellable {
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
 	toThunderState(): boolean;
 	getWorld(): World;
 	getEventName(): string;

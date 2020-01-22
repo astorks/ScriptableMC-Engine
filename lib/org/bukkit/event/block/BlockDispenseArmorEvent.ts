@@ -1,20 +1,20 @@
 declare var Java: any;
 import {LivingEntity} from '../../../../org/bukkit/entity/LivingEntity.js'
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Vector} from '../../../../org/bukkit/util/Vector.js'
 import {ItemStack} from '../../../../org/bukkit/inventory/ItemStack.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Block} from '../../../../org/bukkit/block/Block.js'
 import {BlockDispenseEvent} from '../../../../org/bukkit/event/block/BlockDispenseEvent.js'
 
 export interface BlockDispenseArmorEvent extends BlockDispenseEvent {
 	getTargetEntity(): LivingEntity;
-	getHandlers(): HandlerList;
-	getVelocity(): Vector;
 	setVelocity(vel: Vector): void;
-	setItem(item: ItemStack): void;
+	getVelocity(): Vector;
 	getItem(): ItemStack;
-	setCancelled(cancel: boolean): void;
+	setItem(item: ItemStack): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getBlock(): Block;
 	getEventName(): string;
 	isAsynchronous(): boolean;

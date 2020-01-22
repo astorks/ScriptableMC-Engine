@@ -4,9 +4,9 @@ import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerExpChangeEvent extends PlayerEvent {
-	getHandlers(): HandlerList;
 	getAmount(): number;
 	setAmount(amount: number): void;
+	getHandlers(): HandlerList;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

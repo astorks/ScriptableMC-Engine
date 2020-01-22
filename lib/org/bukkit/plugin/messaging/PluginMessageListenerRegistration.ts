@@ -1,13 +1,13 @@
 declare var Java: any;
-import {Plugin} from '../../../../org/bukkit/plugin/Plugin.js'
 import {PluginMessageListener} from '../../../../org/bukkit/plugin/messaging/PluginMessageListener.js'
+import {Plugin} from '../../../../org/bukkit/plugin/Plugin.js'
 import {Messenger} from '../../../../org/bukkit/plugin/messaging/Messenger.js'
 
 export interface PluginMessageListenerRegistration {
 	getChannel(): string;
-	isValid(): boolean;
-	getPlugin(): Plugin;
 	getListener(): PluginMessageListener;
+	getPlugin(): Plugin;
+	isValid(): boolean;
 }
 
 export class PluginMessageListenerRegistration {

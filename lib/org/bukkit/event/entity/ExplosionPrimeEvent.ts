@@ -7,13 +7,13 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {EntityEvent} from '../../../../org/bukkit/event/entity/EntityEvent.js'
 
 export interface ExplosionPrimeEvent extends EntityEvent, Cancellable {
-	getHandlers(): HandlerList;
 	setFire(fire: boolean): void;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
+	getFire(): boolean;
 	getRadius(): number;
 	setRadius(radius: number): void;
-	getFire(): boolean;
 	getEntity(): Entity;
 	getEntityType(): EntityType;
 	getEventName(): string;

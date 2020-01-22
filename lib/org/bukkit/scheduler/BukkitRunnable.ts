@@ -4,14 +4,14 @@ import {Plugin} from '../../../org/bukkit/plugin/Plugin.js'
 
 export interface BukkitRunnable {
 	runTask(plugin: Plugin): BukkitTask;
-	runTaskLater(plugin: Plugin, delay: number): BukkitTask;
 	runTaskTimer(plugin: Plugin, delay: number, period: number): BukkitTask;
-	runTaskLaterAsynchronously(plugin: Plugin, delay: number): BukkitTask;
-	runTaskAsynchronously(plugin: Plugin): BukkitTask;
-	runTaskTimerAsynchronously(plugin: Plugin, delay: number, period: number): BukkitTask;
+	runTaskLater(plugin: Plugin, delay: number): BukkitTask;
 	isCancelled(): boolean;
 	cancel(): void;
 	getTaskId(): number;
+	runTaskAsynchronously(plugin: Plugin): BukkitTask;
+	runTaskLaterAsynchronously(plugin: Plugin, delay: number): BukkitTask;
+	runTaskTimerAsynchronously(plugin: Plugin, delay: number, period: number): BukkitTask;
 	run(): void;
 }
 

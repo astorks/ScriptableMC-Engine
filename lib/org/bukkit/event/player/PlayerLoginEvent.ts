@@ -6,13 +6,13 @@ import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerLoginEvent extends PlayerEvent {
 	getAddress(): any;
-	getResult(): PlayerLoginEvent$Result;
 	setResult(result: PlayerLoginEvent$Result): void;
+	getResult(): PlayerLoginEvent$Result;
 	getHandlers(): HandlerList;
-	disallow(result: PlayerLoginEvent$Result, message: string): void;
-	getKickMessage(): string;
 	setKickMessage(message: string): void;
 	allow(): void;
+	disallow(result: PlayerLoginEvent$Result, message: string): void;
+	getKickMessage(): string;
 	getHostname(): string;
 	getPlayer(): Player;
 	getEventName(): string;

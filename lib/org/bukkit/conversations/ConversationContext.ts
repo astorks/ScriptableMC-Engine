@@ -5,8 +5,8 @@ import {Conversable} from '../../../org/bukkit/conversations/Conversable.js'
 export interface ConversationContext {
 	getPlugin(): Plugin;
 	getForWhom(): Conversable;
-	getSessionData(key: any): any;
 	getAllSessionData(): any;
+	getSessionData(key: any): any;
 	setSessionData(key: any, value: any): void;
 }
 

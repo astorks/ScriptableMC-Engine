@@ -3,9 +3,9 @@ import {ItemTagAdapterContext} from '../../../../../org/bukkit/inventory/meta/ta
 
 export interface ItemTagType {
 	getPrimitiveType(): any;
+	getComplexType(): any;
 	fromPrimitive(primitive: any, context: ItemTagAdapterContext): any;
 	toPrimitive(complex: any, context: ItemTagAdapterContext): any;
-	getComplexType(): any;
 }
 
 export class ItemTagType {

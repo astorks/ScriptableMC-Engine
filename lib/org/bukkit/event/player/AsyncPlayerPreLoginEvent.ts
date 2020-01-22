@@ -7,17 +7,17 @@ import {Event} from '../../../../org/bukkit/event/Event.js'
 export interface AsyncPlayerPreLoginEvent extends Event {
 	getName(): string;
 	getAddress(): any;
-	getResult(): PlayerPreLoginEvent$Result;
 	setResult(result: PlayerPreLoginEvent$Result): void;
-	getHandlers(): HandlerList;
+	getResult(): PlayerPreLoginEvent$Result;
 	getUniqueId(): string;
-	disallow(result: AsyncPlayerPreLoginEvent$Result, message: string): void;
-	disallow(result: PlayerPreLoginEvent$Result, message: string): void;
-	setLoginResult(result: AsyncPlayerPreLoginEvent$Result): void;
-	getKickMessage(): string;
+	getHandlers(): HandlerList;
 	setKickMessage(message: string): void;
 	getLoginResult(): AsyncPlayerPreLoginEvent$Result;
+	setLoginResult(result: AsyncPlayerPreLoginEvent$Result): void;
 	allow(): void;
+	disallow(result: PlayerPreLoginEvent$Result, message: string): void;
+	disallow(result: AsyncPlayerPreLoginEvent$Result, message: string): void;
+	getKickMessage(): string;
 	getEventName(): string;
 	isAsynchronous(): boolean;
 }

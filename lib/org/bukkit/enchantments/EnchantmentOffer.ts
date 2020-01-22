@@ -4,9 +4,9 @@ import {Enchantment} from '../../../org/bukkit/enchantments/Enchantment.js'
 export interface EnchantmentOffer {
 	getEnchantmentLevel(): number;
 	getEnchantment(): Enchantment;
-	getCost(): number;
 	setCost(cost: number): void;
 	setEnchantment(enchantment: Enchantment): void;
+	getCost(): number;
 	setEnchantmentLevel(enchantmentLevel: number): void;
 }
 

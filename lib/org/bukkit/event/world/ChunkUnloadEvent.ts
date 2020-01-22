@@ -6,8 +6,8 @@ import {ChunkEvent} from '../../../../org/bukkit/event/world/ChunkEvent.js'
 
 export interface ChunkUnloadEvent extends ChunkEvent {
 	getHandlers(): HandlerList;
-	setSaveChunk(saveChunk: boolean): void;
 	isSaveChunk(): boolean;
+	setSaveChunk(saveChunk: boolean): void;
 	getChunk(): Chunk;
 	getWorld(): World;
 	getEventName(): string;

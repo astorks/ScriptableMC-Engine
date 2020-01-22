@@ -5,8 +5,8 @@ export interface BukkitTask {
 	getOwner(): Plugin;
 	isCancelled(): boolean;
 	cancel(): void;
-	isSync(): boolean;
 	getTaskId(): number;
+	isSync(): boolean;
 }
 
 export class BukkitTask {

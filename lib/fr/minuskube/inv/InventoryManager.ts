@@ -1,17 +1,17 @@
 declare var Java: any;
-import {Player} from '../../../org/bukkit/entity/Player.js'
 import {InventoryType} from '../../../org/bukkit/event/inventory/InventoryType.js'
-import {InventoryOpener} from '../../../fr/minuskube/inv/opener/InventoryOpener.js'
+import {Player} from '../../../org/bukkit/entity/Player.js'
 import {SmartInventory} from '../../../fr/minuskube/inv/SmartInventory.js'
+import {InventoryOpener} from '../../../fr/minuskube/inv/opener/InventoryOpener.js'
 import {JavaPlugin} from '../../../org/bukkit/plugin/java/JavaPlugin.js'
 
 export interface InventoryManager {
 	init(): void;
-	getContents(arg0: Player): any;
 	findOpener(arg0: InventoryType): any;
 	getInventory(arg0: Player): any;
-	registerOpeners(arg0: Array<InventoryOpener>): void;
+	getContents(arg0: Player): any;
 	getOpenedPlayers(arg0: SmartInventory): any;
+	registerOpeners(arg0: Array<InventoryOpener>): void;
 }
 
 export class InventoryManager {

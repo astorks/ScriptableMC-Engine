@@ -7,9 +7,9 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {EntityEvent} from '../../../../org/bukkit/event/entity/EntityEvent.js'
 
 export interface EntityDropItemEvent extends EntityEvent, Cancellable {
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
 	getItemDrop(): Item;
 	getEntity(): Entity;
 	getEntityType(): EntityType;

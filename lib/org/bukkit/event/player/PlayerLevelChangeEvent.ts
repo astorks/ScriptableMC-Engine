@@ -5,8 +5,8 @@ import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerLevelChangeEvent extends PlayerEvent {
 	getHandlers(): HandlerList;
-	getNewLevel(): number;
 	getOldLevel(): number;
+	getNewLevel(): number;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

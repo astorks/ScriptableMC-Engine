@@ -1,16 +1,16 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {ItemStack} from '../../../../org/bukkit/inventory/ItemStack.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerItemConsumeEvent extends PlayerEvent, Cancellable {
-	getHandlers(): HandlerList;
-	setItem(item: ItemStack): void;
 	getItem(): ItemStack;
-	setCancelled(cancel: boolean): void;
+	setItem(item: ItemStack): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

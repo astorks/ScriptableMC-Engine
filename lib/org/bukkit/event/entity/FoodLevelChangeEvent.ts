@@ -1,21 +1,21 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
-import {Entity} from '../../../../org/bukkit/entity/Entity.js'
 import {HumanEntity} from '../../../../org/bukkit/entity/HumanEntity.js'
+import {Entity} from '../../../../org/bukkit/entity/Entity.js'
 import {ItemStack} from '../../../../org/bukkit/inventory/ItemStack.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {EntityType} from '../../../../org/bukkit/entity/EntityType.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {EntityEvent} from '../../../../org/bukkit/event/entity/EntityEvent.js'
 
 export interface FoodLevelChangeEvent extends EntityEvent, Cancellable {
-	getHandlers(): HandlerList;
-	getEntity(): Entity;
 	getEntity(): HumanEntity;
-	getItem(): ItemStack;
-	setFoodLevel(level: number): void;
+	getEntity(): Entity;
 	getFoodLevel(): number;
-	setCancelled(cancel: boolean): void;
+	setFoodLevel(level: number): void;
+	getItem(): ItemStack;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getEntityType(): EntityType;
 	getEventName(): string;
 	isAsynchronous(): boolean;

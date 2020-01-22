@@ -5,10 +5,10 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {ServerEvent} from '../../../../org/bukkit/event/server/ServerEvent.js'
 
 export interface ServerCommandEvent extends ServerEvent, Cancellable {
+	getCommand(): string;
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
-	getCommand(): string;
 	setCommand(message: string): void;
 	getSender(): CommandSender;
 	getEventName(): string;

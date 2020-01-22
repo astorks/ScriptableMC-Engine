@@ -1,17 +1,17 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {Entity} from '../../../../org/bukkit/entity/Entity.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {Event} from '../../../../org/bukkit/event/Event.js'
 
 export interface PlayerLeashEntityEvent extends Event, Cancellable {
-	getHandlers(): HandlerList;
 	getPlayer(): Player;
 	getEntity(): Entity;
 	getLeashHolder(): Entity;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getEventName(): string;
 	isAsynchronous(): boolean;
 }

@@ -1,8 +1,8 @@
 declare var Java: any;
 
 export interface Cancellable {
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	setCancelled(cancel: boolean): void;
 }
 
 export class Cancellable {

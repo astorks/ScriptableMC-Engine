@@ -6,14 +6,14 @@ import {RegisteredServiceProvider} from '../../../org/bukkit/plugin/RegisteredSe
 export interface ServicesManager {
 	register(service: any, provider: any, plugin: Plugin, priority: ServicePriority): void;
 	load(service: any): any;
+	unregister(provider: any): void;
+	unregister(service: any, provider: any): void;
 	unregisterAll(plugin: Plugin): void;
 	getRegistration(service: any): RegisteredServiceProvider;
-	isProvidedFor(service: any): boolean;
-	getRegistrations(service: any): any;
 	getRegistrations(plugin: Plugin): any;
+	getRegistrations(service: any): any;
 	getKnownServices(): any;
-	unregister(service: any, provider: any): void;
-	unregister(provider: any): void;
+	isProvidedFor(service: any): boolean;
 }
 
 export class ServicesManager {

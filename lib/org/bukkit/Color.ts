@@ -4,16 +4,16 @@ import {ConfigurationSerializable} from '../../org/bukkit/configuration/serializ
 
 export interface Color extends ConfigurationSerializable {
 	serialize(): any;
+	asRGB(): number;
+	mixColors(colors: Array<Color>): Color;
 	getRed(): number;
-	getBlue(): number;
+	mixDyes(colors: Array<DyeColor>): Color;
+	getGreen(): number;
 	setGreen(green: number): Color;
 	setRed(red: number): Color;
 	setBlue(blue: number): Color;
-	asRGB(): number;
+	getBlue(): number;
 	asBGR(): number;
-	getGreen(): number;
-	mixDyes(colors: Array<DyeColor>): Color;
-	mixColors(colors: Array<Color>): Color;
 }
 
 export class Color {

@@ -1,16 +1,16 @@
 declare var Java: any;
 import {EventPriority} from '../../../org/bukkit/event/EventPriority.js'
-import {Event} from '../../../org/bukkit/event/Event.js'
-import {Plugin} from '../../../org/bukkit/plugin/Plugin.js'
 import {Listener} from '../../../org/bukkit/event/Listener.js'
+import {Plugin} from '../../../org/bukkit/plugin/Plugin.js'
+import {Event} from '../../../org/bukkit/event/Event.js'
 import {EventExecutor} from '../../../org/bukkit/plugin/EventExecutor.js'
 
 export interface RegisteredListener {
 	getPriority(): EventPriority;
-	callEvent(event: Event): void;
-	getPlugin(): Plugin;
-	isIgnoringCancelled(): boolean;
 	getListener(): Listener;
+	getPlugin(): Plugin;
+	callEvent(event: Event): void;
+	isIgnoringCancelled(): boolean;
 }
 
 export class RegisteredListener {

@@ -1,12 +1,12 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {ItemStack} from '../../../../org/bukkit/inventory/ItemStack.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerRiptideEvent extends PlayerEvent {
-	getHandlers(): HandlerList;
 	getItem(): ItemStack;
+	getHandlers(): HandlerList;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

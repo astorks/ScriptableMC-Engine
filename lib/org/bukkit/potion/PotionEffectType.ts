@@ -5,10 +5,10 @@ import {PotionEffect} from '../../../org/bukkit/potion/PotionEffect.js'
 export interface PotionEffectType {
 	getName(): string;
 	getId(): number;
-	getColor(): Color;
-	getDurationModifier(): number;
-	createEffect(duration: number, amplifier: number): PotionEffect;
 	isInstant(): boolean;
+	getDurationModifier(): number;
+	getColor(): Color;
+	createEffect(duration: number, amplifier: number): PotionEffect;
 }
 
 export class PotionEffectType {

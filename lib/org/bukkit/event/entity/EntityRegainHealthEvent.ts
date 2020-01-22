@@ -7,11 +7,11 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {EntityEvent} from '../../../../org/bukkit/event/entity/EntityEvent.js'
 
 export interface EntityRegainHealthEvent extends EntityEvent, Cancellable {
-	getHandlers(): HandlerList;
 	getAmount(): number;
 	setAmount(amount: number): void;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getRegainReason(): EntityRegainHealthEvent$RegainReason;
 	getEntity(): Entity;
 	getEntityType(): EntityType;

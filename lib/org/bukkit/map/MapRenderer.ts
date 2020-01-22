@@ -5,8 +5,8 @@ import {Player} from '../../../org/bukkit/entity/Player.js'
 
 export interface MapRenderer {
 	initialize(map: MapView): void;
-	render(map: MapView, canvas: MapCanvas, player: Player): void;
 	isContextual(): boolean;
+	render(map: MapView, canvas: MapCanvas, player: Player): void;
 }
 
 export class MapRenderer {

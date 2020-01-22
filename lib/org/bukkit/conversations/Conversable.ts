@@ -3,12 +3,12 @@ import {Conversation} from '../../../org/bukkit/conversations/Conversation.js'
 import {ConversationAbandonedEvent} from '../../../org/bukkit/conversations/ConversationAbandonedEvent.js'
 
 export interface Conversable {
+	sendRawMessage(message: string): void;
 	isConversing(): boolean;
 	beginConversation(conversation: Conversation): boolean;
-	sendRawMessage(message: string): void;
-	acceptConversationInput(input: string): void;
-	abandonConversation(conversation: Conversation, details: ConversationAbandonedEvent): void;
 	abandonConversation(conversation: Conversation): void;
+	abandonConversation(conversation: Conversation, details: ConversationAbandonedEvent): void;
+	acceptConversationInput(input: string): void;
 }
 
 export class Conversable {

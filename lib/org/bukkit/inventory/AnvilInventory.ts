@@ -7,11 +7,11 @@ import {InventoryHolder} from '../../../org/bukkit/inventory/InventoryHolder.js'
 import {Inventory} from '../../../org/bukkit/inventory/Inventory.js'
 
 export interface AnvilInventory extends Inventory {
-	getMaximumRepairCost(): number;
-	setMaximumRepairCost(levels: number): void;
-	getRepairCost(): number;
-	getRenameText(): string;
 	setRepairCost(levels: number): void;
+	getRenameText(): string;
+	getRepairCost(): number;
+	setMaximumRepairCost(levels: number): void;
+	getMaximumRepairCost(): number;
 	remove(material: Material): void;
 	remove(item: ItemStack): void;
 	clear(): void;
@@ -28,22 +28,22 @@ export interface AnvilInventory extends Inventory {
 	getLocation(): Location;
 	getType(): InventoryType;
 	getSize(): number;
-	getHolder(): InventoryHolder;
-	firstEmpty(): number;
-	getViewers(): any;
-	containsAtLeast(item: ItemStack, amount: number): boolean;
-	getMaxStackSize(): number;
-	setItem(index: number, item: ItemStack): void;
-	addItem(items: Array<ItemStack>): any;
-	removeItem(items: Array<ItemStack>): any;
-	setMaxStackSize(size: number): void;
-	getContents(): Array<ItemStack>;
-	getStorageContents(): Array<ItemStack>;
-	getItem(index: number): ItemStack;
-	setStorageContents(items: Array<ItemStack>): void;
 	all(material: Material): any;
 	all(item: ItemStack): any;
 	setContents(items: Array<ItemStack>): void;
+	getMaxStackSize(): number;
+	getContents(): Array<ItemStack>;
+	getHolder(): InventoryHolder;
+	removeItem(items: Array<ItemStack>): any;
+	firstEmpty(): number;
+	getItem(index: number): ItemStack;
+	setItem(index: number, item: ItemStack): void;
+	getStorageContents(): Array<ItemStack>;
+	containsAtLeast(item: ItemStack, amount: number): boolean;
+	setMaxStackSize(size: number): void;
+	getViewers(): any;
+	setStorageContents(items: Array<ItemStack>): void;
+	addItem(items: Array<ItemStack>): any;
 	spliterator(): any;
 	forEach(arg0: any): void;
 }

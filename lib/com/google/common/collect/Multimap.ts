@@ -18,9 +18,9 @@ export interface Multimap {
 	keySet(): any;
 	entries(): any;
 	removeAll(arg0: any): any;
+	asMap(): any;
 	containsEntry(arg0: any, arg1: any): boolean;
 	replaceValues(arg0: any, arg1: any): any;
-	asMap(): any;
 }
 
 export class Multimap {

@@ -10,11 +10,11 @@ export interface PermissionAttachment {
 	setPermission(_name: string, value: boolean): void;
 	setPermission(perm: Permission, value: boolean): void;
 	getPlugin(): Plugin;
+	setRemovalCallback(ex: PermissionRemovedExecutor): void;
 	getRemovalCallback(): PermissionRemovedExecutor;
-	getPermissible(): Permissible;
 	unsetPermission(perm: Permission): void;
 	unsetPermission(_name: string): void;
-	setRemovalCallback(ex: PermissionRemovedExecutor): void;
+	getPermissible(): Permissible;
 }
 
 export class PermissionAttachment {

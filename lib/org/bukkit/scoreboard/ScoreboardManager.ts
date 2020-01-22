@@ -2,8 +2,8 @@ declare var Java: any;
 import {Scoreboard} from '../../../org/bukkit/scoreboard/Scoreboard.js'
 
 export interface ScoreboardManager {
-	getMainScoreboard(): Scoreboard;
 	getNewScoreboard(): Scoreboard;
+	getMainScoreboard(): Scoreboard;
 }
 
 export class ScoreboardManager {

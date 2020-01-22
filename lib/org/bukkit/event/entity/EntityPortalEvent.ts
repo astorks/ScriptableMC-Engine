@@ -7,14 +7,14 @@ import {EntityTeleportEvent} from '../../../../org/bukkit/event/entity/EntityTel
 
 export interface EntityPortalEvent extends EntityTeleportEvent {
 	getHandlers(): HandlerList;
-	setSearchRadius(searchRadius: number): void;
 	getSearchRadius(): number;
-	setCancelled(cancel: boolean): void;
+	setSearchRadius(searchRadius: number): void;
 	isCancelled(): boolean;
+	setCancelled(cancel: boolean): void;
 	getTo(): Location;
+	setTo(to: Location): void;
 	getFrom(): Location;
 	setFrom(from: Location): void;
-	setTo(to: Location): void;
 	getEntity(): Entity;
 	getEntityType(): EntityType;
 	getEventName(): string;

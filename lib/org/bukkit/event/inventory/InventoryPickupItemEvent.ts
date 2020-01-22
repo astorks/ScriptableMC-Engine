@@ -1,16 +1,16 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
-import {Item} from '../../../../org/bukkit/entity/Item.js'
 import {Inventory} from '../../../../org/bukkit/inventory/Inventory.js'
+import {Item} from '../../../../org/bukkit/entity/Item.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {Event} from '../../../../org/bukkit/event/Event.js'
 
 export interface InventoryPickupItemEvent extends Event, Cancellable {
-	getHandlers(): HandlerList;
-	getItem(): Item;
 	getInventory(): Inventory;
-	setCancelled(cancel: boolean): void;
+	getItem(): Item;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getEventName(): string;
 	isAsynchronous(): boolean;
 }

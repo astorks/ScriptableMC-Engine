@@ -8,9 +8,9 @@ import {EntityEvent} from '../../../../org/bukkit/event/entity/EntityEvent.js'
 
 export interface EntitySpawnEvent extends EntityEvent, Cancellable {
 	getLocation(): Location;
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
 	getEntity(): Entity;
 	getEntityType(): EntityType;
 	getEventName(): string;

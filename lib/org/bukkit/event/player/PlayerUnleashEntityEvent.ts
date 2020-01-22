@@ -9,8 +9,8 @@ import {EntityUnleashEvent} from '../../../../org/bukkit/event/entity/EntityUnle
 
 export interface PlayerUnleashEntityEvent extends EntityUnleashEvent, Cancellable {
 	getPlayer(): Player;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	setCancelled(cancel: boolean): void;
 	getHandlers(): HandlerList;
 	getReason(): EntityUnleashEvent$UnleashReason;
 	getEntity(): Entity;

@@ -7,8 +7,8 @@ export interface EntityType extends Keyed {
 	getKey(): NamespacedKey;
 	isAlive(): boolean;
 	getTypeId(): number;
-	isSpawnable(): boolean;
 	getEntityClass(): any;
+	isSpawnable(): boolean;
 	name(): string;
 	compareTo(arg0: any): number;
 	compareTo(arg0: any): number;

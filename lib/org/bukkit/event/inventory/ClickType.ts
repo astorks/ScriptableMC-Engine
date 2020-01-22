@@ -1,11 +1,11 @@
 declare var Java: any;
 
 export interface ClickType {
-	isShiftClick(): boolean;
-	isRightClick(): boolean;
-	isLeftClick(): boolean;
 	isKeyboardClick(): boolean;
+	isLeftClick(): boolean;
+	isRightClick(): boolean;
 	isCreativeAction(): boolean;
+	isShiftClick(): boolean;
 	name(): string;
 	compareTo(arg0: any): number;
 	compareTo(arg0: any): number;

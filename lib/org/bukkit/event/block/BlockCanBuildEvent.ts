@@ -1,18 +1,18 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {Material} from '../../../../org/bukkit/Material.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {BlockData} from '../../../../org/bukkit/block/data/BlockData.js'
 import {Block} from '../../../../org/bukkit/block/Block.js'
 import {BlockEvent} from '../../../../org/bukkit/event/block/BlockEvent.js'
 
 export interface BlockCanBuildEvent extends BlockEvent {
-	getHandlers(): HandlerList;
 	getPlayer(): Player;
 	getMaterial(): Material;
+	getHandlers(): HandlerList;
+	getBlockData(): BlockData;
 	setBuildable(cancel: boolean): void;
 	isBuildable(): boolean;
-	getBlockData(): BlockData;
 	getBlock(): Block;
 	getEventName(): string;
 	isAsynchronous(): boolean;

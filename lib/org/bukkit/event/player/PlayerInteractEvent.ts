@@ -1,33 +1,33 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
-import {ItemStack} from '../../../../org/bukkit/inventory/ItemStack.js'
 import {Material} from '../../../../org/bukkit/Material.js'
-import {Action} from '../../../../org/bukkit/event/block/Action.js'
+import {ItemStack} from '../../../../org/bukkit/inventory/ItemStack.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {BlockFace} from '../../../../org/bukkit/block/BlockFace.js'
-import {EquipmentSlot} from '../../../../org/bukkit/inventory/EquipmentSlot.js'
 import {Event$Result} from '../../../../org/bukkit/event/Event$Result.js'
 import {Block} from '../../../../org/bukkit/block/Block.js'
+import {Action} from '../../../../org/bukkit/event/block/Action.js'
+import {EquipmentSlot} from '../../../../org/bukkit/inventory/EquipmentSlot.js'
 import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerInteractEvent extends PlayerEvent, Cancellable {
-	getHandlers(): HandlerList;
-	getItem(): ItemStack;
 	getMaterial(): Material;
-	setCancelled(cancel: boolean): void;
+	getItem(): ItemStack;
 	isCancelled(): boolean;
-	getAction(): Action;
+	getHandlers(): HandlerList;
+	setCancelled(cancel: boolean): void;
 	getBlockFace(): BlockFace;
+	useItemInHand(): Event$Result;
+	useInteractedBlock(): Event$Result;
+	setUseItemInHand(useItemInHand: Event$Result): void;
+	hasItem(): boolean;
+	isBlockInHand(): boolean;
+	getClickedBlock(): Block;
+	hasBlock(): boolean;
+	getAction(): Action;
 	getHand(): EquipmentSlot;
 	setUseInteractedBlock(useInteractedBlock: Event$Result): void;
-	hasBlock(): boolean;
-	useInteractedBlock(): Event$Result;
-	hasItem(): boolean;
-	setUseItemInHand(useItemInHand: Event$Result): void;
-	isBlockInHand(): boolean;
-	useItemInHand(): Event$Result;
-	getClickedBlock(): Block;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

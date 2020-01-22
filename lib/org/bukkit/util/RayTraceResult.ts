@@ -1,14 +1,14 @@
 declare var Java: any;
-import {Entity} from '../../../org/bukkit/entity/Entity.js'
-import {BlockFace} from '../../../org/bukkit/block/BlockFace.js'
-import {Block} from '../../../org/bukkit/block/Block.js'
 import {Vector} from '../../../org/bukkit/util/Vector.js'
+import {Block} from '../../../org/bukkit/block/Block.js'
+import {BlockFace} from '../../../org/bukkit/block/BlockFace.js'
+import {Entity} from '../../../org/bukkit/entity/Entity.js'
 
 export interface RayTraceResult {
-	getHitEntity(): Entity;
-	getHitBlockFace(): BlockFace;
-	getHitBlock(): Block;
 	getHitPosition(): Vector;
+	getHitBlock(): Block;
+	getHitBlockFace(): BlockFace;
+	getHitEntity(): Entity;
 }
 
 export class RayTraceResult {

@@ -1,14 +1,14 @@
 declare var Java: any;
-import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {Block} from '../../../../org/bukkit/block/Block.js'
+import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
 import {BlockState} from '../../../../org/bukkit/block/BlockState.js'
 import {BlockFormEvent} from '../../../../org/bukkit/event/block/BlockFormEvent.js'
 
 export interface BlockSpreadEvent extends BlockFormEvent {
-	getHandlers(): HandlerList;
 	getSource(): Block;
-	setCancelled(cancel: boolean): void;
+	getHandlers(): HandlerList;
 	isCancelled(): boolean;
+	setCancelled(cancel: boolean): void;
 	getNewState(): BlockState;
 	getBlock(): Block;
 	getEventName(): string;

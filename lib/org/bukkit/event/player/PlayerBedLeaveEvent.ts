@@ -5,10 +5,10 @@ import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerBedLeaveEvent extends PlayerEvent {
-	getHandlers(): HandlerList;
 	setSpawnLocation(setBedSpawn: boolean): void;
-	shouldSetSpawnLocation(): boolean;
+	getHandlers(): HandlerList;
 	getBed(): Block;
+	shouldSetSpawnLocation(): boolean;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

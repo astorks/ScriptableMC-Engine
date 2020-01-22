@@ -7,10 +7,10 @@ import {BlockExpEvent} from '../../../../org/bukkit/event/block/BlockExpEvent.js
 
 export interface BlockBreakEvent extends BlockExpEvent, Cancellable {
 	getPlayer(): Player;
-	setDropItems(dropItems: boolean): void;
-	isDropItems(): boolean;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	setCancelled(cancel: boolean): void;
+	isDropItems(): boolean;
+	setDropItems(dropItems: boolean): void;
 	getHandlers(): HandlerList;
 	getExpToDrop(): number;
 	setExpToDrop(exp: number): void;

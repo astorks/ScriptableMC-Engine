@@ -2,9 +2,9 @@ declare var Java: any;
 import {Configuration} from '../../../org/bukkit/configuration/Configuration.js'
 
 export interface ConfigurationOptions {
-	configuration(): Configuration;
 	pathSeparator(value: string): ConfigurationOptions;
 	pathSeparator(): string;
+	configuration(): Configuration;
 	copyDefaults(): boolean;
 	copyDefaults(value: boolean): ConfigurationOptions;
 }

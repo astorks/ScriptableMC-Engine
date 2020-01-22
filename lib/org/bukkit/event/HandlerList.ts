@@ -5,12 +5,12 @@ import {Listener} from '../../../org/bukkit/event/Listener.js'
 
 export interface HandlerList {
 	register(listener: RegisteredListener): void;
-	unregister(listener: Listener): void;
-	unregister(plugin: Plugin): void;
 	unregister(listener: RegisteredListener): void;
-	getRegisteredListeners(): Array<RegisteredListener>;
-	bake(): void;
+	unregister(plugin: Plugin): void;
+	unregister(listener: Listener): void;
 	registerAll(listeners: any): void;
+	bake(): void;
+	getRegisteredListeners(): Array<RegisteredListener>;
 }
 
 export class HandlerList {

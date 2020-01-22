@@ -1,17 +1,17 @@
 declare var Java: any;
 import {HandlerList} from '../../../../org/bukkit/event/HandlerList.js'
-import {EquipmentSlot} from '../../../../org/bukkit/inventory/EquipmentSlot.js'
 import {Entity} from '../../../../org/bukkit/entity/Entity.js'
+import {EquipmentSlot} from '../../../../org/bukkit/inventory/EquipmentSlot.js'
 import {Player} from '../../../../org/bukkit/entity/Player.js'
 import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerInteractEntityEvent extends PlayerEvent, Cancellable {
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
-	getHand(): EquipmentSlot;
 	getRightClicked(): Entity;
+	getHand(): EquipmentSlot;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

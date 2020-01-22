@@ -16,10 +16,10 @@ export interface SmartInventory {
 	getProvider(): InventoryProvider;
 	getRows(): number;
 	isCloseable(): boolean;
-	getManager(): InventoryManager;
-	getColumns(): number;
 	setCloseable(arg0: boolean): void;
 	getTitle(): string;
+	getManager(): InventoryManager;
+	getColumns(): number;
 }
 
 export class SmartInventory {

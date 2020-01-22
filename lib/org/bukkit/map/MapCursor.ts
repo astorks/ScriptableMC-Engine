@@ -4,18 +4,18 @@ import {MapCursor$Type} from '../../../org/bukkit/map/MapCursor$Type.js'
 export interface MapCursor {
 	getType(): MapCursor$Type;
 	getRawType(): number;
+	setType(type: MapCursor$Type): void;
+	setDirection(direction: number): void;
+	setX(x: number): void;
 	setY(y: number): void;
 	getY(): number;
-	setX(x: number): void;
-	setDirection(direction: number): void;
 	getDirection(): number;
 	getX(): number;
-	setType(type: MapCursor$Type): void;
-	setVisible(visible: boolean): void;
 	isVisible(): boolean;
-	setCaption(caption: string): void;
+	setVisible(visible: boolean): void;
 	getCaption(): string;
 	setRawType(type: number): void;
+	setCaption(caption: string): void;
 }
 
 export class MapCursor {

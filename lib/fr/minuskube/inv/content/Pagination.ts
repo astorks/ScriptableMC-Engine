@@ -9,12 +9,12 @@ export interface Pagination {
 	previous(): Pagination;
 	page(arg0: number): Pagination;
 	getPage(): number;
-	isLast(): boolean;
-	isFirst(): boolean;
-	setItemsPerPage(arg0: number): Pagination;
-	getPageItems(): Array<ClickableItem>;
-	addToIterator(arg0: SlotIterator): Pagination;
 	setItems(arg0: Array<ClickableItem>): Pagination;
+	isLast(): boolean;
+	getPageItems(): Array<ClickableItem>;
+	isFirst(): boolean;
+	addToIterator(arg0: SlotIterator): Pagination;
+	setItemsPerPage(arg0: number): Pagination;
 }
 
 export class Pagination {

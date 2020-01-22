@@ -2,9 +2,9 @@ declare var Java: any;
 import {ConversationContext} from '../../../org/bukkit/conversations/ConversationContext.js'
 
 export interface Prompt {
+	getPromptText(context: ConversationContext): string;
 	blocksForInput(context: ConversationContext): boolean;
 	acceptInput(context: ConversationContext, input: string): Prompt;
-	getPromptText(context: ConversationContext): string;
 }
 
 export class Prompt {

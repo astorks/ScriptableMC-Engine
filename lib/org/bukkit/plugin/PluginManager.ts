@@ -10,32 +10,32 @@ import {Permissible} from '../../../org/bukkit/permissions/Permissible.js'
 export interface PluginManager {
 	getPermissions(): any;
 	getPermission(_name: string): Permission;
-	registerEvent(event: any, listener: Listener, priority: EventPriority, executor: EventExecutor, plugin: Plugin, ignoreCancelled: boolean): void;
+	getPermissionSubscriptions(permission: string): any;
 	registerEvent(event: any, listener: Listener, priority: EventPriority, executor: EventExecutor, plugin: Plugin): void;
+	registerEvent(event: any, listener: Listener, priority: EventPriority, executor: EventExecutor, plugin: Plugin, ignoreCancelled: boolean): void;
+	enablePlugin(plugin: Plugin): void;
+	disablePlugin(plugin: Plugin): void;
+	loadPlugin(file: any): Plugin;
+	getPlugin(_name: string): Plugin;
+	useTimings(): boolean;
+	disablePlugins(): void;
+	loadPlugins(directory: any): Array<Plugin>;
+	isPluginEnabled(plugin: Plugin): boolean;
+	isPluginEnabled(_name: string): boolean;
+	clearPlugins(): void;
 	removePermission(perm: Permission): void;
 	removePermission(_name: string): void;
-	registerInterface(loader: any): void;
-	isPluginEnabled(_name: string): boolean;
-	isPluginEnabled(plugin: Plugin): boolean;
-	loadPlugins(directory: any): Array<Plugin>;
 	registerEvents(listener: Listener, plugin: Plugin): void;
-	useTimings(): boolean;
-	getPlugins(): Array<Plugin>;
-	disablePlugins(): void;
 	callEvent(event: Event): void;
-	clearPlugins(): void;
 	addPermission(perm: Permission): void;
-	getPermissionSubscriptions(permission: string): any;
-	disablePlugin(plugin: Plugin): void;
-	getPlugin(_name: string): Plugin;
-	loadPlugin(file: any): Plugin;
-	enablePlugin(plugin: Plugin): void;
-	getDefaultPermissions(op: boolean): any;
 	recalculatePermissionDefaults(perm: Permission): void;
+	registerInterface(loader: any): void;
+	getPlugins(): Array<Plugin>;
 	unsubscribeFromPermission(permission: string, permissible: Permissible): void;
 	subscribeToDefaultPerms(op: boolean, permissible: Permissible): void;
-	unsubscribeFromDefaultPerms(op: boolean, permissible: Permissible): void;
+	getDefaultPermissions(op: boolean): any;
 	getDefaultPermSubscriptions(op: boolean): any;
+	unsubscribeFromDefaultPerms(op: boolean, permissible: Permissible): void;
 	subscribeToPermission(permission: string, permissible: Permissible): void;
 }
 

@@ -7,11 +7,11 @@ export interface Permission {
 	setDefault(value: PermissionDefault): void;
 	getDescription(): string;
 	setDescription(value: string): void;
-	recalculatePermissibles(): void;
 	getPermissibles(): any;
+	getChildren(): any;
 	addParent(perm: Permission, value: boolean): void;
 	addParent(_name: string, value: boolean): Permission;
-	getChildren(): any;
+	recalculatePermissibles(): void;
 }
 
 export class Permission {

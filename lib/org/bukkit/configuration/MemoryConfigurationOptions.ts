@@ -1,15 +1,15 @@
 declare var Java: any;
+import {ConfigurationOptions} from '../../../org/bukkit/configuration/ConfigurationOptions.js'
 import {Configuration} from '../../../org/bukkit/configuration/Configuration.js'
 import {MemoryConfiguration} from '../../../org/bukkit/configuration/MemoryConfiguration.js'
-import {ConfigurationOptions} from '../../../org/bukkit/configuration/ConfigurationOptions.js'
 
 export interface MemoryConfigurationOptions extends ConfigurationOptions {
+	pathSeparator(value: string): MemoryConfigurationOptions;
+	pathSeparator(arg0: string): ConfigurationOptions;
 	configuration(): Configuration;
 	configuration(): MemoryConfiguration;
-	pathSeparator(arg0: string): ConfigurationOptions;
-	pathSeparator(value: string): MemoryConfigurationOptions;
-	copyDefaults(value: boolean): MemoryConfigurationOptions;
 	copyDefaults(arg0: boolean): ConfigurationOptions;
+	copyDefaults(value: boolean): MemoryConfigurationOptions;
 	pathSeparator(): string;
 	copyDefaults(): boolean;
 }

@@ -6,13 +6,13 @@ import {ServerEvent} from '../../../../org/bukkit/event/server/ServerEvent.js'
 export interface ServerListPingEvent extends ServerEvent {
 	iterator(): any;
 	getAddress(): any;
-	getHandlers(): HandlerList;
 	getMaxPlayers(): number;
 	getMotd(): string;
-	setMaxPlayers(maxPlayers: number): void;
+	getHandlers(): HandlerList;
 	setServerIcon(icon: CachedServerIcon): void;
-	setMotd(motd: string): void;
 	getNumPlayers(): number;
+	setMaxPlayers(maxPlayers: number): void;
+	setMotd(motd: string): void;
 	getEventName(): string;
 	isAsynchronous(): boolean;
 	spliterator(): any;

@@ -7,9 +7,9 @@ import {EntityCombustEvent} from '../../../../org/bukkit/event/entity/EntityComb
 
 export interface EntityCombustByBlockEvent extends EntityCombustEvent {
 	getCombuster(): Block;
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
 	getDuration(): number;
 	setDuration(duration: number): void;
 	getEntity(): Entity;

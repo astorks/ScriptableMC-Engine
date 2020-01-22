@@ -6,12 +6,12 @@ import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerCommandPreprocessEvent extends PlayerEvent, Cancellable {
 	getMessage(): string;
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
-	setMessage(command: string): void;
 	getRecipients(): any;
 	setPlayer(player: Player): void;
+	setMessage(command: string): void;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

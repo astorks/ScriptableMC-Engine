@@ -1,33 +1,33 @@
 declare var Java: any;
 import {Location} from '../../../org/bukkit/Location.js'
-import {Effect} from '../../../org/bukkit/Effect.js'
-import {Particle} from '../../../org/bukkit/Particle.js'
 import {Sound} from '../../../org/bukkit/Sound.js'
 import {SoundCategory} from '../../../org/bukkit/SoundCategory.js'
-import {DyeColor} from '../../../org/bukkit/DyeColor.js'
 import {MapView} from '../../../org/bukkit/map/MapView.js'
 import {Statistic} from '../../../org/bukkit/Statistic.js'
-import {EntityType} from '../../../org/bukkit/entity/EntityType.js'
 import {Material} from '../../../org/bukkit/Material.js'
-import {BlockData} from '../../../org/bukkit/block/data/BlockData.js'
+import {EntityType} from '../../../org/bukkit/entity/EntityType.js'
+import {WeatherType} from '../../../org/bukkit/WeatherType.js'
 import {Instrument} from '../../../org/bukkit/Instrument.js'
 import {Note} from '../../../org/bukkit/Note.js'
+import {BlockData} from '../../../org/bukkit/block/data/BlockData.js'
+import {DyeColor} from '../../../org/bukkit/DyeColor.js'
+import {Effect} from '../../../org/bukkit/Effect.js'
 import {Scoreboard} from '../../../org/bukkit/scoreboard/Scoreboard.js'
 import {Entity} from '../../../org/bukkit/entity/Entity.js'
 import {Plugin} from '../../../org/bukkit/plugin/Plugin.js'
+import {Particle} from '../../../org/bukkit/Particle.js'
 import {ItemStack} from '../../../org/bukkit/inventory/ItemStack.js'
-import {WeatherType} from '../../../org/bukkit/WeatherType.js'
 import {AdvancementProgress} from '../../../org/bukkit/advancement/AdvancementProgress.js'
 import {Advancement} from '../../../org/bukkit/advancement/Advancement.js'
-import {NamespacedKey} from '../../../org/bukkit/NamespacedKey.js'
-import {GameMode} from '../../../org/bukkit/GameMode.js'
-import {InventoryView} from '../../../org/bukkit/inventory/InventoryView.js'
-import {PlayerInventory} from '../../../org/bukkit/inventory/PlayerInventory.js'
 import {Inventory} from '../../../org/bukkit/inventory/Inventory.js'
+import {PlayerInventory} from '../../../org/bukkit/inventory/PlayerInventory.js'
+import {InventoryView} from '../../../org/bukkit/inventory/InventoryView.js'
 import {InventoryView$Property} from '../../../org/bukkit/inventory/InventoryView$Property.js'
 import {Villager} from '../../../org/bukkit/entity/Villager.js'
 import {Merchant} from '../../../org/bukkit/inventory/Merchant.js'
 import {MainHand} from '../../../org/bukkit/inventory/MainHand.js'
+import {GameMode} from '../../../org/bukkit/GameMode.js'
+import {NamespacedKey} from '../../../org/bukkit/NamespacedKey.js'
 import {MemoryKey} from '../../../org/bukkit/entity/memory/MemoryKey.js'
 import {PotionEffect} from '../../../org/bukkit/potion/PotionEffect.js'
 import {PotionEffectType} from '../../../org/bukkit/potion/PotionEffectType.js'
@@ -37,19 +37,19 @@ import {RayTraceResult} from '../../../org/bukkit/util/RayTraceResult.js'
 import {FluidCollisionMode} from '../../../org/bukkit/FluidCollisionMode.js'
 import {AttributeInstance} from '../../../org/bukkit/attribute/AttributeInstance.js'
 import {Attribute} from '../../../org/bukkit/attribute/Attribute.js'
-import {World} from '../../../org/bukkit/World.js'
 import {Server} from '../../../org/bukkit/Server.js'
-import {EntityDamageEvent} from '../../../org/bukkit/event/entity/EntityDamageEvent.js'
-import {Vector} from '../../../org/bukkit/util/Vector.js'
-import {PlayerTeleportEvent$TeleportCause} from '../../../org/bukkit/event/player/PlayerTeleportEvent$TeleportCause.js'
-import {BoundingBox} from '../../../org/bukkit/util/BoundingBox.js'
-import {Pose} from '../../../org/bukkit/entity/Pose.js'
-import {BlockFace} from '../../../org/bukkit/block/BlockFace.js'
+import {World} from '../../../org/bukkit/World.js'
 import {EntityEffect} from '../../../org/bukkit/EntityEffect.js'
+import {BoundingBox} from '../../../org/bukkit/util/BoundingBox.js'
+import {Vector} from '../../../org/bukkit/util/Vector.js'
+import {EntityDamageEvent} from '../../../org/bukkit/event/entity/EntityDamageEvent.js'
+import {PlayerTeleportEvent$TeleportCause} from '../../../org/bukkit/event/player/PlayerTeleportEvent$TeleportCause.js'
+import {BlockFace} from '../../../org/bukkit/block/BlockFace.js'
+import {Pose} from '../../../org/bukkit/entity/Pose.js'
 import {PistonMoveReaction} from '../../../org/bukkit/block/PistonMoveReaction.js'
 import {MetadataValue} from '../../../org/bukkit/metadata/MetadataValue.js'
-import {PermissionAttachment} from '../../../org/bukkit/permissions/PermissionAttachment.js'
 import {Permission} from '../../../org/bukkit/permissions/Permission.js'
+import {PermissionAttachment} from '../../../org/bukkit/permissions/PermissionAttachment.js'
 import {PersistentDataContainer} from '../../../org/bukkit/persistence/PersistentDataContainer.js'
 import {Projectile} from '../../../org/bukkit/entity/Projectile.js'
 import {Conversation} from '../../../org/bukkit/conversations/Conversation.js'
@@ -61,337 +61,337 @@ import {PluginMessageRecipient} from '../../../org/bukkit/plugin/messaging/Plugi
 
 export interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginMessageRecipient {
 	getAddress(): any;
-	setLevel(level: number): void;
-	getLevel(): number;
 	getDisplayName(): string;
 	getAllowFlight(): boolean;
 	canSee(player: Player): boolean;
-	playEffect(loc: Location, effect: Effect, data: any): void;
-	playEffect(loc: Location, effect: Effect, data: number): void;
-	spawnParticle(particle: Particle, location: Location, count: number, offsetX: number, offsetY: number, offsetZ: number): void;
-	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number): void;
-	spawnParticle(particle: Particle, location: Location, count: number, offsetX: number, offsetY: number, offsetZ: number, data: any): void;
-	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, data: any): void;
-	spawnParticle(particle: Particle, location: Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any): void;
-	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any): void;
-	spawnParticle(particle: Particle, location: Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number): void;
-	spawnParticle(particle: Particle, location: Location, count: number): void;
-	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number): void;
-	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, data: any): void;
-	spawnParticle(particle: Particle, location: Location, count: number, data: any): void;
-	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number): void;
-	playSound(location: Location, sound: string, volume: number, pitch: number): void;
-	playSound(location: Location, sound: Sound, volume: number, pitch: number): void;
-	playSound(location: Location, sound: string, category: SoundCategory, volume: number, pitch: number): void;
-	playSound(location: Location, sound: Sound, category: SoundCategory, volume: number, pitch: number): void;
-	sendChunkChange(loc: Location, sx: number, sy: number, sz: number, data: Array<number>): boolean;
-	sendSignChange(loc: Location, lines: Array<string>): void;
-	sendSignChange(loc: Location, lines: Array<string>, dyeColor: DyeColor): void;
-	sendMap(map: MapView): void;
-	updateInventory(): void;
-	saveData(): void;
-	incrementStatistic(statistic: Statistic, entityType: EntityType, amount: number): void;
-	incrementStatistic(statistic: Statistic, entityType: EntityType): void;
-	incrementStatistic(statistic: Statistic, material: Material, amount: number): void;
-	incrementStatistic(statistic: Statistic, material: Material): void;
-	incrementStatistic(statistic: Statistic, amount: number): void;
-	incrementStatistic(statistic: Statistic): void;
-	setStatistic(statistic: Statistic, entityType: EntityType, newValue: number): void;
-	setStatistic(statistic: Statistic, newValue: number): void;
-	setStatistic(statistic: Statistic, material: Material, newValue: number): void;
-	isSprinting(): boolean;
-	setSprinting(sprinting: boolean): void;
+	setDisplayName(_name: string): void;
+	getPlayerListName(): string;
+	setCompassTarget(loc: Location): void;
+	setSneaking(sneak: boolean): void;
+	stopSound(sound: Sound, category: SoundCategory): void;
 	stopSound(sound: string, category: SoundCategory): void;
 	stopSound(sound: string): void;
 	stopSound(sound: Sound): void;
-	stopSound(sound: Sound, category: SoundCategory): void;
-	getPlayerTime(): number;
-	isSleepingIgnored(): boolean;
-	setCompassTarget(loc: Location): void;
-	setDisplayName(_name: string): void;
-	sendRawMessage(message: string): void;
-	getCompassTarget(): Location;
-	loadData(): void;
-	decrementStatistic(statistic: Statistic, entityType: EntityType, amount: number): void;
-	decrementStatistic(statistic: Statistic, entityType: EntityType): void;
-	decrementStatistic(statistic: Statistic): void;
-	decrementStatistic(statistic: Statistic, amount: number): void;
-	decrementStatistic(statistic: Statistic, material: Material, amount: number): void;
-	decrementStatistic(statistic: Statistic, material: Material): void;
-	getStatistic(statistic: Statistic, material: Material): number;
-	getStatistic(statistic: Statistic): number;
-	getStatistic(statistic: Statistic, entityType: EntityType): number;
-	getPlayerListName(): string;
-	performCommand(command: string): boolean;
-	setSneaking(sneak: boolean): void;
-	setSleepingIgnored(isSleeping: boolean): void;
-	setPlayerListName(_name: string): void;
-	isSneaking(): boolean;
+	sendMap(map: MapView): void;
 	setPlayerTime(time: number, relative: boolean): void;
+	setPlayerListName(_name: string): void;
+	decrementStatistic(statistic: Statistic, material: Material, amount: number): void;
+	decrementStatistic(statistic: Statistic, entityType: EntityType, amount: number): void;
+	decrementStatistic(statistic: Statistic, material: Material): void;
+	decrementStatistic(statistic: Statistic, amount: number): void;
+	decrementStatistic(statistic: Statistic): void;
+	decrementStatistic(statistic: Statistic, entityType: EntityType): void;
+	getStatistic(statistic: Statistic, entityType: EntityType): number;
+	getStatistic(statistic: Statistic): number;
+	getStatistic(statistic: Statistic, material: Material): number;
 	kickPlayer(message: string): void;
-	sendBlockChange(loc: Location, block: BlockData): void;
-	sendBlockChange(loc: Location, material: Material, data: number): void;
-	chat(msg: string): void;
+	setPlayerWeather(type: WeatherType): void;
+	saveData(): void;
+	playSound(location: Location, sound: Sound, volume: number, pitch: number): void;
+	playSound(location: Location, sound: string, category: SoundCategory, volume: number, pitch: number): void;
+	playSound(location: Location, sound: Sound, category: SoundCategory, volume: number, pitch: number): void;
+	playSound(location: Location, sound: string, volume: number, pitch: number): void;
+	updateInventory(): void;
+	getCompassTarget(): Location;
+	getPlayerWeather(): WeatherType;
+	setStatistic(statistic: Statistic, material: Material, newValue: number): void;
+	setStatistic(statistic: Statistic, entityType: EntityType, newValue: number): void;
+	setStatistic(statistic: Statistic, newValue: number): void;
+	resetPlayerWeather(): void;
+	loadData(): void;
+	isSprinting(): boolean;
 	playNote(loc: Location, instrument: Instrument, note: Note): void;
 	playNote(loc: Location, instrument: number, note: number): void;
-	setFoodLevel(value: number): void;
+	giveExpLevels(amount: number): void;
+	getExp(): number;
+	chat(msg: string): void;
+	giveExp(amount: number): void;
+	sendBlockChange(loc: Location, material: Material, data: number): void;
+	sendBlockChange(loc: Location, block: BlockData): void;
+	sendChunkChange(loc: Location, sx: number, sy: number, sz: number, data: Array<number>): boolean;
+	sendSignChange(loc: Location, lines: Array<string>): void;
+	sendSignChange(loc: Location, lines: Array<string>, dyeColor: DyeColor): void;
+	incrementStatistic(statistic: Statistic, entityType: EntityType, amount: number): void;
+	incrementStatistic(statistic: Statistic, entityType: EntityType): void;
+	incrementStatistic(statistic: Statistic): void;
+	incrementStatistic(statistic: Statistic, amount: number): void;
+	incrementStatistic(statistic: Statistic, material: Material): void;
+	incrementStatistic(statistic: Statistic, material: Material, amount: number): void;
+	setSprinting(sprinting: boolean): void;
+	isSleepingIgnored(): boolean;
+	playEffect(loc: Location, effect: Effect, data: any): void;
+	playEffect(loc: Location, effect: Effect, data: number): void;
+	sendRawMessage(message: string): void;
+	performCommand(command: string): boolean;
+	setSleepingIgnored(isSleeping: boolean): void;
+	getPlayerTime(): number;
+	resetPlayerTime(): void;
+	isSneaking(): boolean;
+	setAllowFlight(flight: boolean): void;
+	isHealthScaled(): boolean;
+	updateCommands(): void;
+	getSaturation(): number;
 	getFlySpeed(): number;
 	getScoreboard(): Scoreboard;
-	isHealthScaled(): boolean;
-	setSpectatorTarget(entity: Entity): void;
-	setTotalExperience(exp: number): void;
-	setAllowFlight(flight: boolean): void;
+	setHealthScale(scale: number): void;
 	setFlying(value: boolean): void;
-	setExhaustion(value: number): void;
-	hidePlayer(plugin: Plugin, player: Player): void;
-	hidePlayer(player: Player): void;
+	getLocale(): string;
+	setSpectatorTarget(entity: Entity): void;
+	getExhaustion(): number;
 	setSaturation(value: number): void;
+	setExp(exp: number): void;
+	getHealthScale(): number;
+	getSpectatorTarget(): Entity;
+	getLevel(): number;
+	isFlying(): boolean;
 	getWalkSpeed(): number;
 	setHealthScaled(scale: boolean): void;
-	getExhaustion(): number;
-	setScoreboard(scoreboard: Scoreboard): void;
-	getLocale(): string;
-	openBook(book: ItemStack): void;
-	getPlayerWeather(): WeatherType;
-	getSaturation(): number;
-	getSpectatorTarget(): Entity;
-	getFoodLevel(): number;
-	resetTitle(): void;
-	resetPlayerTime(): void;
-	resetPlayerWeather(): void;
-	getExp(): number;
-	showPlayer(player: Player): void;
-	showPlayer(plugin: Plugin, player: Player): void;
-	isFlying(): boolean;
-	giveExp(amount: number): void;
-	setFlySpeed(value: number): void;
-	setTexturePack(url: string): void;
-	setResourcePack(url: string, hash: Array<number>): void;
+	setTotalExperience(exp: number): void;
 	setResourcePack(url: string): void;
-	setPlayerWeather(type: WeatherType): void;
-	setExp(exp: number): void;
-	sendTitle(title: string, subtitle: string, fadeIn: number, stay: number, fadeOut: number): void;
-	sendTitle(title: string, subtitle: string): void;
-	setHealthScale(scale: number): void;
+	setResourcePack(url: string, hash: Array<number>): void;
+	setTexturePack(url: string): void;
+	hidePlayer(plugin: Plugin, player: Player): void;
+	hidePlayer(player: Player): void;
+	spawnParticle(particle: Particle, location: Location, count: number, data: any): void;
+	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, data: any): void;
+	spawnParticle(particle: Particle, location: Location, count: number): void;
+	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any): void;
+	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number): void;
+	spawnParticle(particle: Particle, location: Location, count: number, offsetX: number, offsetY: number, offsetZ: number, data: any): void;
+	spawnParticle(particle: Particle, location: Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number): void;
+	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, data: any): void;
+	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number): void;
+	spawnParticle(particle: Particle, x: number, y: number, z: number, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number): void;
+	spawnParticle(particle: Particle, location: Location, count: number, offsetX: number, offsetY: number, offsetZ: number, extra: number, data: any): void;
+	spawnParticle(particle: Particle, location: Location, count: number, offsetX: number, offsetY: number, offsetZ: number): void;
+	setFlySpeed(value: number): void;
 	getTotalExperience(): number;
-	giveExpLevels(amount: number): void;
-	getHealthScale(): number;
+	setScoreboard(scoreboard: Scoreboard): void;
+	setLevel(level: number): void;
 	setWalkSpeed(value: number): void;
-	updateCommands(): void;
-	getPlayerListFooter(): string;
-	getClientViewDistance(): number;
-	getPlayerListHeader(): string;
-	isPlayerTimeRelative(): boolean;
-	setPlayerListHeaderFooter(header: string, footer: string): void;
+	showPlayer(plugin: Plugin, player: Player): void;
+	showPlayer(player: Player): void;
+	resetTitle(): void;
+	openBook(book: ItemStack): void;
+	getFoodLevel(): number;
+	setFoodLevel(value: number): void;
+	setExhaustion(value: number): void;
+	sendTitle(title: string, subtitle: string): void;
+	sendTitle(title: string, subtitle: string, fadeIn: number, stay: number, fadeOut: number): void;
 	getPlayerTimeOffset(): number;
-	getAdvancementProgress(advancement: Advancement): AdvancementProgress;
-	setPlayerListHeader(header: string): void;
+	getPlayerListFooter(): string;
 	setPlayerListFooter(footer: string): void;
+	setPlayerListHeaderFooter(header: string, footer: string): void;
+	getPlayerListHeader(): string;
+	setPlayerListHeader(header: string): void;
+	isPlayerTimeRelative(): boolean;
+	getAdvancementProgress(advancement: Advancement): AdvancementProgress;
+	getClientViewDistance(): number;
 	getName(): string;
 	getName(): string;
 	sleep(location: Location, force: boolean): boolean;
-	setItemInHand(item: ItemStack): void;
-	setCooldown(material: Material, ticks: number): void;
-	undiscoverRecipes(recipes: any): number;
-	isHandRaised(): boolean;
-	getBedLocation(): Location;
-	isBlocking(): boolean;
-	undiscoverRecipe(recipe: NamespacedKey): boolean;
-	getItemOnCursor(): ItemStack;
-	hasCooldown(material: Material): boolean;
-	getGameMode(): GameMode;
-	discoverRecipe(recipe: NamespacedKey): boolean;
-	discoverRecipes(recipes: any): number;
-	wakeup(setSpawnLocation: boolean): void;
-	getItemInHand(): ItemStack;
-	setGameMode(mode: GameMode): void;
-	setItemOnCursor(item: ItemStack): void;
-	getExpToLevel(): number;
-	getCooldown(material: Material): number;
-	getSleepTicks(): number;
+	getInventory(): Inventory;
+	getInventory(): PlayerInventory;
 	getOpenInventory(): InventoryView;
 	closeInventory(): void;
-	getInventory(): PlayerInventory;
-	getInventory(): Inventory;
-	setWindowProperty(prop: InventoryView$Property, value: number): boolean;
-	openInventory(inventory: Inventory): InventoryView;
-	openInventory(inventory: InventoryView): void;
 	openWorkbench(location: Location, force: boolean): InventoryView;
 	openEnchanting(location: Location, force: boolean): InventoryView;
+	setWindowProperty(prop: InventoryView$Property, value: number): boolean;
+	getItemInHand(): ItemStack;
+	openInventory(inventory: Inventory): InventoryView;
+	openInventory(inventory: InventoryView): void;
 	openMerchant(trader: Villager, force: boolean): InventoryView;
 	openMerchant(merchant: Merchant, force: boolean): InventoryView;
+	setItemInHand(item: ItemStack): void;
 	getEnderChest(): Inventory;
 	getMainHand(): MainHand;
-	setBedSpawnLocation(location: Location, force: boolean): void;
+	wakeup(setSpawnLocation: boolean): void;
+	getGameMode(): GameMode;
+	isBlocking(): boolean;
+	discoverRecipe(recipe: NamespacedKey): boolean;
+	getItemOnCursor(): ItemStack;
+	hasCooldown(material: Material): boolean;
+	setGameMode(mode: GameMode): void;
+	setCooldown(material: Material, ticks: number): void;
+	getBedLocation(): Location;
+	getSleepTicks(): number;
+	isHandRaised(): boolean;
+	discoverRecipes(recipes: any): number;
+	undiscoverRecipes(recipes: any): number;
+	getCooldown(material: Material): number;
+	getExpToLevel(): number;
+	setItemOnCursor(item: ItemStack): void;
+	undiscoverRecipe(recipe: NamespacedKey): boolean;
+	getShoulderEntityLeft(): Entity;
+	getShoulderEntityRight(): Entity;
 	setBedSpawnLocation(location: Location): void;
+	setBedSpawnLocation(location: Location, force: boolean): void;
 	getBedSpawnLocation(): Location;
 	getBedSpawnLocation(): Location;
 	setShoulderEntityLeft(entity: Entity): void;
-	getShoulderEntityLeft(): Entity;
 	setShoulderEntityRight(entity: Entity): void;
-	getShoulderEntityRight(): Entity;
 	setMemory(memoryKey: MemoryKey, memoryValue: any): void;
-	getLineOfSight(transparent: any, maxDistance: number): any;
-	getEyeHeight(): number;
-	getEyeHeight(ignorePose: boolean): number;
-	getRemainingAir(): number;
-	getMaximumAir(): number;
+	isSleeping(): boolean;
 	getKiller(): Player;
-	addPotionEffect(effect: PotionEffect, force: boolean): boolean;
-	addPotionEffect(effect: PotionEffect): boolean;
+	isRiptiding(): boolean;
 	getPotionEffect(type: PotionEffectType): PotionEffect;
-	removePotionEffect(type: PotionEffectType): void;
+	setAI(ai: boolean): void;
 	hasLineOfSight(other: Entity): boolean;
 	getEquipment(): EntityEquipment;
-	setCanPickupItems(pickup: boolean): void;
-	setRemainingAir(ticks: number): void;
-	getCanPickupItems(): boolean;
-	getLastDamage(): number;
-	isLeashed(): boolean;
-	setLeashHolder(holder: Entity): boolean;
-	setNoDamageTicks(ticks: number): void;
-	getEyeLocation(): Location;
-	getNoDamageTicks(): number;
-	isGliding(): boolean;
-	addPotionEffects(effects: any): boolean;
-	hasPotionEffect(type: PotionEffectType): boolean;
-	setGliding(gliding: boolean): void;
-	isSwimming(): boolean;
-	setSwimming(swimming: boolean): void;
 	getTargetBlock(transparent: any, maxDistance: number): Block;
-	isRiptiding(): boolean;
-	setAI(ai: boolean): void;
+	getMaximumAir(): number;
 	setMaximumAir(ticks: number): void;
-	getLeashHolder(): Entity;
+	setNoDamageTicks(ticks: number): void;
+	addPotionEffect(effect: PotionEffect, force: boolean): boolean;
+	addPotionEffect(effect: PotionEffect): boolean;
+	getCanPickupItems(): boolean;
+	setLeashHolder(holder: Entity): boolean;
+	setGliding(gliding: boolean): void;
+	getRemainingAir(): number;
+	getNoDamageTicks(): number;
+	setCanPickupItems(pickup: boolean): void;
+	getEyeHeight(): number;
+	getEyeHeight(ignorePose: boolean): number;
+	isLeashed(): boolean;
+	setRemainingAir(ticks: number): void;
 	setLastDamage(damage: number): void;
-	setCollidable(collidable: boolean): void;
-	isCollidable(): boolean;
-	hasAI(): boolean;
-	getMemory(memoryKey: MemoryKey): any;
+	getLeashHolder(): Entity;
+	getLineOfSight(transparent: any, maxDistance: number): any;
+	getEyeLocation(): Location;
+	addPotionEffects(effects: any): boolean;
+	removePotionEffect(type: PotionEffectType): void;
+	isGliding(): boolean;
+	getLastDamage(): number;
+	isSwimming(): boolean;
+	hasPotionEffect(type: PotionEffectType): boolean;
 	rayTraceBlocks(maxDistance: number, fluidCollisionMode: FluidCollisionMode): RayTraceResult;
 	rayTraceBlocks(maxDistance: number): RayTraceResult;
-	isSleeping(): boolean;
-	getActivePotionEffects(): any;
-	setRemoveWhenFarAway(remove: boolean): void;
-	setMaximumNoDamageTicks(ticks: number): void;
-	getTargetBlockExact(maxDistance: number, fluidCollisionMode: FluidCollisionMode): Block;
-	getTargetBlockExact(maxDistance: number): Block;
-	getLastTwoTargetBlocks(transparent: any, maxDistance: number): any;
+	setSwimming(swimming: boolean): void;
+	getMemory(memoryKey: MemoryKey): any;
+	hasAI(): boolean;
+	setCollidable(collidable: boolean): void;
+	isCollidable(): boolean;
 	getMaximumNoDamageTicks(): number;
 	getRemoveWhenFarAway(): boolean;
+	getLastTwoTargetBlocks(transparent: any, maxDistance: number): any;
+	setRemoveWhenFarAway(remove: boolean): void;
+	getActivePotionEffects(): any;
+	getTargetBlockExact(maxDistance: number, fluidCollisionMode: FluidCollisionMode): Block;
+	getTargetBlockExact(maxDistance: number): Block;
+	setMaximumNoDamageTicks(ticks: number): void;
 	getAttribute(attribute: Attribute): AttributeInstance;
 	damage(amount: number): void;
 	damage(amount: number, source: Entity): void;
-	getHealth(): number;
-	setMaxHealth(health: number): void;
+	resetMaxHealth(): void;
 	setHealth(health: number): void;
 	getMaxHealth(): number;
-	resetMaxHealth(): void;
-	setAbsorptionAmount(amount: number): void;
+	getHealth(): number;
+	setMaxHealth(health: number): void;
 	getAbsorptionAmount(): number;
+	setAbsorptionAmount(amount: number): void;
 	remove(): void;
 	isEmpty(): boolean;
 	getLocation(): Location;
 	getLocation(loc: Location): Location;
 	getType(): EntityType;
-	getWorld(): World;
 	getServer(): Server;
+	isValid(): boolean;
+	getWorld(): World;
+	playEffect(type: EntityEffect): void;
+	getBoundingBox(): BoundingBox;
+	getPassenger(): Entity;
 	getHeight(): number;
-	isOnGround(): boolean;
-	getFireTicks(): number;
-	getMaxFireTicks(): number;
-	setPersistent(persistent: boolean): void;
-	setPassenger(passenger: Entity): boolean;
+	setVelocity(velocity: Vector): void;
+	getEntityId(): number;
+	getLastDamageCause(): EntityDamageEvent;
+	getTicksLived(): number;
+	setRotation(yaw: number, pitch: number): void;
+	removePassenger(passenger: Entity): boolean;
+	getUniqueId(): string;
+	getUniqueId(): string;
+	getVelocity(): Vector;
 	addPassenger(passenger: Entity): boolean;
+	leaveVehicle(): boolean;
+	isDead(): boolean;
+	isOnGround(): boolean;
+	setPersistent(persistent: boolean): void;
+	getFireTicks(): number;
 	eject(): boolean;
-	setLastDamageCause(event: EntityDamageEvent): void;
-	setTicksLived(value: number): void;
 	getVehicle(): Entity;
 	setGlowing(flag: boolean): void;
-	setRotation(yaw: number, pitch: number): void;
-	getVelocity(): Vector;
-	isPersistent(): boolean;
-	isDead(): boolean;
-	getPassenger(): Entity;
-	getPassengers(): any;
-	removePassenger(passenger: Entity): boolean;
-	setFallDistance(distance: number): void;
-	getLastDamageCause(): EntityDamageEvent;
-	getUniqueId(): string;
-	getUniqueId(): string;
-	isValid(): boolean;
-	getFallDistance(): number;
 	isGlowing(): boolean;
+	getPassengers(): any;
+	isPersistent(): boolean;
+	setFallDistance(distance: number): void;
 	setInvulnerable(flag: boolean): void;
+	setPassenger(passenger: Entity): boolean;
+	teleport(location: Location): boolean;
 	teleport(location: Location, cause: PlayerTeleportEvent$TeleportCause): boolean;
 	teleport(destination: Entity): boolean;
 	teleport(destination: Entity, cause: PlayerTeleportEvent$TeleportCause): boolean;
-	teleport(location: Location): boolean;
-	getTicksLived(): number;
-	isInsideVehicle(): boolean;
-	leaveVehicle(): boolean;
-	getEntityId(): number;
 	getWidth(): number;
+	getNearbyEntities(x: number, y: number, z: number): any;
 	setFireTicks(ticks: number): void;
-	getBoundingBox(): BoundingBox;
-	setVelocity(velocity: Vector): void;
-	getPortalCooldown(): number;
-	getPose(): Pose;
-	isSilent(): boolean;
-	hasGravity(): boolean;
-	isInvulnerable(): boolean;
+	getMaxFireTicks(): number;
+	getFallDistance(): number;
+	setLastDamageCause(event: EntityDamageEvent): void;
+	setTicksLived(value: number): void;
+	isInsideVehicle(): boolean;
+	addScoreboardTag(tag: string): boolean;
 	setSilent(flag: boolean): void;
 	setGravity(gravity: boolean): void;
-	addScoreboardTag(tag: string): boolean;
-	setPortalCooldown(cooldown: number): void;
+	hasGravity(): boolean;
 	getScoreboardTags(): any;
 	getFacing(): BlockFace;
-	playEffect(type: EntityEffect): void;
-	getNearbyEntities(x: number, y: number, z: number): any;
+	getPose(): Pose;
+	isSilent(): boolean;
+	setPortalCooldown(cooldown: number): void;
+	getPortalCooldown(): number;
+	isInvulnerable(): boolean;
 	getPistonMoveReaction(): PistonMoveReaction;
+	setCustomNameVisible(flag: boolean): void;
 	isCustomNameVisible(): boolean;
 	removeScoreboardTag(tag: string): boolean;
-	setCustomNameVisible(flag: boolean): void;
-	setMetadata(metadataKey: string, newMetadataValue: MetadataValue): void;
 	hasMetadata(metadataKey: string): boolean;
 	removeMetadata(metadataKey: string, owningPlugin: Plugin): void;
 	getMetadata(metadataKey: string): any;
+	setMetadata(metadataKey: string, newMetadataValue: MetadataValue): void;
 	sendMessage(messages: Array<string>): void;
 	sendMessage(message: string): void;
+	hasPermission(_name: string): boolean;
+	hasPermission(perm: Permission): boolean;
 	removeAttachment(attachment: PermissionAttachment): void;
 	isPermissionSet(_name: string): boolean;
 	isPermissionSet(perm: Permission): boolean;
-	addAttachment(plugin: Plugin): PermissionAttachment;
-	addAttachment(plugin: Plugin, _name: string, value: boolean, ticks: number): PermissionAttachment;
 	addAttachment(plugin: Plugin, ticks: number): PermissionAttachment;
+	addAttachment(plugin: Plugin, _name: string, value: boolean, ticks: number): PermissionAttachment;
+	addAttachment(plugin: Plugin): PermissionAttachment;
 	addAttachment(plugin: Plugin, _name: string, value: boolean): PermissionAttachment;
-	hasPermission(_name: string): boolean;
-	hasPermission(perm: Permission): boolean;
 	recalculatePermissions(): void;
 	getEffectivePermissions(): any;
 	isOp(): boolean;
 	setOp(value: boolean): void;
-	getCustomName(): string;
 	setCustomName(_name: string): void;
+	getCustomName(): string;
 	getPersistentDataContainer(): PersistentDataContainer;
 	launchProjectile(projectile: any): Projectile;
 	launchProjectile(projectile: any, velocity: Vector): Projectile;
 	isConversing(): boolean;
 	beginConversation(conversation: Conversation): boolean;
-	acceptConversationInput(input: string): void;
-	abandonConversation(conversation: Conversation, details: ConversationAbandonedEvent): void;
 	abandonConversation(conversation: Conversation): void;
+	abandonConversation(conversation: Conversation, details: ConversationAbandonedEvent): void;
+	acceptConversationInput(input: string): void;
 	getPlayer(): Player;
-	hasPlayedBefore(): boolean;
-	getFirstPlayed(): number;
 	setWhitelisted(value: boolean): void;
 	getLastPlayed(): number;
 	isOnline(): boolean;
-	isWhitelisted(): boolean;
+	getFirstPlayed(): number;
+	hasPlayedBefore(): boolean;
 	isBanned(): boolean;
+	isWhitelisted(): boolean;
 	serialize(): any;
-	sendPluginMessage(source: Plugin, channel: string, message: Array<number>): void;
 	getListeningPluginChannels(): any;
+	sendPluginMessage(source: Plugin, channel: string, message: Array<number>): void;
 }
 
 export class Player {

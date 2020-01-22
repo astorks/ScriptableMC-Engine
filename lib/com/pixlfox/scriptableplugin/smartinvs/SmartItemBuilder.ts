@@ -5,11 +5,11 @@ import {Enchantment} from '../../../../org/bukkit/enchantments/Enchantment.js'
 export interface SmartItemBuilder {
 	build(): ItemStack;
 	getDisplayName(): string;
-	removeEnchantment(enchantment: Enchantment): SmartItemBuilder;
 	addEnchant(enchantment: Enchantment, level: number, ignoreLevelRestriction: boolean): SmartItemBuilder;
-	setDisplayName(displayName: string): SmartItemBuilder;
-	getLore(): Array<string>;
 	setLore(lore: Array<string>): SmartItemBuilder;
+	getLore(): Array<string>;
+	removeEnchantment(enchantment: Enchantment): SmartItemBuilder;
+	setDisplayName(displayName: string): SmartItemBuilder;
 	isUnbreakable(isUnbreakable: boolean): SmartItemBuilder;
 }
 

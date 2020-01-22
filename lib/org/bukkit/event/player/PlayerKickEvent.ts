@@ -5,13 +5,13 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {PlayerEvent} from '../../../../org/bukkit/event/player/PlayerEvent.js'
 
 export interface PlayerKickEvent extends PlayerEvent, Cancellable {
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
-	setReason(kickReason: string): void;
-	getReason(): string;
 	getLeaveMessage(): string;
 	setLeaveMessage(leaveMessage: string): void;
+	getReason(): string;
+	setReason(kickReason: string): void;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

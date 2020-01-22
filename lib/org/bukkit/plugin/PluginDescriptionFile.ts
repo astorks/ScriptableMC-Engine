@@ -1,6 +1,6 @@
 declare var Java: any;
-import {PluginLoadOrder} from '../../../org/bukkit/plugin/PluginLoadOrder.js'
 import {PermissionDefault} from '../../../org/bukkit/permissions/PermissionDefault.js'
+import {PluginLoadOrder} from '../../../org/bukkit/plugin/PluginLoadOrder.js'
 
 export interface PluginDescriptionFile {
 	getName(): string;
@@ -8,21 +8,21 @@ export interface PluginDescriptionFile {
 	save(writer: any): void;
 	getVersion(): string;
 	getPrefix(): string;
-	getFullName(): string;
 	getDescription(): string;
-	getMain(): string;
+	getFullName(): string;
+	getPermissionDefault(): PermissionDefault;
+	getAwareness(): any;
+	getSoftDepend(): any;
 	getLoad(): PluginLoadOrder;
+	getMain(): string;
 	getAuthors(): any;
 	getWebsite(): string;
-	getDepend(): any;
-	getSoftDepend(): any;
 	getLoadBefore(): any;
+	getDepend(): any;
 	getCommands(): any;
-	getAwareness(): any;
-	getRawName(): string;
 	getClassLoaderOf(): string;
 	getAPIVersion(): string;
-	getPermissionDefault(): PermissionDefault;
+	getRawName(): string;
 }
 
 export class PluginDescriptionFile {

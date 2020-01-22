@@ -5,10 +5,10 @@ export interface AdvancementProgress {
 	isDone(): boolean;
 	getAdvancement(): Advancement;
 	getRemainingCriteria(): any;
-	getDateAwarded(criteria: string): any;
-	getAwardedCriteria(): any;
 	awardCriteria(criteria: string): boolean;
 	revokeCriteria(criteria: string): boolean;
+	getAwardedCriteria(): any;
+	getDateAwarded(criteria: string): any;
 }
 
 export class AdvancementProgress {

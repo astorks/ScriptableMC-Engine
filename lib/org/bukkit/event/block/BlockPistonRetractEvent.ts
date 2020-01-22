@@ -7,11 +7,11 @@ import {BlockPistonEvent} from '../../../../org/bukkit/event/block/BlockPistonEv
 
 export interface BlockPistonRetractEvent extends BlockPistonEvent {
 	getHandlers(): HandlerList;
-	getBlocks(): any;
 	getRetractLocation(): Location;
+	getBlocks(): any;
 	getDirection(): BlockFace;
-	setCancelled(cancelled: boolean): void;
 	isCancelled(): boolean;
+	setCancelled(cancelled: boolean): void;
 	isSticky(): boolean;
 	getBlock(): Block;
 	getEventName(): string;

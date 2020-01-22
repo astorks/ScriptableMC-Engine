@@ -6,11 +6,11 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {EntityEvent} from '../../../../org/bukkit/event/entity/EntityEvent.js'
 
 export interface EntityAirChangeEvent extends EntityEvent, Cancellable {
-	getHandlers(): HandlerList;
 	getAmount(): number;
 	setAmount(amount: number): void;
-	setCancelled(cancelled: boolean): void;
 	isCancelled(): boolean;
+	getHandlers(): HandlerList;
+	setCancelled(cancelled: boolean): void;
 	getEntity(): Entity;
 	getEntityType(): EntityType;
 	getEventName(): string;

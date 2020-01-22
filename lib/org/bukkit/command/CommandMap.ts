@@ -7,11 +7,11 @@ export interface CommandMap {
 	dispatch(sender: CommandSender, cmdLine: string): boolean;
 	register(fallbackPrefix: string, command: Command): boolean;
 	register(label: string, fallbackPrefix: string, command: Command): boolean;
+	getCommand(_name: string): Command;
 	tabComplete(sender: CommandSender, cmdLine: string): any;
 	tabComplete(sender: CommandSender, cmdLine: string, location: Location): any;
-	registerAll(fallbackPrefix: string, commands: any): void;
 	clearCommands(): void;
-	getCommand(_name: string): Command;
+	registerAll(fallbackPrefix: string, commands: any): void;
 }
 
 export class CommandMap {

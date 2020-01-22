@@ -8,12 +8,12 @@ import {PlayerMoveEvent} from '../../../../org/bukkit/event/player/PlayerMoveEve
 export interface PlayerTeleportEvent extends PlayerMoveEvent {
 	getCause(): PlayerTeleportEvent$TeleportCause;
 	getHandlers(): HandlerList;
-	setCancelled(cancel: boolean): void;
 	isCancelled(): boolean;
+	setCancelled(cancel: boolean): void;
 	getTo(): Location;
+	setTo(to: Location): void;
 	getFrom(): Location;
 	setFrom(from: Location): void;
-	setTo(to: Location): void;
 	getPlayer(): Player;
 	getEventName(): string;
 	isAsynchronous(): boolean;

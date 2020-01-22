@@ -1,17 +1,17 @@
 declare var Java: any;
-import {Configuration} from '../../../../org/bukkit/configuration/Configuration.js'
-import {MemoryConfiguration} from '../../../../org/bukkit/configuration/MemoryConfiguration.js'
-import {FileConfiguration} from '../../../../org/bukkit/configuration/file/FileConfiguration.js'
-import {MemoryConfigurationOptions} from '../../../../org/bukkit/configuration/MemoryConfigurationOptions.js'
 import {ConfigurationOptions} from '../../../../org/bukkit/configuration/ConfigurationOptions.js'
+import {MemoryConfigurationOptions} from '../../../../org/bukkit/configuration/MemoryConfigurationOptions.js'
+import {MemoryConfiguration} from '../../../../org/bukkit/configuration/MemoryConfiguration.js'
+import {Configuration} from '../../../../org/bukkit/configuration/Configuration.js'
+import {FileConfiguration} from '../../../../org/bukkit/configuration/file/FileConfiguration.js'
 
 export interface FileConfigurationOptions extends MemoryConfigurationOptions {
-	configuration(): Configuration;
-	configuration(): MemoryConfiguration;
-	configuration(): FileConfiguration;
-	pathSeparator(arg0: string): MemoryConfigurationOptions;
 	pathSeparator(value: string): FileConfigurationOptions;
 	pathSeparator(arg0: string): ConfigurationOptions;
+	pathSeparator(arg0: string): MemoryConfigurationOptions;
+	configuration(): MemoryConfiguration;
+	configuration(): Configuration;
+	configuration(): FileConfiguration;
 	header(): string;
 	header(value: string): FileConfigurationOptions;
 	copyDefaults(value: boolean): FileConfigurationOptions;

@@ -6,13 +6,13 @@ import {Cancellable} from '../../../../org/bukkit/event/Cancellable.js'
 import {BlockEvent} from '../../../../org/bukkit/event/block/BlockEvent.js'
 
 export interface FurnaceBurnEvent extends BlockEvent, Cancellable {
+	isCancelled(): boolean;
 	getHandlers(): HandlerList;
 	setCancelled(cancel: boolean): void;
-	isCancelled(): boolean;
-	isBurning(): boolean;
+	getBurnTime(): number;
 	getFuel(): ItemStack;
 	setBurnTime(burnTime: number): void;
-	getBurnTime(): number;
+	isBurning(): boolean;
 	setBurning(burning: boolean): void;
 	getBlock(): Block;
 	getEventName(): string;
