@@ -18,6 +18,11 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     private var scriptEngine: ScriptablePluginEngine? = null
 
     override fun onLoad() {
+        val canRegisterField = CommandAPI::class.java.getDeclaredField("canRegister")
+        canRegisterField.isAccessible = true
+        canRegisterField.setBoolean(null, true)
+        canRegisterField.isAccessible = false
+
         CommandAPI.getInstance().register("scriptablepluginmenu", CommandPermission.fromString("scriptablepluginengine.menu"), arrayOf("spm"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
             if(sender is Player) {
                 MainMenu.INVENTORY.open(sender)
@@ -40,7 +45,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
             }
         })
 
-        // Disabled the in-game command for now, run the main method in TypescriptApiExporter.kt to generate typescript libraries
+        // Disabled the in-game command for now, run the main method in TypescriptApiExporter.kt to generate typescript helper libraries
 //        CommandAPI.getInstance().register("tsdef", CommandPermission.fromString("scriptableplugin.js.reload"), arrayOf("tsd"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
 //            try {
 //                val exporter = ApiExporter("./scripts/mc/", Regex("(com|org|io|fr|net)\\.(.*)?"))
@@ -66,6 +71,11 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
                 CommandAPI.fail("${ChatColor.RED}$e")
             }
         })
+
+        val fixPermissionsMethod = CommandAPI::class.java.getDeclaredMethod("fixPermissions")
+        fixPermissionsMethod.isAccessible = true
+        fixPermissionsMethod.invoke(null)
+        fixPermissionsMethod.isAccessible = false
     }
 
     override fun onEnable() {
@@ -81,6 +91,13 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        try {
+            CommandAPI.getInstance().unregister("scriptablepluginmenu")
+            CommandAPI.getInstance().unregister("jsreload")
+            CommandAPI.getInstance().unregister("jsexec")
+        }
+        catch (e: Exception) { }
+
         try {
             scriptEngine!!.close()
             logger.info("Scriptable plugin engine shutdown.")
