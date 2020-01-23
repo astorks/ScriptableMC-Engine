@@ -1,31 +1,36 @@
-package com.pixlfox.scriptableplugin.core
+package com.pixlfox.scriptablemc.core
 
-import com.pixlfox.scriptableplugin.File
-import com.pixlfox.scriptableplugin.smartinvs.SmartInventoryInterface
-import com.pixlfox.scriptableplugin.smartinvs.SmartItemBuilder
-//import com.pixlfox.scriptableplugin.smartinvs.SmartInventoryInterface
-//import com.pixlfox.scriptableplugin.smartinvs.SmartInventoryProvider
-//import com.pixlfox.scriptableplugin.smartinvs.SmartItemBuilder
+import com.pixlfox.scriptablemc.File
+import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
+import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
+//import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
+//import com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider
+//import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
 //import fr.minuskube.inv.SmartInventory
 import io.github.jorelali.commandapi.api.CommandAPI
 import io.github.jorelali.commandapi.api.arguments.Argument
 import org.bukkit.Bukkit
 import org.bukkit.Server
+import org.bukkit.command.Command
 import org.bukkit.command.CommandMap
+import org.bukkit.command.CommandSender
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
-import org.bukkit.plugin.EventExecutor
 import java.util.HashMap
 import java.lang.reflect.InvocationTargetException
 import org.bukkit.command.PluginCommand
+import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.generator.ChunkGenerator
 import org.bukkit.inventory.ItemStack
-import org.bukkit.plugin.Plugin
+import org.bukkit.plugin.*
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageListenerRegistration
 import org.graalvm.polyglot.Value
+import java.io.InputStream
+import java.util.logging.Logger
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pluginName: String, val pluginInstance: Value): Listener {
@@ -39,8 +44,6 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         get() = CommandAPI.getInstance()
 
     private val commands = mutableListOf<PluginCommand>()
-    private val incomingPluginMessageListeners = mutableListOf<PluginMessageListenerRegistration>()
-    private val outgoingPluginMessageListeners = mutableListOf<String>()
 
     internal fun enable() {
         if(engine.debugEnabled) {
@@ -63,41 +66,26 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         for(command in commands) {
             unregisterCommand(command)
         }
-
-        val incomingPluginMessageListeners = incomingPluginMessageListeners.toTypedArray()
-        for(listener in incomingPluginMessageListeners) {
-            unregisterIncomingPluginChannel(listener)
-        }
-
-        val outgoingPluginMessageListeners = outgoingPluginMessageListeners.toTypedArray()
-        for(listener in outgoingPluginMessageListeners) {
-            unregisterOutgoingPluginChannel(listener)
-        }
     }
 
     fun registerEvent(eventClass: Class<out Event>, executor: EventExecutor) {
-        Bukkit.getServer().pluginManager.registerEvent(eventClass, this, EventPriority.NORMAL, executor, engine.bootstrapPlugin)
+        Bukkit.getServer().pluginManager.registerEvent(eventClass, this, EventPriority.NORMAL, executor, javaPlugin)
     }
 
     fun registerIncomingPluginChannel(channelName: String, listener: PluginMessageListener): PluginMessageListenerRegistration {
-        val messageListenerRegistration = Bukkit.getMessenger().registerIncomingPluginChannel(engine.bootstrapPlugin, channelName, listener)
-        incomingPluginMessageListeners.add(messageListenerRegistration)
-        return messageListenerRegistration
+        return Bukkit.getMessenger().registerIncomingPluginChannel(javaPlugin, channelName, listener)
     }
 
-    fun unregisterIncomingPluginChannel(messageListenerRegistration: PluginMessageListenerRegistration) {
-        incomingPluginMessageListeners.remove(messageListenerRegistration)
-        Bukkit.getMessenger().unregisterIncomingPluginChannel(engine.bootstrapPlugin, messageListenerRegistration.channel, messageListenerRegistration.listener)
+    fun unregisterIncomingPluginChannel(channel: String) {
+        Bukkit.getMessenger().unregisterIncomingPluginChannel(javaPlugin, channel)
     }
 
     fun registerOutgoingPluginChannel(channel: String) {
-        Bukkit.getMessenger().registerOutgoingPluginChannel(engine.bootstrapPlugin, channel)
-        outgoingPluginMessageListeners.add(channel)
+        Bukkit.getMessenger().registerOutgoingPluginChannel(javaPlugin, channel)
     }
 
     fun unregisterOutgoingPluginChannel(channel: String) {
-        Bukkit.getMessenger().unregisterOutgoingPluginChannel(engine.bootstrapPlugin, channel)
-        outgoingPluginMessageListeners.remove(channel)
+        Bukkit.getMessenger().unregisterOutgoingPluginChannel(javaPlugin, channel)
     }
 
     fun newCommand(name: String): PluginCommand? {
@@ -107,7 +95,7 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
             val c = PluginCommand::class.java.getDeclaredConstructor(String::class.java, Plugin::class.java)
             c.isAccessible = true
 
-            command = c.newInstance(name, engine.bootstrapPlugin as Plugin)
+            command = c.newInstance(name, javaPlugin as Plugin)
         } catch (e: SecurityException) {
             e.printStackTrace()
         } catch (e: IllegalArgumentException) {
@@ -189,8 +177,4 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
             return ScriptablePluginContext(engine, pluginName, pluginInstance)
         }
     }
-}
-
-class OutgoingPluginChannelInterface(private val engine: ScriptablePluginEngine, val pluginName: String, val pluginInstance: Value) {
-
 }

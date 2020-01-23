@@ -5,8 +5,8 @@ plugins {
     id "org.jetbrains.gradle.plugin.idea-ext" version "0.5"
 }
 
-group 'com.pixlfox.scriptableplugin'
-version '1.0.3'
+group 'com.pixlfox.scriptablemc'
+version '1.0.4'
 
 sourceCompatibility = 1.8
 

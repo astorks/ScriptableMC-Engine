@@ -1,40 +1,51 @@
-package com.pixlfox.scriptableplugin
+package com.pixlfox.scriptablemc
 
-import com.pixlfox.scriptableplugin.core.ScriptablePluginContext
-import com.pixlfox.scriptableplugin.core.ScriptablePluginEngine
-import com.pixlfox.scriptableplugin.smartinvs.SmartInventoryInterface
-import com.pixlfox.scriptableplugin.smartinvs.SmartInventoryProvider
+import com.pixlfox.scriptablemc.core.ScriptablePluginContext
+import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
+import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
+import com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider
 import fr.minuskube.inv.SmartInventory
 import java.io.File
 import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
 
 fun main() {
-    TypescriptApiExporter(
-        "./lib/",
-        Regex("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
-    )
-    .addHelperClasses()
-    .addBukkitClasses()
-    .clean()
-    .exportAllClasses()
+    TypescriptLibraryExporter()
+        .exportPath("./lib")
+        .allowPackages("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
+        .addHelperClasses()
+        .addBukkitClasses()
+        .clean()
+        .exportLibraries()
 }
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
-class TypescriptApiExporter(private val exportPath: String, private val allowedPackagesRegex: Regex) {
+class TypescriptLibraryExporter {
+    private var exportPath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
+    private var allowedPackagesRegex: Regex = Regex("(.*)?")
 
-    fun clean(): TypescriptApiExporter {
-        deleteDirectory(File(exportPath), true)
+    fun allowPackages(regex: String): TypescriptLibraryExporter {
+        this.allowedPackagesRegex = Regex(regex)
         return this
     }
 
-    fun addHelperClasses(): TypescriptApiExporter {
+    fun exportPath(exportPath: String): TypescriptLibraryExporter {
+        this.exportPath = exportPath
+        return this
+    }
+
+    fun clean(skipThisDir: Boolean = true): TypescriptLibraryExporter {
+        deleteDirectory(File(exportPath), skipThisDir)
+        return this
+    }
+
+    fun addHelperClasses(): TypescriptLibraryExporter {
         addClasses(
             ScriptablePluginContext::class.java,
             ScriptablePluginEngine::class.java,
             fr.minuskube.inv.SmartInventory::class.java,
-            com.pixlfox.scriptableplugin.File::class.java,
+            com.pixlfox.scriptablemc.File::class.java,
             SmartInventoryProvider::class.java,
             SmartInventoryInterface::class.java,
             SmartInventory::class.java,
@@ -43,7 +54,7 @@ class TypescriptApiExporter(private val exportPath: String, private val allowedP
         return this
     }
 
-    fun addBukkitClasses(): TypescriptApiExporter {
+    fun addBukkitClasses(): TypescriptLibraryExporter {
         return this.addClasses(
             org.bukkit.Bukkit::class.java,
             org.bukkit.command.PluginCommand::class.java,
@@ -276,7 +287,7 @@ class TypescriptApiExporter(private val exportPath: String, private val allowedP
         )
     }
 
-    fun addClasses(vararg _classes: Class<*>): TypescriptApiExporter {
+    fun addClasses(vararg _classes: Class<*>): TypescriptLibraryExporter {
         for (_class in _classes) {
             addClass(_class)
         }
@@ -284,7 +295,7 @@ class TypescriptApiExporter(private val exportPath: String, private val allowedP
         return this
     }
 
-    fun addClass(_class: Class<*>): TypescriptApiExporter {
+    fun addClass(_class: Class<*>): TypescriptLibraryExporter {
         if (_class.isArray) {
 
         }
@@ -349,13 +360,13 @@ class TypescriptApiExporter(private val exportPath: String, private val allowedP
 
         for (_method in _class.methods) {
             val returnType = fixClass(_method.returnType)
-            if(!classList.contains(returnType)) {
+            if (!classList.contains(returnType)) {
                 classList.add(returnType)
             }
 
             for (_parameter in _method.parameters) {
                 val type = fixClass(_parameter.type)
-                if(!classList.contains(type)) {
+                if (!classList.contains(type)) {
                     classList.add(type)
                 }
             }
@@ -378,8 +389,8 @@ class TypescriptApiExporter(private val exportPath: String, private val allowedP
             }
         }
 
-        if(_class.superclass != null && _class.superclass.name.matches(allowedPackagesRegex)) {
-            if(!classList.contains(_class.superclass)) {
+        if (_class.superclass != null && _class.superclass.name.matches(allowedPackagesRegex)) {
+            if (!classList.contains(_class.superclass)) {
                 classList.add(_class.superclass)
             }
         }
@@ -387,14 +398,59 @@ class TypescriptApiExporter(private val exportPath: String, private val allowedP
         return classList.toTypedArray()
     }
 
-    fun exportAllClasses() {
+    private fun buildClassList(_classes: Array<out Class<*>>): Array<Class<*>> {
+        val classList = mutableListOf<Class<*>>()
+
+        for(_class in _classes) {
+            for (_method in _class.methods) {
+                val returnType = fixClass(_method.returnType)
+                if (!classList.contains(returnType)) {
+                    classList.add(returnType)
+                }
+
+                for (_parameter in _method.parameters) {
+                    val type = fixClass(_parameter.type)
+                    if (!classList.contains(type)) {
+                        classList.add(type)
+                    }
+                }
+            }
+
+            for (_constructor in _class.constructors) {
+                for (_parameter in _constructor.parameters) {
+                    val type = fixClass(_parameter.type)
+                    if (!classList.contains(type) && type.name.matches(allowedPackagesRegex)) {
+                        classList.add(type)
+                    }
+                }
+            }
+
+            for (_interface in _class.interfaces) {
+                if (!classList.contains(_interface)) {
+                    if (_interface.name.matches(allowedPackagesRegex)) {
+                        classList.add(_interface)
+                    }
+                }
+            }
+
+            if (_class.superclass != null && _class.superclass.name.matches(allowedPackagesRegex)) {
+                if (!classList.contains(_class.superclass)) {
+                    classList.add(_class.superclass)
+                }
+            }
+        }
+
+        return classList.toTypedArray()
+    }
+
+    fun exportLibraries() {
         var count = 0
 
         for (_class in classList) {
             if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
                 count++
 
-                val file = File("$exportPath${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
+                val file = File("$exportPath/${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
                 if(!file.exists()) {
                     file.parentFile.mkdirs()
                     file.createNewFile()
@@ -404,17 +460,49 @@ class TypescriptApiExporter(private val exportPath: String, private val allowedP
             }
         }
 
-        println("Successfully exported $count classes.")
+        println("Successfully generated $count class libraries.")
+    }
+
+    fun exportLibrariesBeta() {
+        for (_classGroup in classList.groupBy { e -> e.packageName }) {
+
+            val file = File("$exportPath/${_classGroup.key}.ts")
+            if(!file.exists()) {
+                file.parentFile.mkdirs()
+                file.createNewFile()
+                file.writeText(generateTypescriptSourceBeta(_classGroup.value.toTypedArray()))
+                println("Exported ${_classGroup.value.size} classes to ${file.path}.")
+            }
+        }
+
+        println("Successfully exported class libraries.")
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun generateTypescriptSource(_class: Class<*>): String {
-        return if(_class.isEnum) {
-            "declare var Java: any;\n" + generateTypescriptImports(_class) + generateTypescriptInterface(_class) + generateTypescriptEnum(_class as Class<Enum<*>>)
-        } else {
-            "declare var Java: any;\n" + generateTypescriptImports(_class) + generateTypescriptInterface(_class) + generateTypescriptClass(_class)
-        }
+        var source = "declare var Java: any;\n"
+        source += generateTypescriptImports(_class)
+        source += generateTypescriptInterface(_class)
+
+        source += if(_class.isEnum) generateTypescriptEnum(_class as Class<Enum<*>>) else generateTypescriptClass(_class)
+
+        return source
     }
+
+
+    @Suppress("UNCHECKED_CAST")
+    private fun generateTypescriptSourceBeta(_classes: Array<Class<*>>): String {
+        var source = "declare var Java: any;\n"
+        source += generateTypescriptImports(_classes)
+
+        for (_class in _classes) {
+            source += generateTypescriptInterface(_class)
+            source += if(_class.isEnum) generateTypescriptEnum(_class as Class<Enum<*>>) else generateTypescriptClass(_class)
+        }
+
+        return source
+    }
+
 
     private fun generateTypescriptImports(_class: Class<*>): String {
         var tsImportsSource = ""
@@ -428,6 +516,25 @@ class TypescriptApiExporter(private val exportPath: String, private val allowedP
                     val upDirCount = getPackageName(_class.name).split('.').count()
 
                     tsImportsSource += "import {${stripPackageName(requiredClass.name)}} from '${"../".repeat(upDirCount)}${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js'\n"
+                }
+            }
+        }
+
+        return tsImportsSource + "\n"
+    }
+
+    private fun generateTypescriptImports(_classes: Array<Class<*>>): String {
+        var tsImportsSource = ""
+
+        val importedPackages = mutableListOf<String>()
+        val classList = buildClassList(_classes)
+
+        for(requiredClass in classList.groupBy { e -> e.packageName }) {
+            val skipImport = _classes.any { _class ->  _class.packageName.equals(requiredClass.key, true)}
+            if(!skipImport) {
+                if (requiredClass.key.matches(allowedPackagesRegex) && !importedPackages.contains(requiredClass.key)) {
+                    tsImportsSource += "import {${requiredClass.value.joinToString(", ") { e -> stripPackageName(e.name) }}} from './${requiredClass.key}.js'\n"
+                    importedPackages.add(requiredClass.key)
                 }
             }
         }

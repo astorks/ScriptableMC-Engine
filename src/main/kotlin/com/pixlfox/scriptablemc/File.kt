@@ -1,4 +1,4 @@
-package com.pixlfox.scriptableplugin
+package com.pixlfox.scriptablemc
 
 @Suppress("unused")
 class File(pathName: String) {

@@ -1,5 +1,5 @@
-name: ScriptablePluginEngine
-version: '1.0.3'
+name: ScriptableMC
+version: '1.0.4'
 api-version: '1.15'
-main: com.pixlfox.scriptableplugin.ScriptablePluginMain
+main: com.pixlfox.scriptablemc.ScriptablePluginMain
 depend: [CommandAPI]

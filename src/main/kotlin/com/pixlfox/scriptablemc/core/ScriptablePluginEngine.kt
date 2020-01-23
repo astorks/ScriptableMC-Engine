@@ -1,4 +1,4 @@
-package com.pixlfox.scriptableplugin.core
+package com.pixlfox.scriptablemc.core
 
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.event.Listener

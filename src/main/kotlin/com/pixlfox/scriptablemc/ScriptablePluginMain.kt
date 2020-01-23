@@ -1,7 +1,7 @@
-package com.pixlfox.scriptableplugin
+package com.pixlfox.scriptablemc
 
-import com.pixlfox.scriptableplugin.core.ScriptablePluginEngine
-import com.pixlfox.scriptableplugin.smartinvs.MainMenu
+import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
+import com.pixlfox.scriptablemc.smartinvs.MainMenu
 import io.github.jorelali.commandapi.api.CommandAPI
 import io.github.jorelali.commandapi.api.CommandExecutor
 import io.github.jorelali.commandapi.api.CommandPermission
@@ -41,12 +41,16 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
                 sender.sendMessage("Javascript engine reloaded.")
             }
             catch (e: Exception) {
-                CommandAPI.fail("${ChatColor.RED}$e")
+                CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                for (stackTrace in e.stackTrace) {
+                    sender.sendMessage("${ChatColor.RED}$stackTrace")
+                }
+                e.printStackTrace()
             }
         })
 
-        // Disabled the in-game command for now, run the main method in TypescriptApiExporter.kt to generate typescript helper libraries
-//        CommandAPI.getInstance().register("tsdef", CommandPermission.fromString("scriptableplugin.js.reload"), arrayOf("tsd"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
+        // Disabled the in-game command for now, run the main method in TypescriptLibraryExporter.kt to generate typescript helper libraries
+//        CommandAPI.getInstance().register("tsdef", CommandPermission.fromString("scriptablemc.js.reload"), arrayOf("tsd"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
 //            try {
 //                val exporter = ApiExporter("./scripts/mc/", Regex("(com|org|io|fr|net)\\.(.*)?"))
 //                exporter.addDefaultClasses()

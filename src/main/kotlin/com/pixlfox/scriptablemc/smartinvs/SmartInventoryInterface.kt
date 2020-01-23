@@ -1,6 +1,6 @@
-package com.pixlfox.scriptableplugin.smartinvs
+package com.pixlfox.scriptablemc.smartinvs
 
-import com.pixlfox.scriptableplugin.core.ScriptablePluginEngine
+import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import fr.minuskube.inv.ClickableItem
 import fr.minuskube.inv.SmartInventory
 import fr.minuskube.inv.content.InventoryContents
