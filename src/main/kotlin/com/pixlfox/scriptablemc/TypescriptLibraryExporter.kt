@@ -464,7 +464,7 @@ class TypescriptLibraryExporter {
     }
 
     fun exportLibrariesBeta() {
-        for (_classGroup in classList.groupBy { e -> e.packageName }) {
+        for (_classGroup in classList.groupBy { e: Class<*> -> e.packageName }) {
 
             val file = File("$exportPath/${_classGroup.key}.ts")
             if(!file.exists()) {
@@ -529,11 +529,11 @@ class TypescriptLibraryExporter {
         val importedPackages = mutableListOf<String>()
         val classList = buildClassList(_classes)
 
-        for(requiredClass in classList.groupBy { e -> e.packageName }) {
-            val skipImport = _classes.any { _class ->  _class.packageName.equals(requiredClass.key, true)}
+        for(requiredClass in classList.groupBy { e: Class<*> -> e.packageName }) {
+            val skipImport = _classes.any { _class: Class<*> ->  _class.packageName.equals(requiredClass.key, true)}
             if(!skipImport) {
                 if (requiredClass.key.matches(allowedPackagesRegex) && !importedPackages.contains(requiredClass.key)) {
-                    tsImportsSource += "import {${requiredClass.value.joinToString(", ") { e -> stripPackageName(e.name) }}} from './${requiredClass.key}.js'\n"
+                    tsImportsSource += "import {${requiredClass.value.joinToString(", ") { e: Class<*> -> stripPackageName(e.name) }}} from './${requiredClass.key}.js'\n"
                     importedPackages.add(requiredClass.key)
                 }
             }
