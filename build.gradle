@@ -21,22 +21,24 @@ repositories {
     mavenCentral()
     jcenter()
     maven {
-        name 'spigotmc'
-        url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        name = 'spigotmc'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
     }
     maven {
-        url 'https://hub.spigotmc.org/nexus/content/repositories/sonatype-nexus-snapshots/'
+        name = 'spigotmc nexus'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/sonatype-nexus-snapshots/'
     }
     maven {
-        url "https://libraries.minecraft.net"
+        name = 'minecraft'
+        url = "https://libraries.minecraft.net"
     }
     maven {
         name = 'mccommandapi'
         url = 'https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/1.13CommandAPI/'
     }
     maven {
-        name 'papermc'
-        url 'https://papermc.io/repo/repository/maven-public/'
+        name = 'papermc'
+        url = 'https://papermc.io/repo/repository/maven-public/'
     }
     maven {
         name = "placeholderapi"
@@ -69,7 +71,20 @@ compileTestKotlin {
     }
 }
 
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'com.pixlfox.scriptablemc.TypescriptLibraryExporter'
+        )
+    }
+}
+
 shadowJar {
     archiveFileName = "ScriptableMC.jar"
     mergeServiceFiles()
+}
+
+task exportTypeScriptLibraries(type: JavaExec) {
+    group = "libraries"
+    classpath = files("./build/libs/ScriptableMC.jar")
 }

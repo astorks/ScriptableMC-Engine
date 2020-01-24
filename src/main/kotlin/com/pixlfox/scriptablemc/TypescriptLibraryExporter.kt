@@ -9,21 +9,11 @@ import java.io.File
 import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
 
-fun main() {
-    TypescriptLibraryExporter()
-        .exportPath("./lib")
-        .allowPackages("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
-        .addHelperClasses()
-        .addBukkitClasses()
-        .clean()
-        .exportLibraries()
-}
-
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
 class TypescriptLibraryExporter {
-    private var exportPath: String = "./lib"
+    private var exportPath: String = "./lib/ts"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
 
     fun allowPackages(regex: String): TypescriptLibraryExporter {
         this.allowedPackagesRegex = Regex(regex)
@@ -754,6 +744,19 @@ class TypescriptLibraryExporter {
         }
         else {
             directoryToBeDeleted.delete()
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun main(args: Array<String>) {
+            TypescriptLibraryExporter()
+                .exportPath("./lib/ts")
+                .allowPackages("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
+                .addHelperClasses()
+                .addBukkitClasses()
+                .clean()
+                .exportLibraries()
         }
     }
 }
