@@ -18,8 +18,10 @@ jobs:
       run: ./gradlew shadowJar
     - name: Export TypeScript Libraries with Gradle
       run: ./gradlew exportTypeScriptLibraries
-    - name: Compress TypeScript Libraries with Gradle
-      run: zip -r ./lib/ScriptableMC-TypeScript-Lib.zip ./lib/ts/*
+    - name: Compress TypeScript Libraries
+      run: |
+        cd ./lib/ts/
+        zip -r ../ScriptableMC-TypeScript-Lib.zip ./*
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1.0.0
