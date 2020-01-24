@@ -1,19 +1,47 @@
 package com.pixlfox.scriptablemc
 
+import com.github.javaparser.ast.body.MethodDeclaration
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter
+import com.github.javaparser.utils.SourceRoot
 import com.pixlfox.scriptablemc.core.ScriptablePluginContext
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
 import com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider
+import com.thoughtworks.paranamer.BytecodeReadingParanamer
+import com.thoughtworks.paranamer.Paranamer
 import fr.minuskube.inv.SmartInventory
 import java.io.File
+import java.lang.reflect.Constructor
+import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
+import java.nio.file.Path
+
+
+fun main() {
+    TypescriptLibraryExporter()
+        .test()
+}
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
 class TypescriptLibraryExporter {
     private var exportPath: String = "./lib/ts"
     private val classList = mutableListOf<Class<*>>()
     private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
+    private val paranamer: Paranamer = BytecodeReadingParanamer()
+
+    fun test() {
+        val sourceRoot = SourceRoot(Path.of("./lib"))
+        val cu = sourceRoot.parse("", "Bukkit.java")
+        cu.accept(object : VoidVisitorAdapter<Any>() {
+            override fun visit(n: MethodDeclaration, arg: Any) {
+                super.visit(n, arg)
+                if(n.isPublic && !n.isAbstract && n.isStatic) {
+                    println("Bukkit:${n.name}(${n.parameters.joinToString { e -> "${e.nameAsString}: ${e.typeAsString}" }}): ${n.typeAsString}")
+                }
+            }
+        }, "")
+    }
 
     fun allowPackages(regex: String): TypescriptLibraryExporter {
         this.allowedPackagesRegex = Regex(regex)
@@ -549,7 +577,7 @@ class TypescriptLibraryExporter {
                 tsInterfaceSource += if (_method.parameterCount == 0) {
                     "\t${_method.name}(): ${javaClassToTypescript(_method.returnType)};\n"
                 } else {
-                    "\t${_method.name}(${getParameters(_method.parameters).joinToString(", ")}): ${javaClassToTypescript(_method.returnType)};\n"
+                    "\t${_method.name}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType)};\n"
                 }
             }
         }
@@ -568,7 +596,7 @@ class TypescriptLibraryExporter {
         tsClassSource += "\t}\n"
 
         for ((index, constructor) in _class.constructors.withIndex()) {
-            tsClassSource += "\tconstructor(${getParameters(constructor.parameters).joinToString(", ")});\n"
+            tsClassSource += "\tconstructor(${getParameters(constructor).joinToString(", ")});\n"
             if(index == _class.constructors.size - 1) {
                 tsClassSource += "\tconstructor(...args: any[]) {\n"
                 tsClassSource += "\t\treturn new $className.\$javaClass(...args);\n"
@@ -610,7 +638,7 @@ class TypescriptLibraryExporter {
                 }
 
                 if(Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
-                    tsClassSource += "\tpublic static ${safeName(jsMethodName)}(${getParameters(_method.parameters).joinToString(", ")}): ${javaClassToTypescript(_method.returnType)};\n"
+                    tsClassSource += "\tpublic static ${safeName(jsMethodName)}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType)};\n"
                     if(index == _methodGroups.value.size - 1) {
                         tsClassSource += "\tpublic static ${safeName(jsMethodName)}(...args: any[]): any {\n"
                         tsClassSource += "\t\treturn $className.\$javaClass.${_method.name}(...args);\n"
@@ -665,6 +693,28 @@ class TypescriptLibraryExporter {
 
         for(_parameter in _parameters) {
             parameterNames.add("${safeName(_parameter.name)}: ${javaClassToTypescript(_parameter.type)}")
+        }
+
+        return parameterNames.toTypedArray()
+    }
+
+    private fun getParameters(_method: Method): Array<String> {
+        val parameterNames = mutableListOf<String>()
+        val paranames = paranamer.lookupParameterNames(_method, false)
+
+        for((index, _parameter) in _method.parameters.withIndex()) {
+            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${javaClassToTypescript(_parameter.type)}")
+        }
+
+        return parameterNames.toTypedArray()
+    }
+
+    private fun getParameters(_constructor: Constructor<*>): Array<String> {
+        val parameterNames = mutableListOf<String>()
+        val paranames = paranamer.lookupParameterNames(_constructor, false)
+
+        for((index, _parameter) in _constructor.parameters.withIndex()) {
+            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${javaClassToTypescript(_parameter.type)}")
         }
 
         return parameterNames.toTypedArray()
