@@ -6,7 +6,7 @@ plugins {
 }
 
 group 'com.pixlfox.scriptablemc'
-version '1.0.4'
+version '1.0.5'
 
 sourceCompatibility = 1.8
 
@@ -38,6 +38,10 @@ repositories {
         name 'papermc'
         url 'https://papermc.io/repo/repository/maven-public/'
     }
+    maven {
+        name = "placeholderapi"
+        url = 'http://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
 }
 
 dependencies {
@@ -46,6 +50,7 @@ dependencies {
     compile 'com.mojang:brigadier:1.0.17'
     compile "io.github.jorelali:commandapi:2.3"
     compile 'fr.minuskube.inv:smart-invs:1.2.7'
+    compileOnly 'me.clip:placeholderapi:2.10.4'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     testCompile group: 'junit', name: 'junit', version: '4.12'

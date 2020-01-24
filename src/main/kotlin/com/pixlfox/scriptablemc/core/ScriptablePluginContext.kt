@@ -9,7 +9,9 @@ import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
 //import fr.minuskube.inv.SmartInventory
 import io.github.jorelali.commandapi.api.CommandAPI
 import io.github.jorelali.commandapi.api.arguments.Argument
+import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
+import org.bukkit.OfflinePlayer
 import org.bukkit.Server
 import org.bukkit.command.Command
 import org.bukkit.command.CommandMap
@@ -22,6 +24,7 @@ import java.util.HashMap
 import java.lang.reflect.InvocationTargetException
 import org.bukkit.command.PluginCommand
 import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.entity.Player
 import org.bukkit.generator.ChunkGenerator
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.*
@@ -166,6 +169,24 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
     fun itemBuilder(itemStack: ItemStack): SmartItemBuilder {
         return SmartItemBuilder(itemStack)
+    }
+
+    fun setPlaceholders(player: Player, placeholderText: String): String {
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            return PlaceholderAPI.setPlaceholders(player, placeholderText)
+        }
+
+        engine.bootstrapPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
+        return placeholderText
+    }
+
+    fun setPlaceholders(player: OfflinePlayer, placeholderText: String): String {
+        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            return PlaceholderAPI.setPlaceholders(player, placeholderText)
+        }
+
+        engine.bootstrapPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
+        return placeholderText
     }
 
     companion object {
