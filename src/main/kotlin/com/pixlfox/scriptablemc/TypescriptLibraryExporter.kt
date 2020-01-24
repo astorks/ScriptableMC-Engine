@@ -1,8 +1,5 @@
 package com.pixlfox.scriptablemc
 
-import com.github.javaparser.ast.body.MethodDeclaration
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter
-import com.github.javaparser.utils.SourceRoot
 import com.pixlfox.scriptablemc.core.ScriptablePluginContext
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
@@ -15,13 +12,6 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
-import java.nio.file.Path
-
-
-fun main() {
-    TypescriptLibraryExporter()
-        .test()
-}
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
 class TypescriptLibraryExporter {
@@ -29,19 +19,6 @@ class TypescriptLibraryExporter {
     private val classList = mutableListOf<Class<*>>()
     private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
-
-    fun test() {
-        val sourceRoot = SourceRoot(Path.of("./lib"))
-        val cu = sourceRoot.parse("", "Bukkit.java")
-        cu.accept(object : VoidVisitorAdapter<Any>() {
-            override fun visit(n: MethodDeclaration, arg: Any) {
-                super.visit(n, arg)
-                if(n.isPublic && !n.isAbstract && n.isStatic) {
-                    println("Bukkit:${n.name}(${n.parameters.joinToString { e -> "${e.nameAsString}: ${e.typeAsString}" }}): ${n.typeAsString}")
-                }
-            }
-        }, "")
-    }
 
     fun allowPackages(regex: String): TypescriptLibraryExporter {
         this.allowedPackagesRegex = Regex(regex)
