@@ -15,11 +15,11 @@ jobs:
     - name: Fix gradlew permissions
       run: chmod +x ./gradlew
     - name: Build with Gradle
-        run: ./gradlew shadowJar
+      run: ./gradlew shadowJar
     - name: Export TypeScript Libraries with Gradle
-        run: ./gradlew exportTypeScriptLibraries
+      run: ./gradlew exportTypeScriptLibraries
     - name: Compress TypeScript Libraries with Gradle
-        run: zip -r ./lib/ScriptableMC-TypeScript-Lib.zip ./lib/ts/*
+      run: zip -r ./lib/ScriptableMC-TypeScript-Lib.zip ./lib/ts/*
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1.0.0
@@ -31,7 +31,7 @@ jobs:
         draft: false
         prerelease: true
     - name: Upload Plugin Jar
-      id: upload-release-asset
+      id: upload-plugin-jar
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -41,7 +41,7 @@ jobs:
         asset_name: ScriptableMC.jar
         asset_content_type: application/java-archive
     - name: Upload TypeScript Libraries
-      id: upload-release-asset
+      id: upload-typescript-libraries
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
