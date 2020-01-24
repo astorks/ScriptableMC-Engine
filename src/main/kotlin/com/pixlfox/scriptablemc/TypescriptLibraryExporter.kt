@@ -463,20 +463,20 @@ class TypescriptLibraryExporter {
         println("Successfully generated $count class libraries.")
     }
 
-    fun exportLibrariesBeta() {
-        for (_classGroup in classList.groupBy { e: Class<*> -> e.packageName }) {
-
-            val file = File("$exportPath/${_classGroup.key}.ts")
-            if(!file.exists()) {
-                file.parentFile.mkdirs()
-                file.createNewFile()
-                file.writeText(generateTypescriptSourceBeta(_classGroup.value.toTypedArray()))
-                println("Exported ${_classGroup.value.size} classes to ${file.path}.")
-            }
-        }
-
-        println("Successfully exported class libraries.")
-    }
+//    fun exportLibrariesBeta() {
+//        for (_classGroup in classList.groupBy { e: Class<*> -> e.packageName }) {
+//
+//            val file = File("$exportPath/${_classGroup.key}.ts")
+//            if(!file.exists()) {
+//                file.parentFile.mkdirs()
+//                file.createNewFile()
+//                file.writeText(generateTypescriptSourceBeta(_classGroup.value.toTypedArray()))
+//                println("Exported ${_classGroup.value.size} classes to ${file.path}.")
+//            }
+//        }
+//
+//        println("Successfully exported class libraries.")
+//    }
 
     @Suppress("UNCHECKED_CAST")
     private fun generateTypescriptSource(_class: Class<*>): String {
@@ -490,18 +490,18 @@ class TypescriptLibraryExporter {
     }
 
 
-    @Suppress("UNCHECKED_CAST")
-    private fun generateTypescriptSourceBeta(_classes: Array<Class<*>>): String {
-        var source = "declare var Java: any;\n"
-        source += generateTypescriptImports(_classes)
-
-        for (_class in _classes) {
-            source += generateTypescriptInterface(_class)
-            source += if(_class.isEnum) generateTypescriptEnum(_class as Class<Enum<*>>) else generateTypescriptClass(_class)
-        }
-
-        return source
-    }
+//    @Suppress("UNCHECKED_CAST")
+//    private fun generateTypescriptSourceBeta(_classes: Array<Class<*>>): String {
+//        var source = "declare var Java: any;\n"
+//        source += generateTypescriptImports(_classes)
+//
+//        for (_class in _classes) {
+//            source += generateTypescriptInterface(_class)
+//            source += if(_class.isEnum) generateTypescriptEnum(_class as Class<Enum<*>>) else generateTypescriptClass(_class)
+//        }
+//
+//        return source
+//    }
 
 
     private fun generateTypescriptImports(_class: Class<*>): String {
@@ -523,24 +523,24 @@ class TypescriptLibraryExporter {
         return tsImportsSource + "\n"
     }
 
-    private fun generateTypescriptImports(_classes: Array<Class<*>>): String {
-        var tsImportsSource = ""
-
-        val importedPackages = mutableListOf<String>()
-        val classList = buildClassList(_classes)
-
-        for(requiredClass in classList.groupBy { e: Class<*> -> e.packageName }) {
-            val skipImport = _classes.any { _class: Class<*> ->  _class.packageName.equals(requiredClass.key, true)}
-            if(!skipImport) {
-                if (requiredClass.key.matches(allowedPackagesRegex) && !importedPackages.contains(requiredClass.key)) {
-                    tsImportsSource += "import {${requiredClass.value.joinToString(", ") { e: Class<*> -> stripPackageName(e.name) }}} from './${requiredClass.key}.js'\n"
-                    importedPackages.add(requiredClass.key)
-                }
-            }
-        }
-
-        return tsImportsSource + "\n"
-    }
+//    private fun generateTypescriptImports(_classes: Array<Class<*>>): String {
+//        var tsImportsSource = ""
+//
+//        val importedPackages = mutableListOf<String>()
+//        val classList = buildClassList(_classes)
+//
+//        for(requiredClass in classList.groupBy { e: Class<*> -> e.packageName }) {
+//            val skipImport = _classes.any { _class: Class<*> ->  _class.packageName.equals(requiredClass.key, true)}
+//            if(!skipImport) {
+//                if (requiredClass.key.matches(allowedPackagesRegex) && !importedPackages.contains(requiredClass.key)) {
+//                    tsImportsSource += "import {${requiredClass.value.joinToString(", ") { e: Class<*> -> stripPackageName(e.name) }}} from './${requiredClass.key}.js'\n"
+//                    importedPackages.add(requiredClass.key)
+//                }
+//            }
+//        }
+//
+//        return tsImportsSource + "\n"
+//    }
 
     private fun generateTypescriptInterface(_class: Class<*>): String {
         var tsInterfaceSource = "export interface ${stripPackageName(_class.name)}"
