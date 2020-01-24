@@ -33,13 +33,23 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
         inventoryManager.init()
         jsBindings.putMember("engine", this)
 
-        eval(
-            Source.newBuilder("js", File("${rootServerFolder}scripts/main.js"))
-                .name("main.js")
-                .mimeType("application/javascript+module")
-                .interactive(false)
-                .build()
-        )
+        val mainScriptFile = File("${rootServerFolder}scripts/main.js")
+        if(!mainScriptFile.parentFile.exists()) {
+            mainScriptFile.parentFile.mkdirs()
+        }
+
+        if(mainScriptFile.exists()) {
+            eval(
+                Source.newBuilder("js", mainScriptFile)
+                    .name("main.js")
+                    .mimeType("application/javascript+module")
+                    .interactive(false)
+                    .build()
+            )
+        }
+        else {
+            throw ScriptNotFoundException(mainScriptFile)
+        }
     }
 
     internal fun close() {
@@ -50,6 +60,22 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
         scriptablePlugins.clear()
 
         graalContext.close(true)
+    }
+
+    fun evalFile(filePath: String): Value {
+        val scriptFile = File("${rootServerFolder}scripts/$filePath")
+
+        return if(scriptFile.exists()) {
+            eval(
+                Source.newBuilder("js", scriptFile)
+                    .name(scriptFile.name)
+                    .mimeType("application/javascript+module")
+                    .interactive(false)
+                    .build()
+            )
+        } else {
+            throw ScriptNotFoundException(scriptFile)
+        }
     }
 
     fun evalJs(source: String): Value {
@@ -97,3 +123,5 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
             get() { return inst }
     }
 }
+
+class ScriptNotFoundException(scriptFile: File) : Exception("Unable to load script: ${scriptFile.path}.")

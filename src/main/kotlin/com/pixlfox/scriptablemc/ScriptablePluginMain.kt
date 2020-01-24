@@ -1,5 +1,6 @@
 package com.pixlfox.scriptablemc
 
+import com.pixlfox.scriptablemc.core.ScriptNotFoundException
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.smartinvs.MainMenu
 import io.github.jorelali.commandapi.api.CommandAPI
@@ -11,6 +12,7 @@ import org.bukkit.ChatColor
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.entity.Player
+import org.graalvm.polyglot.PolyglotException
 
 
 @Suppress("unused")
@@ -40,11 +42,15 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
 
                 sender.sendMessage("Javascript engine reloaded.")
             }
-            catch (e: Exception) {
+            catch (e: PolyglotException) {
                 CommandAPI.fail("${ChatColor.DARK_RED}$e")
                 for (stackTrace in e.stackTrace) {
                     sender.sendMessage("${ChatColor.RED}$stackTrace")
                 }
+                e.printStackTrace()
+            }
+            catch (e: Exception) {
+                CommandAPI.fail("${ChatColor.DARK_RED}$e")
                 e.printStackTrace()
             }
         })
@@ -71,8 +77,16 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
                     sender.sendMessage(response.toString())
                 }
             }
+            catch (e: PolyglotException) {
+                CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                for (stackTrace in e.stackTrace) {
+                    sender.sendMessage("${ChatColor.RED}$stackTrace")
+                }
+                e.printStackTrace()
+            }
             catch (e: Exception) {
-                CommandAPI.fail("${ChatColor.RED}$e")
+                CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                e.printStackTrace()
             }
         })
 
