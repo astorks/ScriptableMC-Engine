@@ -7,6 +7,7 @@ import io.github.jorelali.commandapi.api.CommandExecutor
 import io.github.jorelali.commandapi.api.CommandPermission
 import io.github.jorelali.commandapi.api.arguments.Argument
 import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument
+import io.github.jorelali.commandapi.api.arguments.LiteralArgument
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
@@ -26,10 +27,10 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
             canRegisterField.isAccessible = false
 
             CommandAPI.getInstance().register(
-                "scriptablepluginmenu",
-                CommandPermission.fromString("scriptablepluginengine.menu"),
-                arrayOf("spm"),
-                linkedMapOf<String, Argument>(),
+                "scriptablemc",
+                CommandPermission.fromString("scriptablemc.menu"),
+                arrayOf("smc"),
+                linkedMapOf<String, Argument>("menu" to LiteralArgument("menu")),
                 CommandExecutor { sender, _ ->
                     if (sender is Player) {
                         MainMenu.INVENTORY.open(sender)
@@ -37,8 +38,25 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
                 })
 
             CommandAPI.getInstance().register(
+                "scriptablemc",
+                CommandPermission.fromString("scriptablemc.info"),
+                arrayOf("smc"),
+                linkedMapOf<String, Argument>("info" to LiteralArgument("info")),
+                CommandExecutor { sender, _ ->
+                    if (sender is Player) {
+                        val isGraalRuntime = scriptEngine?.evalJs("if (typeof Graal != 'undefined') { Graal.isGraalRuntime() } else { false }")?.asBoolean() == true
+                        sender.sendMessage("${ChatColor.GREEN}ScriptableMC Version: ${this.description.version}")
+                        sender.sendMessage("${ if(isGraalRuntime) ChatColor.GREEN else ChatColor.YELLOW }GraalVM Java Runtime: $isGraalRuntime")
+                        if(isGraalRuntime) {
+                            sender.sendMessage("${ChatColor.AQUA}GraalVM Runtime Version: ${scriptEngine?.evalJs("Graal.versionGraalVM")}")
+                            sender.sendMessage("${ChatColor.AQUA}GraalJS Engine Version: ${scriptEngine?.evalJs("Graal.versionJS")}")
+                        }
+                    }
+                })
+
+            CommandAPI.getInstance().register(
                 "jsreload",
-                CommandPermission.fromString("scriptablepluginengine.js.reload"),
+                CommandPermission.fromString("scriptablemc.js.reload"),
                 arrayOf("jsrl"),
                 linkedMapOf<String, Argument>(),
                 CommandExecutor { sender, _ ->
@@ -80,7 +98,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
 
             CommandAPI.getInstance().register(
                 "jsexec",
-                CommandPermission.fromString("scriptablepluginengine.js.execute"),
+                CommandPermission.fromString("scriptablemc.js.execute"),
                 arrayOf("jsex"),
                 linkedMapOf<String, Argument>("source" to GreedyStringArgument()),
                 CommandExecutor { sender, args ->
@@ -103,7 +121,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
 
             CommandAPI.getInstance().register(
                 "jsexecfile",
-                CommandPermission.fromString("scriptablepluginengine.js.execute.file"),
+                CommandPermission.fromString("scriptablemc.js.execute.file"),
                 arrayOf("jsexf"),
                 linkedMapOf<String, Argument>("fileName" to GreedyStringArgument()),
                 CommandExecutor { sender, args ->
@@ -161,9 +179,10 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     override fun onDisable() {
         runInPluginContext {
             try {
-                CommandAPI.getInstance().unregister("scriptablepluginmenu")
+                CommandAPI.getInstance().unregister("scriptablemc")
                 CommandAPI.getInstance().unregister("jsreload")
                 CommandAPI.getInstance().unregister("jsexec")
+                CommandAPI.getInstance().unregister("jsexecfile")
             } catch (e: Exception) { }
 
             try {

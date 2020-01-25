@@ -12,3 +12,12 @@ Run JavaScript/TypeScript plugins for Bukkit/Spigot/Paper Minecraft 1.15 using t
 **This is required as you can NOT launch your minecraft server with the default JRE or the plugin will fail to load**
 - [Download the latest ScriptableMC plugin](https://github.com/astorks/ScriptableMC-Engine/releases/latest) and place it in your plugins folder.
 - Take a look at [ScriptableMC-TypeScript](https://github.com/astorks/ScriptableMC-TypeScript) for a full typescript plugin example.
+
+## Commands and Permissions
+| Command       | Alias         | Description                                           | Permission               |
+| ------------- | ------------- |:-----------------------------------------------------:| ------------------------ |
+| `/jsreload`   | `/jsrl`       | Fully reloads the script engine and all script files. | `scriptablemc.js.reload` |
+| `/jsexec <source>`   | `/jsex`       | Executes javascript source and prints the return value. | `scriptablemc.js.execute` |
+| `/jsexecfile <filePath>`   | `/jsexf`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
+| `/scriptablemc menu`   | `/smc menu`       | Opens an inventory menu that allows you to control the scriptable engine. | `scriptablemc.menu` |
+| `/scriptablemc info`   | `/smc info`       | Prints plugin version and GraalVM/GraalJS versions if available. | `scriptablemc.info` |
