@@ -7,6 +7,7 @@ import com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
 import fr.minuskube.inv.SmartInventory
+import org.bukkit.FireworkEffect
 import java.io.File
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
@@ -601,7 +602,7 @@ class TypescriptLibraryExporter {
             }
         }
 
-        for (_methodGroups in _class.methods.takeWhile { e -> Modifier.isStatic(e.modifiers) && Modifier.isPublic(e.modifiers) }.groupBy { e -> e.name }) {
+        for (_methodGroups in _class.methods.filter { e -> Modifier.isStatic(e.modifiers) && Modifier.isPublic(e.modifiers) }.groupBy { e -> e.name }) {
 
             val jsMethodName: String = _methodGroups.key
 
