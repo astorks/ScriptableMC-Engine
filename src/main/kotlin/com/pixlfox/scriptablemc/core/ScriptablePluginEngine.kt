@@ -21,8 +21,6 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
         .allowHostClassLoading(true)
         .allowIO(true)
         .option("js.ecmascript-version", "2020")
-        .option("js.debug-builtin", "true")
-        .option("js.nashorn-compat", "true")
         .build()
     private val jsBindings: Value = graalContext.getBindings("js")
     internal val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
@@ -98,7 +96,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
         val pluginContext = ScriptablePluginContext.newInstance(pluginName, this, pluginInstance)
         pluginInstance.putMember("context", pluginContext)
         scriptablePlugins.add(pluginContext)
-        pluginInstance.invokeMember("onLoad")
+        pluginContext.load()
         return pluginContext
     }
 

@@ -48,6 +48,14 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
     private val commands = mutableListOf<PluginCommand>()
 
+    internal fun load() {
+        if(engine.debugEnabled) {
+            engine.bootstrapPlugin.logger.info("[$pluginName] Loading scriptable plugin context.")
+        }
+
+        pluginInstance.invokeMember("onLoad")
+    }
+
     internal fun enable() {
         if(engine.debugEnabled) {
             engine.bootstrapPlugin.logger.info("[$pluginName] Enabling scriptable plugin context.")
@@ -195,7 +203,10 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
                 engine.bootstrapPlugin.logger.info("[$pluginName] Creating new scriptable plugin context.")
             }
 
-            return ScriptablePluginContext(engine, pluginName, pluginInstance)
+            val context =  ScriptablePluginContext(engine, pluginName, pluginInstance)
+            context.load()
+
+            return context
         }
     }
 }

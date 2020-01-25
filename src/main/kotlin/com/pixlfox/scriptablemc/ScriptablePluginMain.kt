@@ -1,6 +1,5 @@
 package com.pixlfox.scriptablemc
 
-import com.pixlfox.scriptablemc.core.ScriptNotFoundException
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.smartinvs.MainMenu
 import io.github.jorelali.commandapi.api.CommandAPI
@@ -9,9 +8,9 @@ import io.github.jorelali.commandapi.api.CommandPermission
 import io.github.jorelali.commandapi.api.arguments.Argument
 import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument
 import org.bukkit.ChatColor
+import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.entity.Player
 import org.graalvm.polyglot.PolyglotException
 
 
@@ -20,42 +19,51 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     private var scriptEngine: ScriptablePluginEngine? = null
 
     override fun onLoad() {
-        val canRegisterField = CommandAPI::class.java.getDeclaredField("canRegister")
-        canRegisterField.isAccessible = true
-        canRegisterField.setBoolean(null, true)
-        canRegisterField.isAccessible = false
+        runInPluginContext {
+            val canRegisterField = CommandAPI::class.java.getDeclaredField("canRegister")
+            canRegisterField.isAccessible = true
+            canRegisterField.setBoolean(null, true)
+            canRegisterField.isAccessible = false
 
-        CommandAPI.getInstance().register("scriptablepluginmenu", CommandPermission.fromString("scriptablepluginengine.menu"), arrayOf("spm"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
-            if(sender is Player) {
-                MainMenu.INVENTORY.open(sender)
-            }
-        })
+            CommandAPI.getInstance().register(
+                "scriptablepluginmenu",
+                CommandPermission.fromString("scriptablepluginengine.menu"),
+                arrayOf("spm"),
+                linkedMapOf<String, Argument>(),
+                CommandExecutor { sender, _ ->
+                    if (sender is Player) {
+                        MainMenu.INVENTORY.open(sender)
+                    }
+                })
 
-        CommandAPI.getInstance().register("jsreload", CommandPermission.fromString("scriptablepluginengine.js.reload"), arrayOf("jsrl"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
-            try {
-                scriptEngine!!.close()
-                logger.info("Scripting engine shutdown.")
+            CommandAPI.getInstance().register(
+                "jsreload",
+                CommandPermission.fromString("scriptablepluginengine.js.reload"),
+                arrayOf("jsrl"),
+                linkedMapOf<String, Argument>(),
+                CommandExecutor { sender, _ ->
+                    try {
+                        scriptEngine!!.close()
+                        logger.info("Scripting engine shutdown.")
 
-                scriptEngine = ScriptablePluginEngine(this)
-                scriptEngine!!.start()
-                logger.info("Scripting engine started.")
+                        scriptEngine = ScriptablePluginEngine(this)
+                        scriptEngine!!.start()
+                        logger.info("Scripting engine started.")
 
-                sender.sendMessage("Javascript engine reloaded.")
-            }
-            catch (e: PolyglotException) {
-                CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                for (stackTrace in e.stackTrace) {
-                    sender.sendMessage("${ChatColor.RED}$stackTrace")
-                }
-                e.printStackTrace()
-            }
-            catch (e: Exception) {
-                CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                e.printStackTrace()
-            }
-        })
+                        sender.sendMessage("Javascript engine reloaded.")
+                    } catch (e: PolyglotException) {
+                        CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                        for (stackTrace in e.stackTrace) {
+                            sender.sendMessage("${ChatColor.RED}$stackTrace")
+                        }
+                        e.printStackTrace()
+                    } catch (e: Exception) {
+                        CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                        e.printStackTrace()
+                    }
+                })
 
-        // Disabled the in-game command for now, run the main method in TypescriptLibraryExporter.kt to generate typescript helper libraries
+            // Disabled the in-game command for now, run the main method in TypescriptLibraryExporter.kt to generate typescript helper libraries
 //        CommandAPI.getInstance().register("tsdef", CommandPermission.fromString("scriptablemc.js.reload"), arrayOf("tsd"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
 //            try {
 //                val exporter = ApiExporter("./scripts/mc/", Regex("(com|org|io|fr|net)\\.(.*)?"))
@@ -70,59 +78,108 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
 //            }
 //        })
 
-        CommandAPI.getInstance().register("jsexec", CommandPermission.fromString("scriptablepluginengine.js.execute"), arrayOf("jsex"), linkedMapOf<String, Argument>("source" to GreedyStringArgument()), CommandExecutor { sender, args ->
-            try {
-                val response = scriptEngine!!.evalJs(args[0] as String)
-                if(!response.isNull) {
-                    sender.sendMessage(response.toString())
-                }
-            }
-            catch (e: PolyglotException) {
-                CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                for (stackTrace in e.stackTrace) {
-                    sender.sendMessage("${ChatColor.RED}$stackTrace")
-                }
-                e.printStackTrace()
-            }
-            catch (e: Exception) {
-                CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                e.printStackTrace()
-            }
-        })
+            CommandAPI.getInstance().register(
+                "jsexec",
+                CommandPermission.fromString("scriptablepluginengine.js.execute"),
+                arrayOf("jsex"),
+                linkedMapOf<String, Argument>("source" to GreedyStringArgument()),
+                CommandExecutor { sender, args ->
+                    try {
+                        val response = scriptEngine!!.evalJs(args[0] as String)
+                        if (!response.isNull) {
+                            sender.sendMessage(response.toString())
+                        }
+                    } catch (e: PolyglotException) {
+                        CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                        for (stackTrace in e.stackTrace) {
+                            sender.sendMessage("${ChatColor.RED}$stackTrace")
+                        }
+                        e.printStackTrace()
+                    } catch (e: Exception) {
+                        CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                        e.printStackTrace()
+                    }
+                })
 
-        val fixPermissionsMethod = CommandAPI::class.java.getDeclaredMethod("fixPermissions")
-        fixPermissionsMethod.isAccessible = true
-        fixPermissionsMethod.invoke(null)
-        fixPermissionsMethod.isAccessible = false
+            CommandAPI.getInstance().register(
+                "jsexecfile",
+                CommandPermission.fromString("scriptablepluginengine.js.execute.file"),
+                arrayOf("jsexf"),
+                linkedMapOf<String, Argument>("fileName" to GreedyStringArgument()),
+                CommandExecutor { sender, args ->
+                    if((args[0] as String).equals("main.js", true)) {
+                        CommandAPI.fail("${ChatColor.DARK_RED}Unable to execute the main script entrypoint. Use the command /jsrl to reload scripts.")
+                    }
+                    else {
+                        try {
+                            val response = scriptEngine!!.evalFile(args[0] as String)
+                            if (!response.isNull) {
+                                sender.sendMessage(response.toString())
+                            }
+                        } catch (e: PolyglotException) {
+                            CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                            for (stackTrace in e.stackTrace) {
+                                sender.sendMessage("${ChatColor.RED}$stackTrace")
+                            }
+                            e.printStackTrace()
+                        } catch (e: Exception) {
+                            CommandAPI.fail("${ChatColor.DARK_RED}$e")
+                            e.printStackTrace()
+                        }
+                    }
+                })
+
+            val fixPermissionsMethod = CommandAPI::class.java.getDeclaredMethod("fixPermissions")
+            fixPermissionsMethod.isAccessible = true
+            fixPermissionsMethod.invoke(null)
+            fixPermissionsMethod.isAccessible = false
+        }
     }
 
     override fun onEnable() {
-        try {
-            scriptEngine = ScriptablePluginEngine(this)
-            scriptEngine!!.start()
-            logger.info("Scriptable plugin engine started.")
-        }
-        catch (e: Exception) {
-            logger.warning("Scriptable plugin engine failed to start.")
-            e.printStackTrace()
+        runInPluginContext {
+            try {
+                scriptEngine = ScriptablePluginEngine(this)
+                scriptEngine!!.start()
+                logger.info("Scriptable plugin engine started.")
+            } catch (e: IllegalStateException) {
+                if (e.message?.contains("Make sure the truffle-api.jar is on the classpath.", true) == true) {
+                    logger.warning("Scriptable plugin engine failed to start.")
+                    e.printStackTrace()
+                    logger.severe("It looks like you're trying to run this server with the standard java runtime. ScriptableMC only works with the GraalVM java runtime.")
+                } else {
+                    logger.warning("Scriptable plugin engine failed to start.")
+                    e.printStackTrace()
+                }
+            } catch (e: Exception) {
+                logger.warning("Scriptable plugin engine failed to start.")
+                e.printStackTrace()
+            }
         }
     }
 
     override fun onDisable() {
-        try {
-            CommandAPI.getInstance().unregister("scriptablepluginmenu")
-            CommandAPI.getInstance().unregister("jsreload")
-            CommandAPI.getInstance().unregister("jsexec")
-        }
-        catch (e: Exception) { }
+        runInPluginContext {
+            try {
+                CommandAPI.getInstance().unregister("scriptablepluginmenu")
+                CommandAPI.getInstance().unregister("jsreload")
+                CommandAPI.getInstance().unregister("jsexec")
+            } catch (e: Exception) { }
 
-        try {
-            scriptEngine!!.close()
-            logger.info("Scriptable plugin engine shutdown.")
+            try {
+                scriptEngine!!.close()
+                logger.info("Scriptable plugin engine shutdown.")
+            } catch (e: Exception) {
+                logger.warning("Scriptable plugin engine failed to shutdown.")
+                e.printStackTrace()
+            }
         }
-        catch (e: Exception) {
-            logger.warning("Scriptable plugin engine failed to shutdown.")
-            e.printStackTrace()
-        }
+    }
+
+    private fun runInPluginContext(callback: () -> Unit) {
+        val oldCl = Thread.currentThread().contextClassLoader
+        Thread.currentThread().contextClassLoader = javaClass.classLoader
+        callback()
+        Thread.currentThread().contextClassLoader = oldCl
     }
 }
