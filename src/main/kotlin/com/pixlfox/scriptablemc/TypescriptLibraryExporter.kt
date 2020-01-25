@@ -715,6 +715,7 @@ class TypescriptLibraryExporter {
             name.equals("arguments", true) -> "_arguments"
             name.equals("name", true) -> "_name"
             name.equals("<set-?>", true) -> "value"
+            name.equals("in", true) -> "_in"
             else -> name
         }
     }
