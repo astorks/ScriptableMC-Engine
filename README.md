@@ -10,7 +10,7 @@ Feel free to create an issue if you find any missing features, bugs, or just hav
 **This plugin requires running your minecraft server with OpenJDK, Standard JDK, or the GraalVM java runtime.**<br >
 Most linux servers already use OpenJDK, however if you're running windows or full AOT javascript compilation you can install [GraalVM-CE](https://github.com/graalvm/graalvm-ce-builds/releases/latest).
 
-GraalVM-CE is a free open source java runtime created by Oracle (the same creator as Java) that is pre-packaged with the GraalJS Engine allowing all javascript engine features including AOT compilation of javascript.
+GraalVM-CE is a free open source java runtime created by Oracle that is pre-packaged with the GraalJS Engine allowing all javascript engine features including AOT compilation of javascript.
 
 ## Installing The Plugin
 - Download the latest [Command-API](https://github.com/JorelAli/1.13-Command-API/releases) and place it in your server plugins folder. This is used for command auto-completion.
