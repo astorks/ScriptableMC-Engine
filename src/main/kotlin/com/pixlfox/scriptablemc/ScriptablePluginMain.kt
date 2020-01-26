@@ -64,7 +64,9 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
                         scriptEngine!!.close()
                         logger.info("Scripting engine shutdown.")
 
-                        scriptEngine = ScriptablePluginEngine(this)
+                        reloadConfig()
+
+                        scriptEngine = ScriptablePluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false))
                         scriptEngine!!.start()
                         logger.info("Scripting engine started.")
 
@@ -156,8 +158,10 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
 
     override fun onEnable() {
         runInPluginContext {
+            saveDefaultConfig()
+
             try {
-                scriptEngine = ScriptablePluginEngine(this)
+                scriptEngine = ScriptablePluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false))
                 scriptEngine!!.start()
                 logger.info("Scriptable plugin engine started.")
             } catch (e: IllegalStateException) {
