@@ -1,0 +1,6 @@
+# Root scripts folder default: ./scripts
+# Example inside plugin folder: ./plugins/ScriptableMC/scripts
+root_scripts_folder: './scripts'
+
+# Prints some additional debugging messages
+debug: false

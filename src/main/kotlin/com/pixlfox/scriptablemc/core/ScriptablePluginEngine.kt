@@ -10,9 +10,7 @@ import java.util.*
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFolder: String = "./"): Listener {
-    var debugEnabled: Boolean = false
-
+class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false): Listener {
     private val graalContext: Context = Context
         .newBuilder()
         .allowAllAccess(true)
@@ -31,7 +29,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
         inventoryManager.init()
         jsBindings.putMember("engine", this)
 
-        val mainScriptFile = File("${rootServerFolder}scripts/main.js")
+        val mainScriptFile = File("${rootScriptsFolder}/main.js")
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
         }
@@ -61,7 +59,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootServerFold
     }
 
     fun evalFile(filePath: String): Value {
-        val scriptFile = File("${rootServerFolder}scripts/$filePath")
+        val scriptFile = File("${rootScriptsFolder}/$filePath")
 
         return if(scriptFile.exists()) {
             eval(
