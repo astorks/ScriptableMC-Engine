@@ -18,6 +18,7 @@ GraalVM-CE is a free open source java runtime created by Oracle that is pre-pack
 - Ensure your server is running OpenJDK 8+ or GraalVM
 - [Download the latest ScriptableMC plugin](https://github.com/astorks/ScriptableMC-Engine/releases/latest) and place it in your plugins folder.
 - Take a look at [ScriptableMC-TypeScript](https://github.com/astorks/ScriptableMC-TypeScript) for a full typescript plugin example.
+You can take the typescript example and compile it, then directly modify the javascript if you don't want to use typescript.
 
 ## Commands and Permissions
 | Command       | Alias         | Description                                           | Permission               |
