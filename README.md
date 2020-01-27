@@ -1,6 +1,7 @@
 # ScriptableMC-Engine
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/astorks/ScriptableMC-Engine?label=ScriptableMC&style=for-the-badge)](https://github.com/astorks/ScriptableMC-Engine/releases/latest)
+[![SpigotMC Resource](https://img.shields.io/badge/SpigotMC-Resource-yellow?style=for-the-badge)](https://www.spigotmc.org/resources/scriptablemc-engine.74690/)
 
 Run JavaScript/TypeScript plugins for Bukkit/Spigot/Paper Minecraft 1.15 using the GraalJS script engine.
 
