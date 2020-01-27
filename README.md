@@ -9,7 +9,7 @@ Run JavaScript/TypeScript plugins for Bukkit/Spigot/Paper Minecraft 1.15 using t
 Feel free to create an issue if you find any missing features, bugs, or just have an idea for a great feature to add.
 
 **This plugin requires running your minecraft server with OpenJDK, Standard JDK, or the GraalVM java runtime.**<br >
-Most linux servers already use OpenJDK, however if you're running windows or full AOT javascript compilation you can install [GraalVM-CE](https://github.com/graalvm/graalvm-ce-builds/releases/latest).
+Most linux servers already use OpenJDK, however if you're running windows or want a fully supported java runtime that supports AOT javascript compilation you can install [GraalVM-CE](https://github.com/graalvm/graalvm-ce-builds/releases/latest).
 
 GraalVM-CE is a free open source java runtime created by Oracle that is pre-packaged with the GraalJS Engine allowing all javascript engine features including AOT compilation of javascript.
 
