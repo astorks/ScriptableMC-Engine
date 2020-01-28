@@ -800,7 +800,7 @@ class TypescriptLibraryExporter {
 
             File("./lib/package.json").writeText("{\n" +
                     "  \"name\": \"scriptablemc-typescript-lib\",\n" +
-                    "  \"version\": \"${TypescriptLibraryExporter::class.java.`package`.implementationVersion}\",\n" +
+                    "  \"version\": \"1.0.0\",\n" +
                     "  \"description\": \"Typescript plugin example and libraries for Minecraft 1.15\",\n" +
                     "  \"scripts\": {\n" +
                     "    \"compile\": \"npx tsc\"\n" +
