@@ -1,0 +1,26 @@
+name: Java CI
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Set up Node.js 12.14.1
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.14.1
+    - name: Fix gradlew permissions
+      run: chmod +x ./gradlew
+    - name: Build with Gradle
+      run: ./gradlew shadowJar
+    - name: Export TypeScript Libraries with Gradle
+      run: ./gradlew exportTypeScriptLibraries
+    - name: Compile TypeScript libraries
+      run: |
+        cd ./lib/
+        npm install
+        npm run compile

@@ -783,11 +783,11 @@ class TypescriptLibraryExporter {
                     "    \"compilerOptions\": {\n" +
                     "        \"target\": \"es2019\",\n" +
                     "        \"module\": \"esnext\",\n" +
-                    "        \"sourceMap\": false,\n" +
+                    "        \"sourceMap\": true,\n" +
                     "        \"allowJs\": true,\n" +
                     "        \"outDir\": \"js\",\n" +
                     "        \"rootDir\": \"ts\",\n" +
-                    "        \"declaration\": false,\n" +
+                    "        \"declaration\": true,\n" +
                     "        \"lib\": [\"ES5\", \"ES2015\", \"ES2016\", \"ES2017\", \"ES2018\", \"ES2019\"],\n" +
                     "        \"types\": [\n" +
                     "\n" +
