@@ -1,163 +1,22 @@
 package com.pixlfox.scriptablemc
 
+import co.aikar.commands.PaperCommandManager
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
-import com.pixlfox.scriptablemc.smartinvs.MainMenu
-import io.github.jorelali.commandapi.api.CommandAPI
-import io.github.jorelali.commandapi.api.CommandExecutor
-import io.github.jorelali.commandapi.api.CommandPermission
-import io.github.jorelali.commandapi.api.arguments.Argument
-import io.github.jorelali.commandapi.api.arguments.GreedyStringArgument
-import io.github.jorelali.commandapi.api.arguments.LiteralArgument
-import org.bukkit.ChatColor
-import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
-import org.graalvm.polyglot.PolyglotException
 
 
 @Suppress("unused")
 class ScriptablePluginMain : JavaPlugin(), Listener {
-    private var scriptEngine: ScriptablePluginEngine? = null
-
-    override fun onLoad() {
-        runInPluginContext {
-            val canRegisterField = CommandAPI::class.java.getDeclaredField("canRegister")
-            canRegisterField.isAccessible = true
-            canRegisterField.setBoolean(null, true)
-            canRegisterField.isAccessible = false
-
-            CommandAPI.getInstance().register(
-                "scriptablemc",
-                CommandPermission.fromString("scriptablemc.menu"),
-                arrayOf("smc"),
-                linkedMapOf<String, Argument>("menu" to LiteralArgument("menu")),
-                CommandExecutor { sender, _ ->
-                    if (sender is Player) {
-                        MainMenu.INVENTORY.open(sender)
-                    }
-                })
-
-            CommandAPI.getInstance().register(
-                "scriptablemc",
-                CommandPermission.fromString("scriptablemc.info"),
-                arrayOf("smc"),
-                linkedMapOf<String, Argument>("info" to LiteralArgument("info")),
-                CommandExecutor { sender, _ ->
-                    if (sender is Player) {
-                        val isGraalRuntime = scriptEngine?.evalJs("if (typeof Graal != 'undefined') { Graal.isGraalRuntime() } else { false }")?.asBoolean() == true
-                        sender.sendMessage("${ChatColor.GREEN}ScriptableMC Version: ${this.description.version}")
-                        sender.sendMessage("${ if(isGraalRuntime) ChatColor.GREEN else ChatColor.YELLOW }GraalVM Java Runtime: $isGraalRuntime")
-                        if(isGraalRuntime) {
-                            sender.sendMessage("${ChatColor.AQUA}GraalVM Runtime Version: ${scriptEngine?.evalJs("Graal.versionGraalVM")}")
-                            sender.sendMessage("${ChatColor.AQUA}GraalJS Engine Version: ${scriptEngine?.evalJs("Graal.versionJS")}")
-                        }
-                    }
-                })
-
-            CommandAPI.getInstance().register(
-                "jsreload",
-                CommandPermission.fromString("scriptablemc.js.reload"),
-                arrayOf("jsrl"),
-                linkedMapOf<String, Argument>(),
-                CommandExecutor { sender, _ ->
-                    try {
-                        scriptEngine!!.close()
-                        logger.info("Scripting engine shutdown.")
-
-                        reloadConfig()
-
-                        scriptEngine = ScriptablePluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false))
-                        scriptEngine!!.start()
-                        logger.info("Scripting engine started.")
-
-                        sender.sendMessage("Javascript engine reloaded.")
-                    } catch (e: PolyglotException) {
-                        CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                        for (stackTrace in e.stackTrace) {
-                            sender.sendMessage("${ChatColor.RED}$stackTrace")
-                        }
-                        e.printStackTrace()
-                    } catch (e: Exception) {
-                        CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                        e.printStackTrace()
-                    }
-                })
-
-            // Disabled the in-game command for now, run the main method in TypescriptLibraryExporter.kt to generate typescript helper libraries
-//        CommandAPI.getInstance().register("tsdef", CommandPermission.fromString("scriptablemc.js.reload"), arrayOf("tsd"), linkedMapOf<String, Argument>(), CommandExecutor { sender, _ ->
-//            try {
-//                val exporter = ApiExporter("./scripts/mc/", Regex("(com|org|io|fr|net)\\.(.*)?"))
-//                exporter.addDefaultClasses()
-//                exporter.clean()
-//                exporter.exportAllClasses()
-//
-//                sender.sendMessage("${ChatColor.GREEN}${ChatColor.BOLD}Export complete!")
-//            }
-//            catch (e: Exception) {
-//                CommandAPI.fail("${ChatColor.RED}${e.localizedMessage}")
-//            }
-//        })
-
-            CommandAPI.getInstance().register(
-                "jsexec",
-                CommandPermission.fromString("scriptablemc.js.execute"),
-                arrayOf("jsex"),
-                linkedMapOf<String, Argument>("source" to GreedyStringArgument()),
-                CommandExecutor { sender, args ->
-                    try {
-                        val response = scriptEngine!!.evalJs(args[0] as String)
-                        if (!response.isNull) {
-                            sender.sendMessage(response.toString())
-                        }
-                    } catch (e: PolyglotException) {
-                        CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                        for (stackTrace in e.stackTrace) {
-                            sender.sendMessage("${ChatColor.RED}$stackTrace")
-                        }
-                        e.printStackTrace()
-                    } catch (e: Exception) {
-                        CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                        e.printStackTrace()
-                    }
-                })
-
-            CommandAPI.getInstance().register(
-                "jsexecfile",
-                CommandPermission.fromString("scriptablemc.js.execute.file"),
-                arrayOf("jsexf"),
-                linkedMapOf<String, Argument>("fileName" to GreedyStringArgument()),
-                CommandExecutor { sender, args ->
-                    if((args[0] as String).equals("main.js", true)) {
-                        CommandAPI.fail("${ChatColor.DARK_RED}Unable to execute the main script entrypoint. Use the command /jsrl to reload scripts.")
-                    }
-                    else {
-                        try {
-                            val response = scriptEngine!!.evalFile(args[0] as String)
-                            if (!response.isNull) {
-                                sender.sendMessage(response.toString())
-                            }
-                        } catch (e: PolyglotException) {
-                            CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                            for (stackTrace in e.stackTrace) {
-                                sender.sendMessage("${ChatColor.RED}$stackTrace")
-                            }
-                            e.printStackTrace()
-                        } catch (e: Exception) {
-                            CommandAPI.fail("${ChatColor.DARK_RED}$e")
-                            e.printStackTrace()
-                        }
-                    }
-                })
-
-            val fixPermissionsMethod = CommandAPI::class.java.getDeclaredMethod("fixPermissions")
-            fixPermissionsMethod.isAccessible = true
-            fixPermissionsMethod.invoke(null)
-            fixPermissionsMethod.isAccessible = false
-        }
-    }
+    internal var scriptEngine: ScriptablePluginEngine? = null
+    private var commandManager: PaperCommandManager? = null
 
     override fun onEnable() {
-        runInPluginContext {
+        commandManager = PaperCommandManager(this)
+        commandManager?.registerCommand(ScriptablePluginCommand(this))
+        commandManager?.registerCommand(ScriptablePluginJsCommand(this))
+
+        patchClassLoader {
             saveDefaultConfig()
 
             try {
@@ -181,14 +40,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
-        runInPluginContext {
-            try {
-                CommandAPI.getInstance().unregister("scriptablemc")
-                CommandAPI.getInstance().unregister("jsreload")
-                CommandAPI.getInstance().unregister("jsexec")
-                CommandAPI.getInstance().unregister("jsexecfile")
-            } catch (e: Exception) { }
-
+        patchClassLoader {
             try {
                 scriptEngine!!.close()
                 logger.info("Scriptable plugin engine shutdown.")
@@ -199,7 +51,12 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
         }
     }
 
-    private fun runInPluginContext(callback: () -> Unit) {
+    /**
+     * Patches the bukkit class loader to allow for GraalVM class loading from inside plugin jar.
+     * A bit hackish but it works.
+     * https://stackoverflow.com/questions/56712178/graalvm-no-language-and-polyglot-implementation-was-found-on-the-classpath
+     */
+    internal fun patchClassLoader(callback: () -> Unit) {
         val oldCl = Thread.currentThread().contextClassLoader
         Thread.currentThread().contextClassLoader = javaClass.classLoader
         callback()

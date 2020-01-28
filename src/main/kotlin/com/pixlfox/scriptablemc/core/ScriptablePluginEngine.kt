@@ -8,7 +8,6 @@ import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 
-
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false): Listener {
     private val graalContext: Context = Context

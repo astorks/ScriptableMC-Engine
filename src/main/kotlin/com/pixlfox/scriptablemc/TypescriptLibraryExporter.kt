@@ -1,24 +1,19 @@
 package com.pixlfox.scriptablemc
 
-import com.pixlfox.scriptablemc.core.ScriptablePluginContext
-import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
-import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
-import com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
-import fr.minuskube.inv.SmartInventory
-import org.bukkit.FireworkEffect
 import java.io.File
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.lang.reflect.Parameter
 
+
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
 class TypescriptLibraryExporter {
     private var exportPath: String = "./lib/ts"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|fr\\.minuskube\\.inv|com\\.google)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
 
     fun allowPackages(regex: String): TypescriptLibraryExporter {
@@ -38,13 +33,12 @@ class TypescriptLibraryExporter {
 
     fun addHelperClasses(): TypescriptLibraryExporter {
         addClasses(
-            ScriptablePluginContext::class.java,
-            ScriptablePluginEngine::class.java,
+            com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
+            com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
             fr.minuskube.inv.SmartInventory::class.java,
-            com.pixlfox.scriptablemc.File::class.java,
-            SmartInventoryProvider::class.java,
-            SmartInventoryInterface::class.java,
-            SmartInventory::class.java,
+            com.pixlfox.scriptablemc.utils.File::class.java,
+            com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider::class.java,
+            com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface::class.java,
             com.google.common.io.ByteStreams::class.java
         )
         return this
@@ -780,12 +774,48 @@ class TypescriptLibraryExporter {
         @JvmStatic
         fun main(args: Array<String>) {
             TypescriptLibraryExporter()
-                .exportPath("./lib/ts")
-                .allowPackages("(org\\.bukkit|com\\.pixlfox|io\\.github\\.jorelali\\.commandapi|fr\\.minuskube\\.inv|com\\.google)(.*)?")
                 .addHelperClasses()
                 .addBukkitClasses()
                 .clean()
                 .exportLibraries()
+
+            File("./lib/tsconfig.json").writeText("{\n" +
+                    "    \"compilerOptions\": {\n" +
+                    "        \"target\": \"es2019\",\n" +
+                    "        \"module\": \"esnext\",\n" +
+                    "        \"sourceMap\": false,\n" +
+                    "        \"allowJs\": true,\n" +
+                    "        \"outDir\": \"js\",\n" +
+                    "        \"rootDir\": \"ts\",\n" +
+                    "        \"declaration\": false,\n" +
+                    "        \"lib\": [\"ES5\", \"ES2015\", \"ES2016\", \"ES2017\", \"ES2018\", \"ES2019\"],\n" +
+                    "        \"types\": [\n" +
+                    "\n" +
+                    "        ]\n" +
+                    "    },\n" +
+                    "    \"include\": [\n" +
+                    "        \"ts/**/*\"\n" +
+                    "    ]\n" +
+                    "}")
+
+            File("./lib/package.json").writeText("{\n" +
+                    "  \"name\": \"scriptablemc-typescript-lib\",\n" +
+                    "  \"version\": \"${TypescriptLibraryExporter::class.java.`package`.implementationVersion}\",\n" +
+                    "  \"description\": \"Typescript plugin example and libraries for Minecraft 1.15\",\n" +
+                    "  \"scripts\": {\n" +
+                    "    \"compile\": \"npx tsc\"\n" +
+                    "  },\n" +
+                    "  \"author\": \"Ashton Storks\",\n" +
+                    "  \"license\": \"ISC\",\n" +
+                    "  \"bugs\": {\n" +
+                    "    \"url\": \"https://github.com/astorks/ScriptableMC-TypeScript/issues\"\n" +
+                    "  },\n" +
+                    "  \"homepage\": \"https://github.com/astorks/ScriptableMC-TypeScript#readme\",\n" +
+                    "  \"dependencies\": {},\n" +
+                    "  \"devDependencies\": {\n" +
+                    "    \"typescript\": \"^3.7.5\"\n" +
+                    "  }\n" +
+                    "}\n")
         }
     }
 }

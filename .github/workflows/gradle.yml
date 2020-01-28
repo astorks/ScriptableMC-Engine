@@ -12,16 +12,25 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Set up Node.js 12.14.1
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.14.1
     - name: Fix gradlew permissions
       run: chmod +x ./gradlew
     - name: Build with Gradle
       run: ./gradlew shadowJar
     - name: Export TypeScript Libraries with Gradle
       run: ./gradlew exportTypeScriptLibraries
-    - name: Compress TypeScript Libraries
+    - name: Compile TypeScript libraries and create archives for release
       run: |
-        cd ./lib/ts/
+        cd ./lib/
+        npm install
+        npm run compile
+        cd ./ts/
         zip -r ../ScriptableMC-TypeScript-Lib.zip ./*
+        cd ../js/
+        zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1.0.0
@@ -51,4 +60,14 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
         asset_path: ./lib/ScriptableMC-TypeScript-Lib.zip
         asset_name: ScriptableMC-TypeScript-Lib.zip
-        asset_content_type: application/java-archive
+        asset_content_type: application/zip
+    - name: Upload JavaScript Libraries
+      id: upload-typescript-libraries
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: ./lib/ScriptableMC-JavaScript-Lib.zip
+        asset_name: ScriptableMC-JavaScript-Lib.zip
+        asset_content_type: application/zip

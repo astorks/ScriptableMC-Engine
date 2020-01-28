@@ -1,4 +1,5 @@
-package com.pixlfox.scriptablemc
+package com.pixlfox.scriptablemc.utils
+
 
 @Suppress("unused")
 class File(pathName: String) {
@@ -14,7 +15,8 @@ class File(pathName: String) {
     fun mkdir(): Boolean = javaFile.mkdir()
     fun mkdirs(): Boolean = javaFile.mkdirs()
     fun isDirectory(): Boolean = javaFile.isDirectory
-    fun parentFile(): File = new(javaFile.parentFile)
+    fun parentFile(): File =
+        new(javaFile.parentFile)
 
     companion object {
         internal fun new(javaFile: java.io.File): File {

@@ -1,21 +1,13 @@
 package com.pixlfox.scriptablemc.core
 
-import com.pixlfox.scriptablemc.File
 import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
 import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
-//import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
-//import com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider
-//import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
-//import fr.minuskube.inv.SmartInventory
-import io.github.jorelali.commandapi.api.CommandAPI
-import io.github.jorelali.commandapi.api.arguments.Argument
+import com.pixlfox.scriptablemc.utils.File
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.Server
-import org.bukkit.command.Command
 import org.bukkit.command.CommandMap
-import org.bukkit.command.CommandSender
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
 import org.bukkit.event.HandlerList
@@ -23,17 +15,14 @@ import org.bukkit.event.Listener
 import java.util.HashMap
 import java.lang.reflect.InvocationTargetException
 import org.bukkit.command.PluginCommand
-import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.generator.ChunkGenerator
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.*
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.plugin.messaging.PluginMessageListener
 import org.bukkit.plugin.messaging.PluginMessageListenerRegistration
 import org.graalvm.polyglot.Value
-import java.io.InputStream
-import java.util.logging.Logger
+
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pluginName: String, val pluginInstance: Value): Listener {
@@ -42,9 +31,6 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
     val javaPlugin: JavaPlugin
         get() = engine.bootstrapPlugin
-
-    val commandApi: CommandAPI
-        get() = CommandAPI.getInstance()
 
     private val commands = mutableListOf<PluginCommand>()
 
@@ -131,22 +117,6 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         commandMap.register(this.pluginName.toLowerCase(), command)
         commands.add(command)
         bukkitCommandMap.isAccessible = false
-    }
-
-    fun registerCommandApi(name: String, executor: io.github.jorelali.commandapi.api.CommandExecutor) {
-        val canRegisterField = CommandAPI::class.java.getDeclaredField("canRegister")
-        canRegisterField.isAccessible = true
-        canRegisterField.setBoolean(null, true)
-
-        commandApi.register(name, linkedMapOf<String, Argument>(), executor)
-
-        canRegisterField.setBoolean(null, false)
-        canRegisterField.isAccessible = false
-
-        val fixPermissionsMethod = CommandAPI::class.java.getDeclaredMethod("fixPermissions")
-        fixPermissionsMethod.isAccessible = true
-        fixPermissionsMethod.invoke(null)
-        fixPermissionsMethod.isAccessible = false
     }
 
     fun unregisterCommand(command: PluginCommand) {
