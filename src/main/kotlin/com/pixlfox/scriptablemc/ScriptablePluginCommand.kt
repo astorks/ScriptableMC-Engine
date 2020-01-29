@@ -10,6 +10,7 @@ import com.pixlfox.scriptablemc.smartinvs.MainMenu
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import org.graalvm.polyglot.PolyglotException
 
 
 @Suppress("unused")
@@ -81,9 +82,19 @@ class ScriptablePluginJsCommand(private val basePlugin: ScriptablePluginMain) : 
     @Syntax("<code>")
     fun onSmcJsExecute(sender: CommandSender, code: String) {
         try {
-            val response = basePlugin.scriptEngine!!.evalJs(code)
+            val response = basePlugin.scriptEngine!!.evalCommandSenderJs(code, sender)
             if (!response.isNull) {
                 sender.sendMessage(response.toString())
+            }
+        }
+        catch (e: PolyglotException) {
+            e.printStackTrace()
+
+            sender.sendMessage("${ChatColor.RED}$e")
+            for (stackTrace in e.stackTrace) {
+                if(stackTrace.fileName?.endsWith(".js", true) == true) {
+                    sender.sendMessage("${ChatColor.YELLOW}$stackTrace")
+                }
             }
         }
         catch (e: Exception) {
@@ -91,7 +102,9 @@ class ScriptablePluginJsCommand(private val basePlugin: ScriptablePluginMain) : 
 
             sender.sendMessage("${ChatColor.DARK_RED}$e")
             for (stackTrace in e.stackTrace) {
-                sender.sendMessage("${ChatColor.DARK_RED}$stackTrace")
+                if(stackTrace.className.startsWith("com.pixlfox.scriptablemc", true)) {
+                    sender.sendMessage("${ChatColor.RED}$stackTrace")
+                }
             }
         }
     }

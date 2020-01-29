@@ -2,7 +2,7 @@ package com.pixlfox.scriptablemc.utils
 
 
 @Suppress("unused")
-class File(pathName: String) {
+class FileWrapper(pathName: String) {
 
     private val javaFile: java.io.File = java.io.File(pathName)
 
@@ -15,12 +15,11 @@ class File(pathName: String) {
     fun mkdir(): Boolean = javaFile.mkdir()
     fun mkdirs(): Boolean = javaFile.mkdirs()
     fun isDirectory(): Boolean = javaFile.isDirectory
-    fun parentFile(): File =
-        new(javaFile.parentFile)
+    fun parentFile(): FileWrapper = new(javaFile.parentFile)
 
     companion object {
-        internal fun new(javaFile: java.io.File): File {
-            return File(javaFile.path)
+        internal fun new(javaFile: java.io.File): FileWrapper {
+            return FileWrapper(javaFile.path)
         }
     }
 }
