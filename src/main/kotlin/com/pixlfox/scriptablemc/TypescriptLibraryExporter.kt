@@ -189,6 +189,18 @@ class TypescriptLibraryExporter {
                 classList.add(returnType)
             }
 
+            val genericType = _method.genericReturnType
+            if(stripPackageName(returnType.name).equals("List", false)) {
+                if(genericType != null && genericType is ParameterizedType) {
+                    val actualTypeArg = genericType.actualTypeArguments.firstOrNull()
+                    if(actualTypeArg != null && actualTypeArg is Class<*>) {
+                        if (!classList.contains(actualTypeArg)) {
+                            classList.add(actualTypeArg)
+                        }
+                    }
+                }
+            }
+
             for (_parameter in _method.parameters) {
                 val type = fixClass(_parameter.type)
                 if (!classList.contains(type)) {
