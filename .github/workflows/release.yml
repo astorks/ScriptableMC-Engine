@@ -17,8 +17,6 @@ jobs:
         node-version: 12.14.1
     - name: Fix gradlew permissions
       run: chmod +x ./gradlew
-    - name: Build with Gradle
-      run: ./gradlew shadowJar
     - name: Export TypeScript Libraries with Gradle
       run: ./gradlew exportTypeScriptLibraries
     - name: Compile TypeScript libraries and create archives for release
@@ -30,6 +28,10 @@ jobs:
         zip -r ../ScriptableMC-TypeScript-Lib.zip ./*
         cd ../js/
         zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
+        cd ../../
+        cp ./lib/ScriptableMC-JavaScript-Lib.zip ./src/main/resources/libraries.zip
+    - name: Build with Gradle
+      run: ./gradlew shadowJar
     - name: Upload Plugin Jar
       uses: skx/github-action-publish-binaries@master
       env:
