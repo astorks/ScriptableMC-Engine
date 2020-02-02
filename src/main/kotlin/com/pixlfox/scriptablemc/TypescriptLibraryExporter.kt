@@ -6,11 +6,7 @@ import com.beust.klaxon.Parser
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
 import java.io.File
-import java.lang.reflect.Constructor
-import java.lang.reflect.Method
-import java.lang.reflect.Modifier
-import java.lang.reflect.Parameter
-import kotlin.Exception
+import java.lang.reflect.*
 
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
@@ -35,12 +31,27 @@ class TypescriptLibraryExporter {
         else -> name
     }
 
-    private fun javaClassToTypescript(_class: Class<*>): String {
+    private fun javaClassToTypescript(_class: Class<*>?, genericType: Type? = null): String {
+        if(_class == null) {
+            return "any"
+        }
+
         val className = stripPackageName(_class.name)
         val packageName = getPackageName(_class.name)
 
         if(_class.isArray) {
             return "Array<${javaClassToTypescript(_class.componentType)}>"
+        }
+
+        if(className.equals("List", false)) {
+            if(genericType != null && genericType is ParameterizedType) {
+                val actualTypeArg = genericType.actualTypeArguments.firstOrNull()
+                if(actualTypeArg != null && actualTypeArg is Class<*>) {
+                    return "Array<${javaClassToTypescript(actualTypeArg)}>"
+                }
+            }
+
+            return "Array<any>"
         }
 
         return if (className.equals("byte", true) || className.equals("short", true) || className.equals("int", true) || className.equals("long", true)) "number"
@@ -403,9 +414,9 @@ class TypescriptLibraryExporter {
         for (_method in _class.methods) {
             if(!Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
                 tsInterfaceSource += if (_method.parameterCount == 0) {
-                    "\t${_method.name}(): ${javaClassToTypescript(_method.returnType)};\n"
+                    "\t${_method.name}(): ${javaClassToTypescript(_method.returnType, _method.genericReturnType)};\n"
                 } else {
-                    "\t${_method.name}(${getParameters(_method).joinToString(", ")}): ${safeClassName(javaClassToTypescript(_method.returnType))};\n"
+                    "\t${_method.name}(${getParameters(_method).joinToString(", ")}): ${safeClassName(javaClassToTypescript(_method.returnType, _method.genericReturnType))};\n"
                 }
             }
         }
@@ -466,7 +477,7 @@ class TypescriptLibraryExporter {
                 }
 
                 if(Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
-                    tsClassSource += "\tpublic static ${safeName(jsMethodName)}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType)};\n"
+                    tsClassSource += "\tpublic static ${safeName(jsMethodName)}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType, _method.genericReturnType)};\n"
                     if(index == _methodGroups.value.size - 1) {
                         tsClassSource += "\tpublic static ${safeName(jsMethodName)}(...args: any[]): any {\n"
                         tsClassSource += "\t\treturn $className.\$javaClass.${_method.name}(...args);\n"
