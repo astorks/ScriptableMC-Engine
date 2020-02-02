@@ -1,33 +1,84 @@
 package com.pixlfox.scriptablemc
 
+import com.beust.klaxon.JsonArray
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
 import java.io.File
-import java.lang.reflect.Constructor
-import java.lang.reflect.Method
-import java.lang.reflect.Modifier
-import java.lang.reflect.Parameter
+import java.lang.reflect.*
 
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
 class TypescriptLibraryExporter {
-    private var exportPath: String = "./lib/ts"
+    private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|fr\\.minuskube\\.inv|com\\.google)(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|fr\\.minuskube\\.inv|com\\.google|java\\.sql)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
+
+    private fun safeName(name: String): String = when {
+        name.equals("function", true) -> "_function"
+        name.equals("yield", true) -> "_yield"
+        name.equals("arguments", true) -> "_arguments"
+        name.equals("name", true) -> "_name"
+        name.equals("<set-?>", true) -> "value"
+        name.equals("in", true) -> "_in"
+        else -> name
+    }
+
+    private fun safeClassName(name: String): String = when {
+        name.equals("Array", false) -> "_Array"
+        else -> name
+    }
+
+    private fun javaClassToTypescript(_class: Class<*>?, genericType: Type? = null): String {
+        if(_class == null) {
+            return "any"
+        }
+
+        val className = stripPackageName(_class.name)
+        val packageName = getPackageName(_class.name)
+
+        if(_class.isArray) {
+            return "Array<${javaClassToTypescript(_class.componentType)}>"
+        }
+
+        if(className.equals("List", false)) {
+            if(genericType != null && genericType is ParameterizedType) {
+                val actualTypeArg = genericType.actualTypeArguments.firstOrNull()
+                if(actualTypeArg != null && actualTypeArg is Class<*>) {
+                    return "Array<${javaClassToTypescript(actualTypeArg)}>"
+                }
+            }
+
+            return "Array<any>"
+        }
+
+        return if (className.equals("byte", true) || className.equals("short", true) || className.equals("int", true) || className.equals("long", true)) "number"
+        else if (className.equals("double", true) || className.equals("float", true)) "number"
+        else if (className.equals("string", true) || className.equals("char", true) || className.equals("UUID", true)) "string"
+        else if (className.equals("void", true)) "void"
+        else if (className.equals("boolean", true)) "boolean"
+        else if (className.equals("Value", true)) "any"
+        else if (!packageName.matches(allowedPackagesRegex)) {
+            //println(_class.name)
+            "any"
+        }
+        else className
+    }
 
     fun allowPackages(regex: String): TypescriptLibraryExporter {
         this.allowedPackagesRegex = Regex(regex)
         return this
     }
 
-    fun exportPath(exportPath: String): TypescriptLibraryExporter {
-        this.exportPath = exportPath
+    fun basePath(basePath: String): TypescriptLibraryExporter {
+        this.basePath = basePath
         return this
     }
 
     fun clean(skipThisDir: Boolean = true): TypescriptLibraryExporter {
-        deleteDirectory(File(exportPath), skipThisDir)
+        deleteDirectory(File(basePath), skipThisDir)
         return this
     }
 
@@ -36,7 +87,7 @@ class TypescriptLibraryExporter {
             com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
             com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
             fr.minuskube.inv.SmartInventory::class.java,
-            com.pixlfox.scriptablemc.utils.File::class.java,
+            com.pixlfox.scriptablemc.utils.FileWrapper::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface::class.java,
             com.google.common.io.ByteStreams::class.java
@@ -45,236 +96,23 @@ class TypescriptLibraryExporter {
     }
 
     fun addBukkitClasses(): TypescriptLibraryExporter {
-        return this.addClasses(
-            org.bukkit.Bukkit::class.java,
-            org.bukkit.command.PluginCommand::class.java,
-            org.bukkit.entity.Player::class.java,
-            org.bukkit.Server::class.java,
-            org.bukkit.event.Event::class.java,
-            org.bukkit.configuration.ConfigurationSection::class.java,
+        val classLoader = javaClass.classLoader
+        val bukkitTypes = Parser.default().parse("./type-search-index.json")
 
-            org.bukkit.event.block.BlockBreakEvent::class.java,
-            org.bukkit.event.block.BlockBurnEvent::class.java,
-            org.bukkit.event.block.BlockCanBuildEvent::class.java,
-            org.bukkit.event.block.BlockCookEvent::class.java,
-            org.bukkit.event.block.BlockDamageEvent::class.java,
-            org.bukkit.event.block.BlockDispenseArmorEvent::class.java,
-            org.bukkit.event.block.BlockDispenseEvent::class.java,
-            org.bukkit.event.block.BlockExpEvent::class.java,
-            org.bukkit.event.block.BlockExplodeEvent::class.java,
-            org.bukkit.event.block.BlockFadeEvent::class.java,
-            org.bukkit.event.block.BlockFertilizeEvent::class.java,
-            org.bukkit.event.block.BlockFormEvent::class.java,
-            org.bukkit.event.block.BlockFromToEvent::class.java,
-            org.bukkit.event.block.BlockGrowEvent::class.java,
-            org.bukkit.event.block.BlockIgniteEvent::class.java,
-            org.bukkit.event.block.BlockMultiPlaceEvent::class.java,
-            org.bukkit.event.block.BlockPhysicsEvent::class.java,
-            org.bukkit.event.block.BlockPistonEvent::class.java,
-            org.bukkit.event.block.BlockPistonExtendEvent::class.java,
-            org.bukkit.event.block.BlockPistonRetractEvent::class.java,
-            org.bukkit.event.block.BlockPlaceEvent::class.java,
-            org.bukkit.event.block.BlockRedstoneEvent::class.java,
-            org.bukkit.event.block.BlockShearEntityEvent::class.java,
-            org.bukkit.event.block.BlockSpreadEvent::class.java,
-            org.bukkit.event.block.CauldronLevelChangeEvent	 ::class.java,
-            org.bukkit.event.block.EntityBlockFormEvent::class.java,
-            org.bukkit.event.block.FluidLevelChangeEvent::class.java,
-            org.bukkit.event.block.LeavesDecayEvent::class.java,
-            org.bukkit.event.block.MoistureChangeEvent::class.java,
-            org.bukkit.event.block.NotePlayEvent::class.java,
-            org.bukkit.event.block.SignChangeEvent::class.java,
-            org.bukkit.event.block.SpongeAbsorbEvent::class.java,
+        if(bukkitTypes is JsonArray<*>) {
+            for (bukkitType in bukkitTypes) {
+                if(bukkitType is JsonObject) {
+                    val packageName = bukkitType.string("p")
+                    val className = bukkitType.string("l")
 
-            org.bukkit.event.enchantment.EnchantItemEvent::class.java,
-            org.bukkit.event.enchantment.PrepareItemEnchantEvent::class.java,
+                    try {
+                        this.addClass(classLoader.loadClass("$packageName.$className"))
+                    } catch (e: ClassNotFoundException) { }
+                }
+            }
+        }
 
-            org.bukkit.event.entity.AreaEffectCloudApplyEvent::class.java,
-            org.bukkit.event.entity.BatToggleSleepEvent::class.java,
-            org.bukkit.event.entity.CreatureSpawnEvent::class.java,
-            org.bukkit.event.entity.CreeperPowerEvent::class.java,
-            org.bukkit.event.entity.EnderDragonChangePhaseEvent::class.java,
-            org.bukkit.event.entity.EntityAirChangeEvent::class.java,
-            org.bukkit.event.entity.EntityBreakDoorEvent::class.java,
-            org.bukkit.event.entity.EntityBreedEvent::class.java,
-            org.bukkit.event.entity.EntityChangeBlockEvent::class.java,
-            org.bukkit.event.entity.EntityCombustByBlockEvent::class.java,
-            org.bukkit.event.entity.EntityCombustByEntityEvent::class.java,
-            org.bukkit.event.entity.EntityCombustEvent::class.java,
-            org.bukkit.event.entity.EntityDamageByBlockEvent::class.java,
-            org.bukkit.event.entity.EntityDamageByEntityEvent::class.java,
-            org.bukkit.event.entity.EntityDamageEvent::class.java,
-            org.bukkit.event.entity.EntityDeathEvent::class.java,
-            org.bukkit.event.entity.EntityDropItemEvent::class.java,
-            org.bukkit.event.entity.EntityEvent::class.java,
-            org.bukkit.event.entity.EntityExplodeEvent::class.java,
-            org.bukkit.event.entity.EntityInteractEvent::class.java,
-            org.bukkit.event.entity.EntityPickupItemEvent::class.java,
-            org.bukkit.event.entity.EntityPortalEnterEvent::class.java,
-            org.bukkit.event.entity.EntityPortalEvent::class.java,
-            org.bukkit.event.entity.EntityPortalExitEvent::class.java,
-            org.bukkit.event.entity.EntityPoseChangeEvent::class.java,
-            org.bukkit.event.entity.EntityPotionEffectEvent::class.java,
-            org.bukkit.event.entity.EntityRegainHealthEvent::class.java,
-            org.bukkit.event.entity.EntityResurrectEvent::class.java,
-            org.bukkit.event.entity.EntityShootBowEvent::class.java,
-            org.bukkit.event.entity.EntitySpawnEvent::class.java,
-            org.bukkit.event.entity.EntityTameEvent::class.java,
-            org.bukkit.event.entity.EntityTargetEvent::class.java,
-            org.bukkit.event.entity.EntityTargetLivingEntityEvent::class.java,
-            org.bukkit.event.entity.EntityTeleportEvent::class.java,
-            org.bukkit.event.entity.EntityToggleGlideEvent::class.java,
-            org.bukkit.event.entity.EntityToggleSwimEvent::class.java,
-            org.bukkit.event.entity.EntityTransformEvent::class.java,
-            org.bukkit.event.entity.EntityUnleashEvent::class.java,
-            org.bukkit.event.entity.ExpBottleEvent::class.java,
-            org.bukkit.event.entity.ExplosionPrimeEvent::class.java,
-            org.bukkit.event.entity.FireworkExplodeEvent::class.java,
-            org.bukkit.event.entity.FoodLevelChangeEvent::class.java,
-            org.bukkit.event.entity.HorseJumpEvent::class.java,
-            org.bukkit.event.entity.ItemDespawnEvent::class.java,
-            org.bukkit.event.entity.ItemMergeEvent::class.java,
-            org.bukkit.event.entity.ItemSpawnEvent::class.java,
-            org.bukkit.event.entity.LingeringPotionSplashEvent::class.java,
-            org.bukkit.event.entity.PigZapEvent::class.java,
-            org.bukkit.event.entity.PigZombieAngerEvent::class.java,
-            org.bukkit.event.entity.PlayerDeathEvent::class.java,
-            org.bukkit.event.entity.PlayerLeashEntityEvent::class.java,
-            org.bukkit.event.entity.PotionSplashEvent::class.java,
-            org.bukkit.event.entity.ProjectileHitEvent::class.java,
-            org.bukkit.event.entity.ProjectileLaunchEvent::class.java,
-            org.bukkit.event.entity.SheepDyeWoolEvent::class.java,
-            org.bukkit.event.entity.SheepRegrowWoolEvent::class.java,
-            org.bukkit.event.entity.SlimeSplitEvent::class.java,
-            org.bukkit.event.entity.VillagerAcquireTradeEvent::class.java,
-            org.bukkit.event.entity.VillagerCareerChangeEvent::class.java,
-            org.bukkit.event.entity.VillagerReplenishTradeEvent::class.java,
-
-            org.bukkit.event.hanging.HangingBreakByEntityEvent::class.java,
-            org.bukkit.event.hanging.HangingBreakEvent::class.java,
-            org.bukkit.event.hanging.HangingEvent::class.java,
-            org.bukkit.event.hanging.HangingPlaceEvent::class.java,
-
-            org.bukkit.event.inventory.BrewEvent::class.java,
-            org.bukkit.event.inventory.BrewingStandFuelEvent::class.java,
-            org.bukkit.event.inventory.CraftItemEvent::class.java,
-            org.bukkit.event.inventory.FurnaceBurnEvent::class.java,
-            org.bukkit.event.inventory.FurnaceExtractEvent::class.java,
-            org.bukkit.event.inventory.FurnaceSmeltEvent::class.java,
-            org.bukkit.event.inventory.InventoryClickEvent::class.java,
-            org.bukkit.event.inventory.InventoryCloseEvent::class.java,
-            org.bukkit.event.inventory.InventoryCreativeEvent::class.java,
-            org.bukkit.event.inventory.InventoryDragEvent::class.java,
-            org.bukkit.event.inventory.InventoryEvent::class.java,
-            org.bukkit.event.inventory.InventoryInteractEvent::class.java,
-            org.bukkit.event.inventory.InventoryMoveItemEvent::class.java,
-            org.bukkit.event.inventory.InventoryOpenEvent::class.java,
-            org.bukkit.event.inventory.InventoryPickupItemEvent::class.java,
-            org.bukkit.event.inventory.PrepareAnvilEvent::class.java,
-            org.bukkit.event.inventory.PrepareItemCraftEvent::class.java,
-            org.bukkit.event.inventory.TradeSelectEvent::class.java,
-
-            org.bukkit.event.player.AsyncPlayerChatEvent::class.java,
-            org.bukkit.event.player.AsyncPlayerPreLoginEvent::class.java,
-            org.bukkit.event.player.PlayerAdvancementDoneEvent::class.java,
-            org.bukkit.event.player.PlayerAnimationEvent::class.java,
-            org.bukkit.event.player.PlayerArmorStandManipulateEvent::class.java,
-            org.bukkit.event.player.PlayerBedEnterEvent::class.java,
-            org.bukkit.event.player.PlayerBedLeaveEvent::class.java,
-            org.bukkit.event.player.PlayerBucketEmptyEvent::class.java,
-            org.bukkit.event.player.PlayerBucketEvent::class.java,
-            org.bukkit.event.player.PlayerBucketFillEvent::class.java,
-            org.bukkit.event.player.PlayerChangedMainHandEvent::class.java,
-            org.bukkit.event.player.PlayerChangedWorldEvent::class.java,
-            org.bukkit.event.player.PlayerChannelEvent::class.java,
-            org.bukkit.event.player.PlayerCommandPreprocessEvent::class.java,
-            org.bukkit.event.player.PlayerCommandSendEvent::class.java,
-            org.bukkit.event.player.PlayerDropItemEvent::class.java,
-            org.bukkit.event.player.PlayerEditBookEvent::class.java,
-            org.bukkit.event.player.PlayerEggThrowEvent::class.java,
-            org.bukkit.event.player.PlayerEvent::class.java,
-            org.bukkit.event.player.PlayerExpChangeEvent::class.java,
-            org.bukkit.event.player.PlayerFishEvent::class.java,
-            org.bukkit.event.player.PlayerGameModeChangeEvent::class.java,
-            org.bukkit.event.player.PlayerInteractAtEntityEvent::class.java,
-            org.bukkit.event.player.PlayerInteractEntityEvent::class.java,
-            org.bukkit.event.player.PlayerInteractEvent::class.java,
-            org.bukkit.event.player.PlayerItemBreakEvent::class.java,
-            org.bukkit.event.player.PlayerItemConsumeEvent::class.java,
-            org.bukkit.event.player.PlayerItemDamageEvent::class.java,
-            org.bukkit.event.player.PlayerItemHeldEvent::class.java,
-            org.bukkit.event.player.PlayerItemMendEvent::class.java,
-            org.bukkit.event.player.PlayerJoinEvent::class.java,
-            org.bukkit.event.player.PlayerKickEvent::class.java,
-            org.bukkit.event.player.PlayerLevelChangeEvent::class.java,
-            org.bukkit.event.player.PlayerLocaleChangeEvent::class.java,
-            org.bukkit.event.player.PlayerLoginEvent::class.java,
-            org.bukkit.event.player.PlayerMoveEvent::class.java,
-            org.bukkit.event.player.PlayerPickupArrowEvent::class.java,
-            org.bukkit.event.player.PlayerPortalEvent::class.java,
-            org.bukkit.event.player.PlayerQuitEvent::class.java,
-            org.bukkit.event.player.PlayerRecipeDiscoverEvent::class.java,
-            org.bukkit.event.player.PlayerRegisterChannelEvent::class.java,
-            org.bukkit.event.player.PlayerResourcePackStatusEvent::class.java,
-            org.bukkit.event.player.PlayerRespawnEvent::class.java,
-            org.bukkit.event.player.PlayerRiptideEvent::class.java,
-            org.bukkit.event.player.PlayerShearEntityEvent::class.java,
-            org.bukkit.event.player.PlayerStatisticIncrementEvent::class.java,
-            org.bukkit.event.player.PlayerSwapHandItemsEvent::class.java,
-            org.bukkit.event.player.PlayerTakeLecternBookEvent::class.java,
-            org.bukkit.event.player.PlayerTeleportEvent::class.java,
-            org.bukkit.event.player.PlayerToggleFlightEvent::class.java,
-            org.bukkit.event.player.PlayerToggleSneakEvent::class.java,
-            org.bukkit.event.player.PlayerToggleSprintEvent::class.java,
-            org.bukkit.event.player.PlayerUnleashEntityEvent::class.java,
-            org.bukkit.event.player.PlayerUnregisterChannelEvent::class.java,
-            org.bukkit.event.player.PlayerVelocityEvent::class.java,
-
-            org.bukkit.event.server.BroadcastMessageEvent::class.java,
-            org.bukkit.event.server.MapInitializeEvent::class.java,
-            org.bukkit.event.server.PluginDisableEvent::class.java,
-            org.bukkit.event.server.PluginEnableEvent::class.java,
-            org.bukkit.event.server.PluginEvent::class.java,
-            org.bukkit.event.server.RemoteServerCommandEvent::class.java,
-            org.bukkit.event.server.ServerCommandEvent::class.java,
-            org.bukkit.event.server.ServerEvent::class.java,
-            org.bukkit.event.server.ServerListPingEvent::class.java,
-            org.bukkit.event.server.ServerLoadEvent::class.java,
-            org.bukkit.event.server.ServiceEvent::class.java,
-            org.bukkit.event.server.ServiceRegisterEvent::class.java,
-            org.bukkit.event.server.ServiceUnregisterEvent::class.java,
-            org.bukkit.event.server.TabCompleteEvent::class.java,
-
-            org.bukkit.event.vehicle.VehicleBlockCollisionEvent::class.java,
-            org.bukkit.event.vehicle.VehicleCollisionEvent::class.java,
-            org.bukkit.event.vehicle.VehicleCreateEvent::class.java,
-            org.bukkit.event.vehicle.VehicleDamageEvent::class.java,
-            org.bukkit.event.vehicle.VehicleDestroyEvent::class.java,
-            org.bukkit.event.vehicle.VehicleEnterEvent::class.java,
-            org.bukkit.event.vehicle.VehicleEntityCollisionEvent::class.java,
-            org.bukkit.event.vehicle.VehicleEvent::class.java,
-            org.bukkit.event.vehicle.VehicleExitEvent::class.java,
-            org.bukkit.event.vehicle.VehicleMoveEvent::class.java,
-            org.bukkit.event.vehicle.VehicleUpdateEvent::class.java,
-
-            org.bukkit.event.weather.LightningStrikeEvent::class.java,
-            org.bukkit.event.weather.ThunderChangeEvent::class.java,
-            org.bukkit.event.weather.WeatherChangeEvent::class.java,
-            org.bukkit.event.weather.WeatherEvent::class.java,
-
-            org.bukkit.event.world.ChunkEvent::class.java,
-            org.bukkit.event.world.ChunkLoadEvent::class.java,
-            org.bukkit.event.world.ChunkPopulateEvent::class.java,
-            org.bukkit.event.world.ChunkUnloadEvent::class.java,
-            org.bukkit.event.world.PortalCreateEvent::class.java,
-            org.bukkit.event.world.SpawnChangeEvent::class.java,
-            org.bukkit.event.world.StructureGrowEvent::class.java,
-            org.bukkit.event.world.WorldEvent::class.java,
-            org.bukkit.event.world.WorldInitEvent::class.java,
-            org.bukkit.event.world.WorldLoadEvent::class.java,
-            org.bukkit.event.world.WorldSaveEvent::class.java,
-            org.bukkit.event.world.WorldUnloadEvent::class.java
-        )
+        return this
     }
 
     fun addClasses(vararg _classes: Class<*>): TypescriptLibraryExporter {
@@ -286,10 +124,7 @@ class TypescriptLibraryExporter {
     }
 
     fun addClass(_class: Class<*>): TypescriptLibraryExporter {
-        if (_class.isArray) {
-
-        }
-        else {
+        if (!_class.isArray) {
             if (!classList.contains(_class) && _class.name.matches(allowedPackagesRegex)) {
                 classList.add(_class)
             } else {
@@ -352,6 +187,18 @@ class TypescriptLibraryExporter {
             val returnType = fixClass(_method.returnType)
             if (!classList.contains(returnType)) {
                 classList.add(returnType)
+            }
+
+            val genericType = _method.genericReturnType
+            if(stripPackageName(returnType.name).equals("List", false)) {
+                if(genericType != null && genericType is ParameterizedType) {
+                    val actualTypeArg = genericType.actualTypeArguments.firstOrNull()
+                    if(actualTypeArg != null && actualTypeArg is Class<*>) {
+                        if (!classList.contains(actualTypeArg)) {
+                            classList.add(actualTypeArg)
+                        }
+                    }
+                }
             }
 
             for (_parameter in _method.parameters) {
@@ -433,40 +280,80 @@ class TypescriptLibraryExporter {
         return classList.toTypedArray()
     }
 
-    fun exportLibraries() {
+    fun exportLibraries(): TypescriptLibraryExporter {
         var count = 0
 
-        for (_class in classList) {
-            if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
-                count++
+        for ((packageName, classes) in classList.sortedBy { stripPackageName(it.name) }.groupBy { getPackageName(it.name) }) {
+            for (_class in classes) {
+                if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+                    count++
 
-                val file = File("$exportPath/${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
-                if(!file.exists()) {
-                    file.parentFile.mkdirs()
-                    file.createNewFile()
-                    file.writeText(generateTypescriptSource(_class))
-                    println("Exported ${stripPackageName(_class.name)} -> ${file.path}.")
+                    val file = File("$basePath/ts/${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
+                    if(!file.exists()) {
+                        file.parentFile.mkdirs()
+                        file.createNewFile()
+                        file.writeText(generateTypescriptSource(_class))
+                        println("Exported $packageName.${stripPackageName(_class.name)} -> ${file.path}.")
+                    }
                 }
             }
         }
 
         println("Successfully generated $count class libraries.")
+
+        return this
     }
 
-//    fun exportLibrariesBeta() {
-//        for (_classGroup in classList.groupBy { e: Class<*> -> e.packageName }) {
-//
-//            val file = File("$exportPath/${_classGroup.key}.ts")
-//            if(!file.exists()) {
-//                file.parentFile.mkdirs()
-//                file.createNewFile()
-//                file.writeText(generateTypescriptSourceBeta(_classGroup.value.toTypedArray()))
-//                println("Exported ${_classGroup.value.size} classes to ${file.path}.")
-//            }
-//        }
-//
-//        println("Successfully exported class libraries.")
-//    }
+    fun exportGlobalLibrary(): TypescriptLibraryExporter {
+        val file = File("$basePath/ts/global.ts")
+        if(!file.exists()) {
+            file.parentFile.mkdirs()
+            file.createNewFile()
+            file.writeText(generateTypescriptGlobalExports())
+            println("Exported global.ts.")
+        }
+
+        return this
+    }
+
+    fun exportProjectFiles(): TypescriptLibraryExporter {
+        File("$basePath/tsconfig.json").writeText("{\n" +
+                "    \"compilerOptions\": {\n" +
+                "        \"target\": \"es2019\",\n" +
+                "        \"module\": \"esnext\",\n" +
+                "        \"sourceMap\": false,\n" +
+                "        \"allowJs\": true,\n" +
+                "        \"outDir\": \"js\",\n" +
+                "        \"rootDir\": \"ts\",\n" +
+                "        \"declaration\": true,\n" +
+                "        \"lib\": [\"ES5\", \"ES2015\", \"ES2016\", \"ES2017\", \"ES2018\", \"ES2019\"]\n" +
+                "    },\n" +
+                "    \"include\": [\n" +
+                "        \"ts/**/*\"\n" +
+                "    ]\n" +
+                "}")
+
+        File("$basePath/package.json").writeText("{\n" +
+                "  \"name\": \"scriptablemc-typescript-lib\",\n" +
+                "  \"version\": \"1.0.0\",\n" +
+                "  \"description\": \"Typescript plugin example and libraries for Minecraft 1.15\",\n" +
+                "  \"scripts\": {\n" +
+                "    \"compile\": \"npx tsc\"\n" +
+                "  },\n" +
+                "  \"author\": \"Ashton Storks\",\n" +
+                "  \"license\": \"ISC\",\n" +
+                "  \"bugs\": {\n" +
+                "    \"url\": \"https://github.com/astorks/ScriptableMC-TypeScript/issues\"\n" +
+                "  },\n" +
+                "  \"homepage\": \"https://github.com/astorks/ScriptableMC-TypeScript#readme\",\n" +
+                "  \"dependencies\": {},\n" +
+                "  \"devDependencies\": {\n" +
+                "    \"typescript\": \"^3.7.5\"\n" +
+                "  }\n" +
+                "}\n")
+
+        return this
+    }
 
     @Suppress("UNCHECKED_CAST")
     private fun generateTypescriptSource(_class: Class<*>): String {
@@ -479,33 +366,18 @@ class TypescriptLibraryExporter {
         return source
     }
 
-
-//    @Suppress("UNCHECKED_CAST")
-//    private fun generateTypescriptSourceBeta(_classes: Array<Class<*>>): String {
-//        var source = "declare var Java: any;\n"
-//        source += generateTypescriptImports(_classes)
-//
-//        for (_class in _classes) {
-//            source += generateTypescriptInterface(_class)
-//            source += if(_class.isEnum) generateTypescriptEnum(_class as Class<Enum<*>>) else generateTypescriptClass(_class)
-//        }
-//
-//        return source
-//    }
-
-
     private fun generateTypescriptImports(_class: Class<*>): String {
         var tsImportsSource = ""
 
         val classList = buildClassList(_class)
-        for(requiredClass in classList) {
+        for(requiredClass in classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
             val packageName = getPackageName(requiredClass.name)
 
             if(!stripPackageName(_class.name).equals(stripPackageName(requiredClass.name), true)) {
                 if (packageName.matches(allowedPackagesRegex) && !requiredClass.name.endsWith("\$Spigot")) {
                     val upDirCount = getPackageName(_class.name).split('.').count()
 
-                    tsImportsSource += "import {${stripPackageName(requiredClass.name)}} from '${"../".repeat(upDirCount)}${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js'\n"
+                    tsImportsSource += "import ${safeClassName(stripPackageName(requiredClass.name))} from '${"../".repeat(upDirCount)}${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js'\n"
                 }
             }
         }
@@ -513,27 +385,34 @@ class TypescriptLibraryExporter {
         return tsImportsSource + "\n"
     }
 
-//    private fun generateTypescriptImports(_classes: Array<Class<*>>): String {
-//        var tsImportsSource = ""
-//
-//        val importedPackages = mutableListOf<String>()
-//        val classList = buildClassList(_classes)
-//
-//        for(requiredClass in classList.groupBy { e: Class<*> -> e.packageName }) {
-//            val skipImport = _classes.any { _class: Class<*> ->  _class.packageName.equals(requiredClass.key, true)}
-//            if(!skipImport) {
-//                if (requiredClass.key.matches(allowedPackagesRegex) && !importedPackages.contains(requiredClass.key)) {
-//                    tsImportsSource += "import {${requiredClass.value.joinToString(", ") { e: Class<*> -> stripPackageName(e.name) }}} from './${requiredClass.key}.js'\n"
-//                    importedPackages.add(requiredClass.key)
-//                }
-//            }
-//        }
-//
-//        return tsImportsSource + "\n"
-//    }
+    private fun generateTypescriptImportForClass(_class: Class<*>): String {
+        return "import ${getPackageName(_class.name).replace('.', '_')}_${safeClassName(stripPackageName(_class.name))} from './${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.js'\n"
+    }
+
+    private fun generateTypescriptGlobalExports(): String {
+        var tsGlobalExportsSource = ""
+
+        for (_class in classList) {
+            if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+                tsGlobalExportsSource += generateTypescriptImportForClass(_class);
+            }
+        }
+
+        for((packageName, classes) in this.classList.groupBy { getPackageName(it.name) }) {
+            tsGlobalExportsSource += "export namespace $packageName {\n"
+            for (_class in classes) {
+                if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+                    tsGlobalExportsSource += "\texport const ${safeClassName(stripPackageName(_class.name))} = ${getPackageName(_class.name).replace('.', '_')}_${safeClassName(stripPackageName(_class.name))};\n"
+                }
+            }
+            tsGlobalExportsSource += "}\n"
+        }
+
+        return tsGlobalExportsSource + "\n"
+    }
 
     private fun generateTypescriptInterface(_class: Class<*>): String {
-        var tsInterfaceSource = "export interface ${stripPackageName(_class.name)}"
+        var tsInterfaceSource = "export default interface ${safeClassName(stripPackageName(_class.name))}"
 
         val interfaceNames = getInterfaceNames(_class)
 
@@ -547,9 +426,9 @@ class TypescriptLibraryExporter {
         for (_method in _class.methods) {
             if(!Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
                 tsInterfaceSource += if (_method.parameterCount == 0) {
-                    "\t${_method.name}(): ${javaClassToTypescript(_method.returnType)};\n"
+                    "\t${_method.name}(): ${javaClassToTypescript(_method.returnType, _method.genericReturnType)};\n"
                 } else {
-                    "\t${_method.name}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType)};\n"
+                    "\t${_method.name}(${getParameters(_method).joinToString(", ")}): ${safeClassName(javaClassToTypescript(_method.returnType, _method.genericReturnType))};\n"
                 }
             }
         }
@@ -560,8 +439,8 @@ class TypescriptLibraryExporter {
     }
 
     private fun generateTypescriptClass(_class: Class<*>): String {
-        val className = stripPackageName(_class.name)
-        var tsClassSource = "export class $className {\n"
+        val className = safeClassName(stripPackageName(_class.name))
+        var tsClassSource = "export default class $className {\n"
 
         tsClassSource += "\tpublic static get \$javaClass(): any {\n"
         tsClassSource += "\t\treturn Java.type('${_class.name}');\n"
@@ -590,7 +469,7 @@ class TypescriptLibraryExporter {
             }
 
             if(Modifier.isStatic(_field.modifiers) && Modifier.isPublic(_field.modifiers) && Modifier.isFinal(_field.modifiers) && !_field.name.matches(blacklistRegex)) {
-                tsClassSource += "\tpublic static get ${safeName(jsFieldName)}(): ${javaClassToTypescript(_field.type)} {\n"
+                tsClassSource += "\tpublic static get ${safeName(jsFieldName)}(): ${safeClassName(javaClassToTypescript(_field.type))} {\n"
                 tsClassSource += "\t\treturn $className.\$javaClass.${_field.name};\n"
                 tsClassSource += "\t}\n"
             }
@@ -610,7 +489,7 @@ class TypescriptLibraryExporter {
                 }
 
                 if(Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
-                    tsClassSource += "\tpublic static ${safeName(jsMethodName)}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType)};\n"
+                    tsClassSource += "\tpublic static ${safeName(jsMethodName)}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType, _method.genericReturnType)};\n"
                     if(index == _methodGroups.value.size - 1) {
                         tsClassSource += "\tpublic static ${safeName(jsMethodName)}(...args: any[]): any {\n"
                         tsClassSource += "\t\treturn $className.\$javaClass.${_method.name}(...args);\n"
@@ -626,8 +505,8 @@ class TypescriptLibraryExporter {
     }
 
     private fun generateTypescriptEnum(_class: Class<Enum<*>>): String {
-        val enumName = stripPackageName(_class.name)
-        var tsEnumSource = "export class $enumName {\n"
+        val enumName = safeClassName(stripPackageName(_class.name))
+        var tsEnumSource = "export default class $enumName {\n"
 
         tsEnumSource += "\tpublic static get \$javaClass(): any {\n"
         tsEnumSource += "\t\treturn Java.type('${_class.name}');\n"
@@ -664,7 +543,7 @@ class TypescriptLibraryExporter {
         val parameterNames = mutableListOf<String>()
 
         for(_parameter in _parameters) {
-            parameterNames.add("${safeName(_parameter.name)}: ${javaClassToTypescript(_parameter.type)}")
+            parameterNames.add("${safeName(_parameter.name)}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
         }
 
         return parameterNames.toTypedArray()
@@ -675,7 +554,7 @@ class TypescriptLibraryExporter {
         val paranames = paranamer.lookupParameterNames(_method, false)
 
         for((index, _parameter) in _method.parameters.withIndex()) {
-            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${javaClassToTypescript(_parameter.type)}")
+            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
         }
 
         return parameterNames.toTypedArray()
@@ -683,10 +562,10 @@ class TypescriptLibraryExporter {
 
     private fun getParameters(_constructor: Constructor<*>): Array<String> {
         val parameterNames = mutableListOf<String>()
-        val paranames = paranamer.lookupParameterNames(_constructor, false)
+        val parameterNamesLookup = paranamer.lookupParameterNames(_constructor, false)
 
         for((index, _parameter) in _constructor.parameters.withIndex()) {
-            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${javaClassToTypescript(_parameter.type)}")
+            parameterNames.add("${safeName(parameterNamesLookup.getOrElse(index) { _parameter.name })}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
         }
 
         return parameterNames.toTypedArray()
@@ -702,18 +581,6 @@ class TypescriptLibraryExporter {
         return parameterNames.toTypedArray()
     }
 
-    private fun safeName(name: String): String {
-        return when {
-            name.equals("function", true) -> "_function"
-            name.equals("yield", true) -> "_yield"
-            name.equals("arguments", true) -> "_arguments"
-            name.equals("name", true) -> "_name"
-            name.equals("<set-?>", true) -> "value"
-            name.equals("in", true) -> "_in"
-            else -> name
-        }
-    }
-
     private fun stripPackageName(name: String): String {
         return name.split('.').last().replace(";", "")
     }
@@ -726,24 +593,6 @@ class TypescriptLibraryExporter {
         }
 
         return packages.joinToString(".")
-    }
-
-    private fun javaClassToTypescript(_class: Class<*>): String {
-        val className = stripPackageName(_class.name)
-        val packageName = getPackageName(_class.name)
-
-        if(_class.isArray) {
-            return "Array<${javaClassToTypescript(_class.componentType)}>"
-        }
-
-        return if (className.equals("byte", true) || className.equals("short", true) || className.equals("int", true) || className.equals("long", true)) "number"
-        else if (className.equals("double", true) || className.equals("float", true)) "number"
-        else if (className.equals("string", true) || className.equals("char", true) || className.equals("UUID", true)) "string"
-        else if (className.equals("void", true)) "void"
-        else if (className.equals("boolean", true)) "boolean"
-        else if (className.equals("Value", true)) "any"
-        else if (!packageName.matches(allowedPackagesRegex)) "any"
-        else className
     }
 
     private fun fixClass(_class: Class<*>): Class<*> {
@@ -778,44 +627,8 @@ class TypescriptLibraryExporter {
                 .addBukkitClasses()
                 .clean()
                 .exportLibraries()
-
-            File("./lib/tsconfig.json").writeText("{\n" +
-                    "    \"compilerOptions\": {\n" +
-                    "        \"target\": \"es2019\",\n" +
-                    "        \"module\": \"esnext\",\n" +
-                    "        \"sourceMap\": true,\n" +
-                    "        \"allowJs\": true,\n" +
-                    "        \"outDir\": \"js\",\n" +
-                    "        \"rootDir\": \"ts\",\n" +
-                    "        \"declaration\": true,\n" +
-                    "        \"lib\": [\"ES5\", \"ES2015\", \"ES2016\", \"ES2017\", \"ES2018\", \"ES2019\"],\n" +
-                    "        \"types\": [\n" +
-                    "\n" +
-                    "        ]\n" +
-                    "    },\n" +
-                    "    \"include\": [\n" +
-                    "        \"ts/**/*\"\n" +
-                    "    ]\n" +
-                    "}")
-
-            File("./lib/package.json").writeText("{\n" +
-                    "  \"name\": \"scriptablemc-typescript-lib\",\n" +
-                    "  \"version\": \"1.0.0\",\n" +
-                    "  \"description\": \"Typescript plugin example and libraries for Minecraft 1.15\",\n" +
-                    "  \"scripts\": {\n" +
-                    "    \"compile\": \"npx tsc\"\n" +
-                    "  },\n" +
-                    "  \"author\": \"Ashton Storks\",\n" +
-                    "  \"license\": \"ISC\",\n" +
-                    "  \"bugs\": {\n" +
-                    "    \"url\": \"https://github.com/astorks/ScriptableMC-TypeScript/issues\"\n" +
-                    "  },\n" +
-                    "  \"homepage\": \"https://github.com/astorks/ScriptableMC-TypeScript#readme\",\n" +
-                    "  \"dependencies\": {},\n" +
-                    "  \"devDependencies\": {\n" +
-                    "    \"typescript\": \"^3.7.5\"\n" +
-                    "  }\n" +
-                    "}\n")
+                .exportGlobalLibrary()
+                .exportProjectFiles()
         }
     }
 }

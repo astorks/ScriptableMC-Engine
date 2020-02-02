@@ -27,3 +27,10 @@ You can take the typescript example and compile it, then directly modify the jav
 | `/scriptablemc javascript file <filePath>`   | `/smc js f <filePath>`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
 | `/scriptablemc menu`   | `/smc menu`       | Opens an inventory menu that allows you to control the scriptable engine. | `scriptablemc.menu` |
 | `/scriptablemc info`   | `/smc info`       | Prints plugin version and GraalVM/GraalJS versions if available. | `scriptablemc.info` |
+
+### `/smc javascript execute` Command Example
+> `/jsex return 1 + 1` <br>
+> ![2](https://i.imgur.com/1MkiDxW.png)
+
+> `/jsex sender.sendMessage(lib.org.bukkit.ChatColor.GREEN + "Hello World!")` <br>
+> ![Hello World!](https://i.imgur.com/1dzwpqy.png)
