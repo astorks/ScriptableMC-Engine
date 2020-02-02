@@ -257,7 +257,7 @@ class TypescriptLibraryExporter {
     fun exportLibraries(): TypescriptLibraryExporter {
         var count = 0
 
-        for ((packageName, classes) in classList.sortedBy { stripPackageName(it.name) }.groupBy { getPackageName(it.name) }) {
+        for ((packageName, classes) in classList.sortedBy { stripPackageName(it.name) }.groupBy { it.packageName }) {
             for (_class in classes) {
                 if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
                     count++
@@ -372,7 +372,7 @@ class TypescriptLibraryExporter {
             }
         }
 
-        for((packageName, classes) in this.classList.groupBy { getPackageName(it.name) }) {
+        for((packageName, classes) in this.classList.groupBy { it.packageName }) {
             tsGlobalExportsSource += "export namespace $packageName {\n"
             for (_class in classes) {
                 if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
