@@ -86,19 +86,16 @@ class TypescriptLibraryExporter {
 
     fun addBukkitClasses(): TypescriptLibraryExporter {
         val classLoader = javaClass.classLoader
-        val bukkitTypes = Parser.default().parse("./type-search-index.json")
+        val bukkitTypes = Parser.default().parse("./type-search-index.json") as JsonArray<JsonObject>
 
-        if(bukkitTypes is JsonArray<*>) {
-            for (bukkitType in bukkitTypes) {
-                if(bukkitType is JsonObject) {
-                    val packageName = bukkitType.string("p")
-                    val className = bukkitType.string("l")
+        for (bukkitType in bukkitTypes) {
+            val packageName = bukkitType.string("p")
+            val className = bukkitType.string("l")
 
-                    try {
-                        this.addClass(classLoader.loadClass("$packageName.$className"))
-                    } catch (e: ClassNotFoundException) { }
-                }
+            try {
+                this.addClass(classLoader.loadClass("$packageName.$className"))
             }
+            catch(e: ClassNotFoundException) { }
         }
 
         return this
