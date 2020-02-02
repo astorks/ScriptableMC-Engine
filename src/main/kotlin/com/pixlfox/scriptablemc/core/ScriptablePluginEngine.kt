@@ -1,5 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
+import com.pixlfox.scriptablemc.utils.UnzipUtility
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -11,7 +12,7 @@ import java.util.*
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false): Listener {
+class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false, val extractLibs: Boolean = true): Listener {
     private val graalContext: Context = Context
         .newBuilder()
         .allowAllAccess(true)
@@ -33,6 +34,14 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         val mainScriptFile = File("${rootScriptsFolder}/main.js")
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
+        }
+
+        if(extractLibs) {
+            val librariesResource = bootstrapPlugin.getResource("libraries.zip")
+            if (librariesResource != null) {
+                val unzipUtil = UnzipUtility()
+                unzipUtil.unzip(librariesResource, "${rootScriptsFolder}/lib")
+            }
         }
 
         if(mainScriptFile.exists()) {

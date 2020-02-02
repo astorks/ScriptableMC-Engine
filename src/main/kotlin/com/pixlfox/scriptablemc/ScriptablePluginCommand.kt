@@ -57,7 +57,8 @@ class ScriptablePluginJsCommand(private val basePlugin: ScriptablePluginMain) : 
                 basePlugin.scriptEngine = ScriptablePluginEngine(
                     basePlugin,
                     basePlugin.config.getString("root_scripts_folder", "./scripts").orEmpty(),
-                    basePlugin.config.getBoolean("debug", false)
+                    basePlugin.config.getBoolean("debug", false),
+                    basePlugin.config.getBoolean("extract_libs", true)
                 )
 
                 basePlugin.scriptEngine!!.start()
