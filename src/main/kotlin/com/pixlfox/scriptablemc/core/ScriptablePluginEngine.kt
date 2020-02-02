@@ -1,8 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
 import fr.minuskube.inv.InventoryManager
-import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 import org.bukkit.event.Listener
 import org.graalvm.polyglot.*
 import java.io.File
@@ -75,43 +73,14 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         }
     }
 
-    fun evalFile(scriptFile: File): Value {
-        return if(scriptFile.exists()) {
-            eval(
-                Source.newBuilder("js", scriptFile)
-                    .name(scriptFile.name)
-                    .mimeType("application/javascript+module")
-                    .interactive(false)
-                    .build()
-            )
-        } else {
-            throw ScriptNotFoundException(scriptFile)
-        }
-    }
-
     fun evalJs(source: String): Value {
         return graalContext.eval(
             Source.newBuilder("js", source,"${UUID.randomUUID()}.js")
-                .mimeType("application/javascript+module")
-                .interactive(false)
-                .cached(false)
-                .build()
+            .mimeType("application/javascript+module")
+            .interactive(false)
+            .cached(false)
+            .build()
         )
-    }
-
-    fun evalCommandSenderJs(source: String, sender: CommandSender): Value {
-        val tempScriptFile = File("${rootScriptsFolder}/${UUID.randomUUID()}.js")
-        tempScriptFile.writeText("new (class EvalCommandSenderContext {\n" +
-                "    run(sender, server, servicesManager) {\n" +
-                "        $source\n" +
-                "    }\n" +
-                "})()\n");
-        val evalCommandSenderContext = evalFile(tempScriptFile)
-        tempScriptFile.delete()
-        evalCommandSenderContext.putMember("sender", sender)
-        evalCommandSenderContext.putMember("server", Bukkit.getServer())
-        evalCommandSenderContext.putMember("servicesManager", Bukkit.getServicesManager())
-        return evalCommandSenderContext.invokeMember("run", sender, Bukkit.getServer(), Bukkit.getServicesManager());
     }
 
     fun eval(source: Source): Value {

@@ -11,10 +11,6 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     internal var scriptEngine: ScriptablePluginEngine? = null
     private var commandManager: PaperCommandManager? = null
 
-    override fun onLoad() {
-        instance = this
-    }
-
     override fun onEnable() {
         commandManager = PaperCommandManager(this)
         commandManager?.registerCommand(ScriptablePluginCommand(this))
@@ -65,12 +61,5 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
         Thread.currentThread().contextClassLoader = javaClass.classLoader
         callback()
         Thread.currentThread().contextClassLoader = oldCl
-    }
-
-    companion object {
-        private var inst: ScriptablePluginMain? = null
-        var instance: ScriptablePluginMain
-            internal set(value) { inst = value }
-            get() { return inst!! }
     }
 }
