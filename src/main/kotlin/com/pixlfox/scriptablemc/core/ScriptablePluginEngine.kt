@@ -101,8 +101,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
 
     fun evalCommandSenderJs(source: String, sender: CommandSender): Value {
         val tempScriptFile = File("${rootScriptsFolder}/${UUID.randomUUID()}.js")
-        tempScriptFile.writeText("import * as lib from './lib/global.js';\n" +
-                "new (class EvalCommandSenderContext {\n" +
+        tempScriptFile.writeText("new (class EvalCommandSenderContext {\n" +
                 "    run(sender, server, servicesManager) {\n" +
                 "        $source\n" +
                 "    }\n" +
