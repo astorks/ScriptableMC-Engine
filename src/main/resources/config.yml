@@ -4,3 +4,7 @@ root_scripts_folder: './scripts'
 
 # Prints some additional debugging messages
 debug: false
+
+# Automatically extract js libraries to scripts lib folder if lib folder is missing
+# If you set this to false you'll need to download and extract the libs manually.
+extract_libs: true

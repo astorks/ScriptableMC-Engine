@@ -24,7 +24,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
             saveDefaultConfig()
 
             try {
-                scriptEngine = ScriptablePluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false))
+                scriptEngine = ScriptablePluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false), config.getBoolean("extract_libs", true))
                 scriptEngine!!.start()
                 logger.info("Scriptable plugin engine started.")
             } catch (e: IllegalStateException) {
