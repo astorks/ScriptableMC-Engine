@@ -2,8 +2,7 @@ package com.pixlfox.scriptablemc.core
 
 import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
 import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
-import com.pixlfox.scriptablemc.utils.FileWrapper
-import com.pixlfox.scriptablemc.utils.MysqlWrapper
+import com.pixlfox.scriptablemc.utils.File
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -32,9 +31,6 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
     val javaPlugin: JavaPlugin
         get() = engine.bootstrapPlugin
-
-    val servicesManager: ServicesManager
-        get() = Bukkit.getServicesManager()
 
     private val commands = mutableListOf<PluginCommand>()
 
@@ -141,12 +137,8 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         knownCommandsField.isAccessible = false
     }
 
-    fun getFile(pathName: String): FileWrapper {
-        return FileWrapper(pathName)
-    }
-
-    fun newMysqlInstance(host: String, port: Int, database: String, username: String, password: String): MysqlWrapper {
-        return MysqlWrapper(host, port, database, username, password)
+    fun getFile(pathName: String): File {
+        return File(pathName)
     }
 
     fun smartInventory(): SmartInventoryInterface {
@@ -173,20 +165,6 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
         engine.bootstrapPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
         return placeholderText
-    }
-
-    fun getBukkitServiceRegistration(className: String): Any? {
-        val serviceClass = servicesManager.knownServices.firstOrNull { e -> e.name == className }
-
-        if(serviceClass != null) {
-            return getBukkitServiceRegistration(serviceClass)
-        }
-
-        return null
-    }
-
-    fun getBukkitServiceRegistration(_class: Class<*>): Any? {
-        return servicesManager.getRegistration(_class)
     }
 
     companion object {

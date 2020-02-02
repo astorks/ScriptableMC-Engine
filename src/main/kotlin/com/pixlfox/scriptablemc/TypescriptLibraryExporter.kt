@@ -11,59 +11,23 @@ import java.lang.reflect.Parameter
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
 class TypescriptLibraryExporter {
-    private var basePath: String = "./lib"
+    private var exportPath: String = "./lib/ts"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|fr\\.minuskube\\.inv|com\\.google|java\\.sql)(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|fr\\.minuskube\\.inv|com\\.google)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
-
-    private fun safeName(name: String): String = when {
-        name.equals("function", true) -> "_function"
-        name.equals("yield", true) -> "_yield"
-        name.equals("arguments", true) -> "_arguments"
-        name.equals("name", true) -> "_name"
-        name.equals("<set-?>", true) -> "value"
-        name.equals("in", true) -> "_in"
-        else -> name
-    }
-
-    private fun safeClassName(name: String): String = when {
-        name.equals("Array", false) -> "_Array"
-        else -> name
-    }
-
-    private fun javaClassToTypescript(_class: Class<*>): String {
-        val className = stripPackageName(_class.name)
-        val packageName = getPackageName(_class.name)
-
-        if(_class.isArray) {
-            return "Array<${javaClassToTypescript(_class.componentType)}>"
-        }
-
-        return if (className.equals("byte", true) || className.equals("short", true) || className.equals("int", true) || className.equals("long", true)) "number"
-        else if (className.equals("double", true) || className.equals("float", true)) "number"
-        else if (className.equals("string", true) || className.equals("char", true) || className.equals("UUID", true)) "string"
-        else if (className.equals("void", true)) "void"
-        else if (className.equals("boolean", true)) "boolean"
-        else if (className.equals("Value", true)) "any"
-        else if (!packageName.matches(allowedPackagesRegex)) {
-            //println(_class.name)
-            "any"
-        }
-        else className
-    }
 
     fun allowPackages(regex: String): TypescriptLibraryExporter {
         this.allowedPackagesRegex = Regex(regex)
         return this
     }
 
-    fun basePath(basePath: String): TypescriptLibraryExporter {
-        this.basePath = basePath
+    fun exportPath(exportPath: String): TypescriptLibraryExporter {
+        this.exportPath = exportPath
         return this
     }
 
     fun clean(skipThisDir: Boolean = true): TypescriptLibraryExporter {
-        deleteDirectory(File(basePath), skipThisDir)
+        deleteDirectory(File(exportPath), skipThisDir)
         return this
     }
 
@@ -72,7 +36,7 @@ class TypescriptLibraryExporter {
             com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
             com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
             fr.minuskube.inv.SmartInventory::class.java,
-            com.pixlfox.scriptablemc.utils.FileWrapper::class.java,
+            com.pixlfox.scriptablemc.utils.File::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface::class.java,
             com.google.common.io.ByteStreams::class.java
@@ -469,14 +433,14 @@ class TypescriptLibraryExporter {
         return classList.toTypedArray()
     }
 
-    fun exportLibraries(): TypescriptLibraryExporter {
+    fun exportLibraries() {
         var count = 0
 
         for (_class in classList) {
             if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
                 count++
 
-                val file = File("$basePath/ts/${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
+                val file = File("$exportPath/${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
                 if(!file.exists()) {
                     file.parentFile.mkdirs()
                     file.createNewFile()
@@ -487,47 +451,6 @@ class TypescriptLibraryExporter {
         }
 
         println("Successfully generated $count class libraries.")
-
-        return this
-    }
-
-    fun exportProjectFiles(): TypescriptLibraryExporter {
-        File("$basePath/tsconfig.json").writeText("{\n" +
-                "    \"compilerOptions\": {\n" +
-                "        \"target\": \"es2019\",\n" +
-                "        \"module\": \"esnext\",\n" +
-                "        \"sourceMap\": false,\n" +
-                "        \"allowJs\": true,\n" +
-                "        \"outDir\": \"js\",\n" +
-                "        \"rootDir\": \"ts\",\n" +
-                "        \"declaration\": true,\n" +
-                "        \"lib\": [\"ES5\", \"ES2015\", \"ES2016\", \"ES2017\", \"ES2018\", \"ES2019\"]\n" +
-                "    },\n" +
-                "    \"include\": [\n" +
-                "        \"ts/**/*\"\n" +
-                "    ]\n" +
-                "}")
-
-        File("$basePath/package.json").writeText("{\n" +
-                "  \"name\": \"scriptablemc-typescript-lib\",\n" +
-                "  \"version\": \"1.0.0\",\n" +
-                "  \"description\": \"Typescript plugin example and libraries for Minecraft 1.15\",\n" +
-                "  \"scripts\": {\n" +
-                "    \"compile\": \"npx tsc\"\n" +
-                "  },\n" +
-                "  \"author\": \"Ashton Storks\",\n" +
-                "  \"license\": \"ISC\",\n" +
-                "  \"bugs\": {\n" +
-                "    \"url\": \"https://github.com/astorks/ScriptableMC-TypeScript/issues\"\n" +
-                "  },\n" +
-                "  \"homepage\": \"https://github.com/astorks/ScriptableMC-TypeScript#readme\",\n" +
-                "  \"dependencies\": {},\n" +
-                "  \"devDependencies\": {\n" +
-                "    \"typescript\": \"^3.7.5\"\n" +
-                "  }\n" +
-                "}\n")
-
-        return this
     }
 
 //    fun exportLibrariesBeta() {
@@ -582,7 +505,7 @@ class TypescriptLibraryExporter {
                 if (packageName.matches(allowedPackagesRegex) && !requiredClass.name.endsWith("\$Spigot")) {
                     val upDirCount = getPackageName(_class.name).split('.').count()
 
-                    tsImportsSource += "import {${safeClassName(stripPackageName(requiredClass.name))}} from '${"../".repeat(upDirCount)}${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js'\n"
+                    tsImportsSource += "import {${stripPackageName(requiredClass.name)}} from '${"../".repeat(upDirCount)}${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js'\n"
                 }
             }
         }
@@ -610,7 +533,7 @@ class TypescriptLibraryExporter {
 //    }
 
     private fun generateTypescriptInterface(_class: Class<*>): String {
-        var tsInterfaceSource = "export interface ${safeClassName(stripPackageName(_class.name))}"
+        var tsInterfaceSource = "export interface ${stripPackageName(_class.name)}"
 
         val interfaceNames = getInterfaceNames(_class)
 
@@ -626,7 +549,7 @@ class TypescriptLibraryExporter {
                 tsInterfaceSource += if (_method.parameterCount == 0) {
                     "\t${_method.name}(): ${javaClassToTypescript(_method.returnType)};\n"
                 } else {
-                    "\t${_method.name}(${getParameters(_method).joinToString(", ")}): ${safeClassName(javaClassToTypescript(_method.returnType))};\n"
+                    "\t${_method.name}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType)};\n"
                 }
             }
         }
@@ -637,7 +560,7 @@ class TypescriptLibraryExporter {
     }
 
     private fun generateTypescriptClass(_class: Class<*>): String {
-        val className = safeClassName(stripPackageName(_class.name))
+        val className = stripPackageName(_class.name)
         var tsClassSource = "export class $className {\n"
 
         tsClassSource += "\tpublic static get \$javaClass(): any {\n"
@@ -667,7 +590,7 @@ class TypescriptLibraryExporter {
             }
 
             if(Modifier.isStatic(_field.modifiers) && Modifier.isPublic(_field.modifiers) && Modifier.isFinal(_field.modifiers) && !_field.name.matches(blacklistRegex)) {
-                tsClassSource += "\tpublic static get ${safeName(jsFieldName)}(): ${safeClassName(javaClassToTypescript(_field.type))} {\n"
+                tsClassSource += "\tpublic static get ${safeName(jsFieldName)}(): ${javaClassToTypescript(_field.type)} {\n"
                 tsClassSource += "\t\treturn $className.\$javaClass.${_field.name};\n"
                 tsClassSource += "\t}\n"
             }
@@ -703,7 +626,7 @@ class TypescriptLibraryExporter {
     }
 
     private fun generateTypescriptEnum(_class: Class<Enum<*>>): String {
-        val enumName = safeClassName(stripPackageName(_class.name))
+        val enumName = stripPackageName(_class.name)
         var tsEnumSource = "export class $enumName {\n"
 
         tsEnumSource += "\tpublic static get \$javaClass(): any {\n"
@@ -741,7 +664,7 @@ class TypescriptLibraryExporter {
         val parameterNames = mutableListOf<String>()
 
         for(_parameter in _parameters) {
-            parameterNames.add("${safeName(_parameter.name)}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
+            parameterNames.add("${safeName(_parameter.name)}: ${javaClassToTypescript(_parameter.type)}")
         }
 
         return parameterNames.toTypedArray()
@@ -752,7 +675,7 @@ class TypescriptLibraryExporter {
         val paranames = paranamer.lookupParameterNames(_method, false)
 
         for((index, _parameter) in _method.parameters.withIndex()) {
-            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
+            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${javaClassToTypescript(_parameter.type)}")
         }
 
         return parameterNames.toTypedArray()
@@ -763,7 +686,7 @@ class TypescriptLibraryExporter {
         val paranames = paranamer.lookupParameterNames(_constructor, false)
 
         for((index, _parameter) in _constructor.parameters.withIndex()) {
-            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
+            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${javaClassToTypescript(_parameter.type)}")
         }
 
         return parameterNames.toTypedArray()
@@ -779,6 +702,18 @@ class TypescriptLibraryExporter {
         return parameterNames.toTypedArray()
     }
 
+    private fun safeName(name: String): String {
+        return when {
+            name.equals("function", true) -> "_function"
+            name.equals("yield", true) -> "_yield"
+            name.equals("arguments", true) -> "_arguments"
+            name.equals("name", true) -> "_name"
+            name.equals("<set-?>", true) -> "value"
+            name.equals("in", true) -> "_in"
+            else -> name
+        }
+    }
+
     private fun stripPackageName(name: String): String {
         return name.split('.').last().replace(";", "")
     }
@@ -791,6 +726,24 @@ class TypescriptLibraryExporter {
         }
 
         return packages.joinToString(".")
+    }
+
+    private fun javaClassToTypescript(_class: Class<*>): String {
+        val className = stripPackageName(_class.name)
+        val packageName = getPackageName(_class.name)
+
+        if(_class.isArray) {
+            return "Array<${javaClassToTypescript(_class.componentType)}>"
+        }
+
+        return if (className.equals("byte", true) || className.equals("short", true) || className.equals("int", true) || className.equals("long", true)) "number"
+        else if (className.equals("double", true) || className.equals("float", true)) "number"
+        else if (className.equals("string", true) || className.equals("char", true) || className.equals("UUID", true)) "string"
+        else if (className.equals("void", true)) "void"
+        else if (className.equals("boolean", true)) "boolean"
+        else if (className.equals("Value", true)) "any"
+        else if (!packageName.matches(allowedPackagesRegex)) "any"
+        else className
     }
 
     private fun fixClass(_class: Class<*>): Class<*> {
@@ -825,7 +778,44 @@ class TypescriptLibraryExporter {
                 .addBukkitClasses()
                 .clean()
                 .exportLibraries()
-                .exportProjectFiles()
+
+            File("./lib/tsconfig.json").writeText("{\n" +
+                    "    \"compilerOptions\": {\n" +
+                    "        \"target\": \"es2019\",\n" +
+                    "        \"module\": \"esnext\",\n" +
+                    "        \"sourceMap\": true,\n" +
+                    "        \"allowJs\": true,\n" +
+                    "        \"outDir\": \"js\",\n" +
+                    "        \"rootDir\": \"ts\",\n" +
+                    "        \"declaration\": true,\n" +
+                    "        \"lib\": [\"ES5\", \"ES2015\", \"ES2016\", \"ES2017\", \"ES2018\", \"ES2019\"],\n" +
+                    "        \"types\": [\n" +
+                    "\n" +
+                    "        ]\n" +
+                    "    },\n" +
+                    "    \"include\": [\n" +
+                    "        \"ts/**/*\"\n" +
+                    "    ]\n" +
+                    "}")
+
+            File("./lib/package.json").writeText("{\n" +
+                    "  \"name\": \"scriptablemc-typescript-lib\",\n" +
+                    "  \"version\": \"1.0.0\",\n" +
+                    "  \"description\": \"Typescript plugin example and libraries for Minecraft 1.15\",\n" +
+                    "  \"scripts\": {\n" +
+                    "    \"compile\": \"npx tsc\"\n" +
+                    "  },\n" +
+                    "  \"author\": \"Ashton Storks\",\n" +
+                    "  \"license\": \"ISC\",\n" +
+                    "  \"bugs\": {\n" +
+                    "    \"url\": \"https://github.com/astorks/ScriptableMC-TypeScript/issues\"\n" +
+                    "  },\n" +
+                    "  \"homepage\": \"https://github.com/astorks/ScriptableMC-TypeScript#readme\",\n" +
+                    "  \"dependencies\": {},\n" +
+                    "  \"devDependencies\": {\n" +
+                    "    \"typescript\": \"^3.7.5\"\n" +
+                    "  }\n" +
+                    "}\n")
         }
     }
 }
