@@ -25,6 +25,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
     private val jsBindings: Value = graalContext.getBindings("js")
     internal val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
     internal val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
+    private var enabledAllPlugins: Boolean = false
 
     internal fun start() {
         instance = this
@@ -39,19 +40,30 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         if(extractLibs) {
             val librariesResource = bootstrapPlugin.getResource("libraries.zip")
             if (librariesResource != null) {
-                val unzipUtil = UnzipUtility()
-                unzipUtil.unzip(librariesResource, "${rootScriptsFolder}/lib")
+                UnzipUtility.unzip(librariesResource, "${rootScriptsFolder}/lib")
             }
         }
 
         if(mainScriptFile.exists()) {
-            eval(
+            val pluginTypes = eval(
                 Source.newBuilder("js", mainScriptFile)
                     .name("main.js")
                     .mimeType("application/javascript+module")
                     .interactive(false)
                     .build()
             )
+
+            // Load all plugin types returned as an array
+            if(pluginTypes.hasArrayElements()) {
+                for (i in 0..pluginTypes.arraySize) {
+                    this.loadPlugin(pluginTypes.getArrayElement(i))
+                }
+            }
+
+            // Enable all plugins if not already enabled
+            if(!enabledAllPlugins) {
+                enableAllPlugins()
+            }
         }
         else {
             throw ScriptNotFoundException(mainScriptFile)
@@ -110,18 +122,23 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
 
     fun evalCommandSenderJs(source: String, sender: CommandSender): Value {
         val tempScriptFile = File("${rootScriptsFolder}/${UUID.randomUUID()}.js")
-        tempScriptFile.writeText("import * as lib from './lib/global.js';\n" +
-                "new (class EvalCommandSenderContext {\n" +
-                "    run(sender, server, servicesManager) {\n" +
-                "        $source\n" +
-                "    }\n" +
-                "})()\n");
-        val evalCommandSenderContext = evalFile(tempScriptFile)
-        tempScriptFile.delete()
-        evalCommandSenderContext.putMember("sender", sender)
-        evalCommandSenderContext.putMember("server", Bukkit.getServer())
-        evalCommandSenderContext.putMember("servicesManager", Bukkit.getServicesManager())
-        return evalCommandSenderContext.invokeMember("run", sender, Bukkit.getServer(), Bukkit.getServicesManager());
+        try {
+            tempScriptFile.writeText("import * as lib from './lib/global.js';\n" +
+                    "new (class EvalCommandSenderContext {\n" +
+                    "    run(sender, server, servicesManager) {\n" +
+                    "        $source\n" +
+                    "    }\n" +
+                    "})()\n");
+            val evalCommandSenderContext = evalFile(tempScriptFile)
+
+            evalCommandSenderContext.putMember("sender", sender)
+            evalCommandSenderContext.putMember("server", Bukkit.getServer())
+            evalCommandSenderContext.putMember("servicesManager", Bukkit.getServicesManager())
+            return evalCommandSenderContext.invokeMember("run", sender, Bukkit.getServer(), Bukkit.getServicesManager())
+        }
+        finally {
+            tempScriptFile.delete()
+        }
     }
 
     fun eval(source: Source): Value {
@@ -142,6 +159,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         for (pluginContext in scriptablePlugins) {
             pluginContext.enable()
         }
+        enabledAllPlugins = true
     }
 
     fun enablePlugin(pluginContext: ScriptablePluginContext) {

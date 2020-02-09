@@ -36,14 +36,6 @@ class ScriptablePluginCommand(private val basePlugin: ScriptablePluginMain) : Ba
         MainMenu.INVENTORY.open(player)
     }
 
-}
-
-
-@Suppress("unused")
-@CommandAlias("scriptablemc|smc")
-@Subcommand("javascript|js")
-class ScriptablePluginJsCommand(private val basePlugin: ScriptablePluginMain) : BaseCommand() {
-
     @Subcommand("reload|rl")
     @CommandAlias("jsrl")
     @CommandPermission("scriptablemc.js.reload")
@@ -76,6 +68,14 @@ class ScriptablePluginJsCommand(private val basePlugin: ScriptablePluginMain) : 
             }
         }
     }
+
+}
+
+
+@Suppress("unused")
+@CommandAlias("scriptablemc|smc")
+@Subcommand("javascript|js")
+class ScriptablePluginJavaScriptCommand(private val basePlugin: ScriptablePluginMain) : BaseCommand() {
 
     @Subcommand("execute|ex")
     @CommandAlias("jsex")
@@ -136,4 +136,43 @@ class ScriptablePluginJsCommand(private val basePlugin: ScriptablePluginMain) : 
         }
     }
 
+}
+
+@Suppress("unused")
+@CommandAlias("scriptablemc|smc")
+@Subcommand("typescript|ts")
+class ScriptablePluginTypeScriptCommand(private val basePlugin: ScriptablePluginMain) : BaseCommand() {
+
+    @Subcommand("reload|rl")
+    @CommandAlias("jsrl")
+    @CommandPermission("scriptablemc.js.reload")
+    fun onSmcJsReload(sender: CommandSender) {
+        basePlugin.patchClassLoader {
+            try {
+                basePlugin.scriptEngine!!.close()
+                basePlugin.logger.info("Scripting engine shutdown.")
+                basePlugin.reloadConfig()
+
+                basePlugin.scriptEngine = ScriptablePluginEngine(
+                    basePlugin,
+                    basePlugin.config.getString("root_scripts_folder", "./scripts").orEmpty(),
+                    basePlugin.config.getBoolean("debug", false),
+                    basePlugin.config.getBoolean("extract_libs", true)
+                )
+
+                basePlugin.scriptEngine!!.start()
+                basePlugin.logger.info("Scripting engine started.")
+
+                sender.sendMessage("Javascript engine reloaded.")
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+
+                sender.sendMessage("${ChatColor.DARK_RED}$e")
+                for (stackTrace in e.stackTrace) {
+                    sender.sendMessage("${ChatColor.DARK_RED}$stackTrace")
+                }
+            }
+        }
+    }
 }
