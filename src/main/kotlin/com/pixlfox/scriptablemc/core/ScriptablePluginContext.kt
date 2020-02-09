@@ -128,17 +128,17 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         commandMapField.isAccessible = true
         val commandMap = commandMapField.get(Bukkit.getServer()) as CommandMap
 
-        val knownCommandsField = commandMap.javaClass.superclass.getDeclaredField("knownCommands")
-        knownCommandsField.isAccessible = true
-        val knownCommands = knownCommandsField.get(commandMap) as HashMap<*, *>
+        val knownCommandsField = commandMap.javaClass.superclass.declaredFields.firstOrNull { it.name.equals("knownCommands", false) }
+        knownCommandsField?.isAccessible = true
+        val knownCommands = knownCommandsField?.get(commandMap) as HashMap<*, *>?
 
         command.unregister(commandMap)
 
-        knownCommands.remove(command.name)
+        knownCommands?.remove(command.name)
         commands.remove(command)
 
         commandMapField.isAccessible = false
-        knownCommandsField.isAccessible = false
+        knownCommandsField?.isAccessible = false
     }
 
     fun getFile(pathName: String): FileWrapper {

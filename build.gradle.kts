@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.pixlfox.scriptablemc"
-version = "1.1.7"
+version = "1.1.8"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8

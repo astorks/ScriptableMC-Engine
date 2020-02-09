@@ -43,3 +43,4 @@ node_modules/
 libraries/tools/kotlin-test-nodejs-runner/lib/
 local.properties
 lib
+libraries
