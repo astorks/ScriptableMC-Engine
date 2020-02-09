@@ -19,7 +19,7 @@ class ScriptablePluginCommand(private val basePlugin: ScriptablePluginMain) : Ba
 
     @Subcommand("info|i")
     @CommandPermission("scriptablemc.info")
-    fun onSmcInfo(player: Player) {
+    fun onSmcInfo(player: CommandSender) {
         val scriptEngine = basePlugin.scriptEngine
         val isGraalRuntime = scriptEngine?.evalJs("if (typeof Graal != 'undefined') { Graal.isGraalRuntime() } else { false }")?.asBoolean() == true
         player.sendMessage("${ChatColor.GREEN}ScriptableMC Version: ${basePlugin.description.version}")
