@@ -7,7 +7,7 @@ import java.sql.DriverManager
 import java.sql.PreparedStatement
 import java.sql.Statement
 
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 class MysqlWrapper(private val host: String, private val port: Int, private val database: String, private val username: String, private val password: String) {
     private var connection: Connection? = null
 

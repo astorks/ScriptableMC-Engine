@@ -18,7 +18,8 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     override fun onEnable() {
         commandManager = PaperCommandManager(this)
         commandManager?.registerCommand(ScriptablePluginCommand(this))
-        commandManager?.registerCommand(ScriptablePluginJsCommand(this))
+        commandManager?.registerCommand(ScriptablePluginJavaScriptCommand(this))
+        commandManager?.registerCommand(ScriptablePluginTypeScriptCommand(this))
 
         patchClassLoader {
             saveDefaultConfig()
