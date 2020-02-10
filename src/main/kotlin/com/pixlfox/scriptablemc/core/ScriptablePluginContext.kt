@@ -6,6 +6,7 @@ import com.pixlfox.scriptablemc.utils.FileWrapper
 import com.pixlfox.scriptablemc.utils.MysqlWrapper
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.Server
 import org.bukkit.command.CommandMap
@@ -128,7 +129,12 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         commandMapField.isAccessible = true
         val commandMap = commandMapField.get(Bukkit.getServer()) as CommandMap
 
-        val knownCommandsField = commandMap.javaClass.superclass.declaredFields.firstOrNull { it.name.equals("knownCommands", false) }
+        var knownCommandsField = commandMap.javaClass.superclass.declaredFields.firstOrNull { it.name.equals("knownCommands", false) }
+
+        if(knownCommandsField == null) { // Pre-MCv1.13 command unregister fix
+            knownCommandsField = commandMap.javaClass.declaredFields.firstOrNull { it.name.equals("knownCommands", false) }
+        }
+
         knownCommandsField?.isAccessible = true
         val knownCommands = knownCommandsField?.get(commandMap) as HashMap<*, *>?
 

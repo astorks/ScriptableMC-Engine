@@ -5,6 +5,7 @@ import fr.minuskube.inv.ClickableItem
 import fr.minuskube.inv.SmartInventory
 import fr.minuskube.inv.content.InventoryContents
 import fr.minuskube.inv.content.InventoryProvider
+import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -40,6 +41,9 @@ class SmartInventoryInterface {
 }
 
 class SmartItemBuilder(private val itemStack: ItemStack) {
+
+    constructor(material: Material): this(ItemStack(material))
+
     fun setDisplayName(displayName: String): SmartItemBuilder {
         val itemMeta = itemStack.itemMeta
         itemMeta?.setDisplayName(displayName)
