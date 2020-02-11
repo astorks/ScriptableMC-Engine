@@ -10,6 +10,13 @@ import java.io.File
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
+private val helperClasses: Array<String> = arrayOf(
+    "com.smc.version.MinecraftVersion",
+    "com.smc.version.MinecraftVersions",
+    "com.smc.version.SnapshotVersion",
+    "com.smc.utils.FileWrapper",
+    "com.smc.utils.MysqlWrapper"
+)
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false, val extractLibs: Boolean = true): Listener {
@@ -31,6 +38,16 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         instance = this
         inventoryManager.init()
         jsBindings.putMember("engine", this)
+
+        for(helperClass in helperClasses) {
+            try {
+                javaClass.classLoader.loadClass(helperClass)
+            }
+            catch (e: Exception) {
+                bootstrapPlugin.logger.warning("Failed to load helper class \"$helperClass\" via classloader.")
+                e.printStackTrace()
+            }
+        }
 
         val mainScriptFile = File("${rootScriptsFolder}/main.js")
         if(!mainScriptFile.parentFile.exists()) {
@@ -55,7 +72,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
 
             // Load all plugin types returned as an array
             if(pluginTypes.hasArrayElements()) {
-                for (i in 0..pluginTypes.arraySize) {
+                for (i in 0 until pluginTypes.arraySize) {
                     this.loadPlugin(pluginTypes.getArrayElement(i))
                 }
             }

@@ -1,4 +1,4 @@
-package com.pixlfox.scriptablemc.utils
+package com.smc.utils
 
 import com.pixlfox.scriptablemc.ScriptablePluginMain
 import org.bukkit.Bukkit

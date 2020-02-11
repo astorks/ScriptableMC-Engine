@@ -1,4 +1,4 @@
-package com.pixlfox.scriptablemc.utils
+package com.smc.utils
 
 
 @Suppress("unused")
@@ -15,7 +15,8 @@ class FileWrapper(pathName: String) {
     fun mkdir(): Boolean = javaFile.mkdir()
     fun mkdirs(): Boolean = javaFile.mkdirs()
     fun isDirectory(): Boolean = javaFile.isDirectory
-    fun parentFile(): FileWrapper = new(javaFile.parentFile)
+    fun parentFile(): FileWrapper =
+        new(javaFile.parentFile)
 
     companion object {
         internal fun new(javaFile: java.io.File): FileWrapper {

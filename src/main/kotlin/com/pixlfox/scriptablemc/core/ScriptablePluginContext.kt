@@ -2,11 +2,10 @@ package com.pixlfox.scriptablemc.core
 
 import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
 import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
-import com.pixlfox.scriptablemc.utils.FileWrapper
-import com.pixlfox.scriptablemc.utils.MysqlWrapper
+import com.smc.utils.FileWrapper
+import com.smc.utils.MysqlWrapper
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.Server
 import org.bukkit.command.CommandMap

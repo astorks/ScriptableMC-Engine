@@ -13,7 +13,7 @@ import java.lang.reflect.*
 class TypescriptLibraryExporter {
     private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|fr\\.minuskube\\.inv|com\\.google|java\\.sql)(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
 
     private fun safeName(name: String): String = when {
@@ -87,7 +87,10 @@ class TypescriptLibraryExporter {
             com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
             com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
             fr.minuskube.inv.SmartInventory::class.java,
-            com.pixlfox.scriptablemc.utils.FileWrapper::class.java,
+            com.smc.utils.FileWrapper::class.java,
+            com.smc.utils.MysqlWrapper::class.java,
+            com.smc.version.MinecraftVersion::class.java,
+            com.smc.version.MinecraftVersions::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface::class.java,
             com.google.common.io.ByteStreams::class.java
@@ -232,6 +235,14 @@ class TypescriptLibraryExporter {
             }
         }
 
+        val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
+        for (_field in _class.fields.filter { Modifier.isStatic(it.modifiers) &&Modifier.isPublic(it.modifiers) && !it.name.matches(blacklistRegex) }) {
+                val type = fixClass(_field.type)
+                if (!classList.contains(type) && type.name.matches(allowedPackagesRegex)) {
+                    classList.add(type)
+                }
+        }
+
         return classList.toTypedArray()
     }
 
@@ -316,6 +327,12 @@ class TypescriptLibraryExporter {
         return this
     }
 
+    fun copyStaticSources(): TypescriptLibraryExporter {
+        File("./src/main/ts/").copyRecursively(File("$basePath/ts/"), true)
+
+        return this
+    }
+
     fun exportProjectFiles(): TypescriptLibraryExporter {
         File("$basePath/tsconfig.json").writeText("{\n" +
                 "    \"compilerOptions\": {\n" +
@@ -394,7 +411,7 @@ class TypescriptLibraryExporter {
 
         for (_class in classList) {
             if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
-                tsGlobalExportsSource += generateTypescriptImportForClass(_class);
+                tsGlobalExportsSource += generateTypescriptImportForClass(_class)
             }
         }
 
@@ -628,6 +645,7 @@ class TypescriptLibraryExporter {
                 .clean()
                 .exportLibraries()
                 .exportGlobalLibrary()
+                .copyStaticSources()
                 .exportProjectFiles()
         }
     }
