@@ -34,3 +34,9 @@ You can take the typescript example and compile it, then directly modify the jav
 
 > `/jsex sender.sendMessage(lib.org.bukkit.ChatColor.GREEN + "Hello World!")` <br>
 > ![Hello World!](https://i.imgur.com/1dzwpqy.png)
+
+
+### Third Party Libraries
+https://github.com/MinusKube/SmartInvs - Inventory menu library<br />
+https://github.com/aikar/commands - Built-in commands and auto-completion<br />
+https://github.com/graalvm/graaljs - JavaScript engine

@@ -1,6 +1,7 @@
 package com.pixlfox.scriptablemc.smartinvs
 
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
+import com.smc.utils.ItemBuilder
 import fr.minuskube.inv.content.InventoryContents
 import fr.minuskube.inv.content.InventoryProvider
 import org.bukkit.entity.Player
@@ -18,34 +19,26 @@ import fr.minuskube.inv.content.SlotIterator
 class MainMenu(private val pluginEngine: ScriptablePluginEngine) : InventoryProvider {
     override fun init(player: Player?, contents: InventoryContents?) {
         if(contents != null && player != null) {
-            contents.fillBorders(ClickableItem.empty(ItemStack(Material.BLACK_CONCRETE)))
-
-            if(player.hasPermission("scriptablemc.js.reload")) {
-                val reloadItemStack = ItemStack(Material.GOLD_NUGGET)
-                val reloadItemMeta = reloadItemStack.itemMeta
-                reloadItemMeta?.setDisplayName("${ChatColor.DARK_AQUA}Reload Script Engine")
-                reloadItemStack.itemMeta = reloadItemMeta
-                contents.set(1, 1, ClickableItem.of(reloadItemStack) {
-                    Bukkit.getServer().dispatchCommand(player, "jsreload")
+            if(player.hasPermission("scriptablemc.reload")) {
+                contents.set(0, 0, ClickableItem.of(ItemBuilder(Material.GOLD_NUGGET)
+                    .setDisplayName("${ChatColor.DARK_AQUA}Reload Script Engine")
+                    .build()) {
+                    Bukkit.getServer().dispatchCommand(player, "scriptablemc reload")
                 })
             }
 
             if(player.hasPermission("scriptablemc.info")) {
-                val pluginsItemStack = ItemStack(Material.IRON_NUGGET)
-                val pluginsItemMeta = pluginsItemStack.itemMeta
-                pluginsItemMeta?.setDisplayName("${ChatColor.GREEN}Print ScriptableMC Info")
-                pluginsItemStack.itemMeta = pluginsItemMeta
-                contents.set(1, 2, ClickableItem.of(pluginsItemStack) {
+                contents.set(0, 1, ClickableItem.of(ItemBuilder(Material.IRON_NUGGET)
+                    .setDisplayName("${ChatColor.GREEN}Print ScriptableMC Info")
+                    .build()) {
                     Bukkit.getServer().dispatchCommand(player, "scriptablemc info")
                     player.closeInventory()
                 })
             }
 
-            val closeItemStack = ItemStack(Material.BARRIER)
-            val closeItemMeta = closeItemStack.itemMeta
-            closeItemMeta?.setDisplayName("${ChatColor.RED}Close Menu")
-            closeItemStack.itemMeta = closeItemMeta
-            contents.set(1, 7, ClickableItem.of(closeItemStack) {
+            contents.set(0, 8, ClickableItem.of(ItemBuilder(Material.BARRIER)
+                .setDisplayName("${ChatColor.RED}Close Menu")
+                .build()) {
                 player.closeInventory()
             })
         }
@@ -59,7 +52,7 @@ class MainMenu(private val pluginEngine: ScriptablePluginEngine) : InventoryProv
                     .id("spm.mainmenu")
                     .manager(ScriptablePluginEngine.instance!!.inventoryManager)
                     .provider(MainMenu(ScriptablePluginEngine.instance!!))
-                    .size(3, 9)
+                    .size(1, 9)
                     .title(ChatColor.LIGHT_PURPLE.toString() + "ScriptableMC | Main Menu")
                     .closeable(true)
                     .build()

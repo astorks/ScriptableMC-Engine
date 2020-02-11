@@ -1,9 +1,5 @@
 package com.pixlfox.scriptablemc.core
 
-import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
-import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
-import com.pixlfox.scriptablemc.utils.FileWrapper
-import com.pixlfox.scriptablemc.utils.MysqlWrapper
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -17,7 +13,6 @@ import java.util.HashMap
 import java.lang.reflect.InvocationTargetException
 import org.bukkit.command.PluginCommand
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.*
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.plugin.messaging.PluginMessageListener
@@ -128,7 +123,12 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
         commandMapField.isAccessible = true
         val commandMap = commandMapField.get(Bukkit.getServer()) as CommandMap
 
-        val knownCommandsField = commandMap.javaClass.superclass.declaredFields.firstOrNull { it.name.equals("knownCommands", false) }
+        var knownCommandsField = commandMap.javaClass.superclass.declaredFields.firstOrNull { it.name.equals("knownCommands", false) }
+
+        if(knownCommandsField == null) { // Pre-MCv1.13 command unregister fix
+            knownCommandsField = commandMap.javaClass.declaredFields.firstOrNull { it.name.equals("knownCommands", false) }
+        }
+
         knownCommandsField?.isAccessible = true
         val knownCommands = knownCommandsField?.get(commandMap) as HashMap<*, *>?
 
@@ -139,22 +139,6 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
         commandMapField.isAccessible = false
         knownCommandsField?.isAccessible = false
-    }
-
-    fun getFile(pathName: String): FileWrapper {
-        return FileWrapper(pathName)
-    }
-
-    fun newMysqlInstance(host: String, port: Int, database: String, username: String, password: String): MysqlWrapper {
-        return MysqlWrapper(host, port, database, username, password)
-    }
-
-    fun smartInventory(): SmartInventoryInterface {
-        return SmartInventoryInterface()
-    }
-
-    fun itemBuilder(itemStack: ItemStack): SmartItemBuilder {
-        return SmartItemBuilder(itemStack)
     }
 
     fun setPlaceholders(player: Player, placeholderText: String): String {

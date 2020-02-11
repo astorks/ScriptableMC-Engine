@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.pixlfox.scriptablemc"
-version = "1.1.8"
+version = "1.1.9"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -37,10 +37,6 @@ repositories {
         url = uri("https://libraries.minecraft.net")
     }
     maven {
-        name = "mccommandapi"
-        url = uri("https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/1.13CommandAPI/")
-    }
-    maven {
         name = "papermc"
         url = uri("https://papermc.io/repo/repository/maven-public/")
     }
@@ -69,6 +65,7 @@ dependencies {
     implementation("com.thoughtworks.paranamer:paranamer:2.8")
     implementation("com.beust:klaxon:5.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
     testImplementation("junit", "junit", "4.12")
 }
 

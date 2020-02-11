@@ -10,6 +10,20 @@ import java.io.File
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
+private val helperClasses: Array<String> = arrayOf(
+    "com.smc.version.MinecraftVersion",
+    "com.smc.version.MinecraftVersions",
+    "com.smc.version.SnapshotVersion",
+
+    "com.smc.utils.ItemBuilder",
+    "com.smc.utils.MysqlWrapper",
+
+    "com.smc.smartinvs.SmartInventory",
+    "com.smc.smartinvs.SmartInventoryProvider",
+
+    "*me.clip.placeholderapi.PlaceholderAPI"
+
+)
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false, val extractLibs: Boolean = true): Listener {
@@ -32,6 +46,18 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         inventoryManager.init()
         jsBindings.putMember("engine", this)
 
+        for(helperClass in helperClasses) {
+            try {
+                javaClass.classLoader.loadClass(helperClass.replace("*", ""))
+            }
+            catch (e: Exception) {
+                if(!helperClass.startsWith("*")) {
+                    bootstrapPlugin.logger.warning("Failed to load helper class \"$helperClass\" via classloader.")
+                    e.printStackTrace()
+                }
+            }
+        }
+
         val mainScriptFile = File("${rootScriptsFolder}/main.js")
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
@@ -45,7 +71,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         }
 
         if(mainScriptFile.exists()) {
-            val pluginTypes = eval(
+            val mainReturn = eval(
                 Source.newBuilder("js", mainScriptFile)
                     .name("main.js")
                     .mimeType("application/javascript+module")
@@ -54,15 +80,15 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
             )
 
             // Load all plugin types returned as an array
-            if(pluginTypes.hasArrayElements()) {
-                for (i in 0..pluginTypes.arraySize) {
-                    this.loadPlugin(pluginTypes.getArrayElement(i))
+            if(mainReturn.hasArrayElements()) {
+                for (i in 0 until mainReturn.arraySize) {
+                    this.loadPlugin(mainReturn.getArrayElement(i))
                 }
-            }
 
-            // Enable all plugins if not already enabled
-            if(!enabledAllPlugins) {
-                enableAllPlugins()
+                // Enable all plugins if not already enabled
+                if(!enabledAllPlugins) {
+                    enableAllPlugins()
+                }
             }
         }
         else {
