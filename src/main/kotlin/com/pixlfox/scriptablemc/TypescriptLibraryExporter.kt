@@ -86,14 +86,19 @@ class TypescriptLibraryExporter {
         addClasses(
             com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
             com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
-            fr.minuskube.inv.SmartInventory::class.java,
-            com.smc.utils.FileWrapper::class.java,
+
+            com.smc.utils.ItemBuilder::class.java,
             com.smc.utils.MysqlWrapper::class.java,
+
             com.smc.version.MinecraftVersion::class.java,
             com.smc.version.MinecraftVersions::class.java,
-            com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider::class.java,
-            com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface::class.java,
+
+            fr.minuskube.inv.SmartInventory::class.java,
+            com.smc.smartinvs.SmartInventoryProvider::class.java,
+            com.smc.smartinvs.SmartInventory::class.java,
+
             com.google.common.io.ByteStreams::class.java,
+
             java.io.File::class.java
         )
         return this
@@ -492,7 +497,7 @@ class TypescriptLibraryExporter {
             }
         }
 
-        for (_methodGroups in _class.methods.filter { e -> Modifier.isStatic(e.modifiers) && Modifier.isPublic(e.modifiers) }.groupBy { e -> e.name }) {
+        for (_methodGroups in _class.methods.filter { e -> Modifier.isStatic(e.modifiers) && !Modifier.isPrivate(e.modifiers) }.groupBy { e -> e.name }) {
 
             val jsMethodName: String = _methodGroups.key
 

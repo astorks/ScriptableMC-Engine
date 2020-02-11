@@ -1,9 +1,5 @@
 package com.pixlfox.scriptablemc.core
 
-import com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface
-import com.pixlfox.scriptablemc.smartinvs.SmartItemBuilder
-import com.smc.utils.FileWrapper
-import com.smc.utils.MysqlWrapper
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -17,7 +13,6 @@ import java.util.HashMap
 import java.lang.reflect.InvocationTargetException
 import org.bukkit.command.PluginCommand
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.*
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.plugin.messaging.PluginMessageListener
@@ -144,22 +139,6 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
         commandMapField.isAccessible = false
         knownCommandsField?.isAccessible = false
-    }
-
-    fun getFile(pathName: String): FileWrapper {
-        return FileWrapper(pathName)
-    }
-
-    fun newMysqlInstance(host: String, port: Int, database: String, username: String, password: String): MysqlWrapper {
-        return MysqlWrapper(host, port, database, username, password)
-    }
-
-    fun smartInventory(): SmartInventoryInterface {
-        return SmartInventoryInterface()
-    }
-
-    fun itemBuilder(itemStack: ItemStack): SmartItemBuilder {
-        return SmartItemBuilder(itemStack)
     }
 
     fun setPlaceholders(player: Player, placeholderText: String): String {

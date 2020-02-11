@@ -1,15 +1,13 @@
 import Event from "./org/bukkit/event/Event.js";
 import Server from "./org/bukkit/Server.js";
 import ScriptablePluginContext from "./com/pixlfox/scriptablemc/core/ScriptablePluginContext.js";
-import ScriptablePluginEngine from "./com/pixlfox/scriptablemc/core/ScriptablePluginEngine.js";
 import PluginCommand from "./org/bukkit/command/PluginCommand.js";
 import Player from "./org/bukkit/entity/Player.js";
 import PluginMessageListenerRegistration from "./org/bukkit/plugin/messaging/PluginMessageListenerRegistration.js";
 import OfflinePlayer from "./org/bukkit/OfflinePlayer.js";
-import FileWrapper from "./com/smc/utils/FileWrapper.js";
 import MysqlWrapper from "./com/smc/utils/MysqlWrapper.js";
+import File from "./java/io/File.js";
 
-declare const engine: ScriptablePluginEngine;
 declare type Type<T> = { new (...args: any[]): T; };
 
 export default class JsPlugin {
@@ -55,12 +53,12 @@ export default class JsPlugin {
         this.context.unregisterOutgoingPluginChannel(channel);
     }
 
-    getFile(pathName: string): FileWrapper {
-        return this.context.getFile(pathName);
+    getFile(pathName: string): File {
+        return new File(pathName);
     }
 
     newMysqlInstance(host: string, port: number, database: string, username: string, password: string): MysqlWrapper {
-        return this.context.newMysqlInstance(host, port, database, username, password);
+        return new MysqlWrapper(host, port, database, username, password);
     }
 
     mysqlFromConfig(configObject: { host: string, port: number, database: string, username: string, password: string }): MysqlWrapper {

@@ -14,8 +14,15 @@ private val helperClasses: Array<String> = arrayOf(
     "com.smc.version.MinecraftVersion",
     "com.smc.version.MinecraftVersions",
     "com.smc.version.SnapshotVersion",
-    "com.smc.utils.FileWrapper",
-    "com.smc.utils.MysqlWrapper"
+
+    "com.smc.utils.ItemBuilder",
+    "com.smc.utils.MysqlWrapper",
+
+    "com.smc.smartinvs.SmartInventory",
+    "com.smc.smartinvs.SmartInventoryProvider",
+
+    "*me.clip.placeholderapi.PlaceholderAPI"
+
 )
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -41,11 +48,13 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
 
         for(helperClass in helperClasses) {
             try {
-                javaClass.classLoader.loadClass(helperClass)
+                javaClass.classLoader.loadClass(helperClass.replace("*", ""))
             }
             catch (e: Exception) {
-                bootstrapPlugin.logger.warning("Failed to load helper class \"$helperClass\" via classloader.")
-                e.printStackTrace()
+                if(!helperClass.startsWith("*")) {
+                    bootstrapPlugin.logger.warning("Failed to load helper class \"$helperClass\" via classloader.")
+                    e.printStackTrace()
+                }
             }
         }
 
