@@ -62,7 +62,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         }
 
         if(mainScriptFile.exists()) {
-            val pluginTypes = eval(
+            val mainReturn = eval(
                 Source.newBuilder("js", mainScriptFile)
                     .name("main.js")
                     .mimeType("application/javascript+module")
@@ -71,15 +71,15 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
             )
 
             // Load all plugin types returned as an array
-            if(pluginTypes.hasArrayElements()) {
-                for (i in 0 until pluginTypes.arraySize) {
-                    this.loadPlugin(pluginTypes.getArrayElement(i))
+            if(mainReturn.hasArrayElements()) {
+                for (i in 0 until mainReturn.arraySize) {
+                    this.loadPlugin(mainReturn.getArrayElement(i))
                 }
-            }
 
-            // Enable all plugins if not already enabled
-            if(!enabledAllPlugins) {
-                enableAllPlugins()
+                // Enable all plugins if not already enabled
+                if(!enabledAllPlugins) {
+                    enableAllPlugins()
+                }
             }
         }
         else {

@@ -13,7 +13,7 @@ import java.lang.reflect.*
 class TypescriptLibraryExporter {
     private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql)(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
 
     private fun safeName(name: String): String = when {
@@ -93,7 +93,8 @@ class TypescriptLibraryExporter {
             com.smc.version.MinecraftVersions::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryProvider::class.java,
             com.pixlfox.scriptablemc.smartinvs.SmartInventoryInterface::class.java,
-            com.google.common.io.ByteStreams::class.java
+            com.google.common.io.ByteStreams::class.java,
+            java.io.File::class.java
         )
         return this
     }
@@ -342,8 +343,7 @@ class TypescriptLibraryExporter {
                 "        \"allowJs\": true,\n" +
                 "        \"outDir\": \"js\",\n" +
                 "        \"rootDir\": \"ts\",\n" +
-                "        \"declaration\": true,\n" +
-                "        \"lib\": [\"ES5\", \"ES2015\", \"ES2016\", \"ES2017\", \"ES2018\", \"ES2019\"]\n" +
+                "        \"declaration\": true\n" +
                 "    },\n" +
                 "    \"include\": [\n" +
                 "        \"ts/**/*\"\n" +
