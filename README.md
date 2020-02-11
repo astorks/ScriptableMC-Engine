@@ -22,7 +22,7 @@ You can take the typescript example and compile it, then directly modify the jav
 ## Commands and Permissions
 | Command       | Alias         | Description                                           | Permission               |
 | ------------- | ------------- |-----------------------------------------------------| ------------------------ |
-| `/scriptablemc reload`   | `/smc rl | /jsrl`       | Fully reloads the script engine and all script files. | `scriptablemc.reload` |
+| `/scriptablemc reload`   | `/smc rl /jsrl`       | Fully reloads the script engine and all script files. | `scriptablemc.reload` |
 | `/scriptablemc javascript execute <source>`   | `/smc js ex <source>`       | Executes javascript source and prints the return value. | `scriptablemc.js.execute` |
 | `/scriptablemc javascript file <filePath>`   | `/smc js f <filePath>`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
 | `/scriptablemc menu`   | `/smc menu`       | Opens an inventory menu that allows you to control the scriptable engine. | `scriptablemc.menu` |
