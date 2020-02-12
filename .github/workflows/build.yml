@@ -3,9 +3,6 @@ on:
   push:
     branches:
       - dev
-  pull_request:
-    branches:
-      - master
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -36,15 +33,12 @@ jobs:
         cp ./lib/ScriptableMC-JavaScript-Lib.zip ./src/main/resources/libraries.zip
     - name: Build with Gradle
       run: ./gradlew shadowJar
+    - name: Copy artifacts
+      run: |
+        cp ./build/libs/ScriptableMC.jar ./artifacts/
+        cp ./lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
+        cp ./lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
     - uses: actions/upload-artifact@v1
       with:
-        name: ScriptableMC.jar
-        path: build/libs/ScriptableMC.jar
-    - uses: actions/upload-artifact@v1
-      with:
-        name: ScriptableMC-TypeScript-Lib.zip
-        path: lib/ScriptableMC-TypeScript-Lib.zip
-    - uses: actions/upload-artifact@v1
-      with:
-        name: ScriptableMC-JavaScript-Lib.zip
-        path: lib/ScriptableMC-JavaScript-Lib.zip
+        name: ScriptableMC-DEV
+        path: artifacts/
