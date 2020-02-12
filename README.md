@@ -37,6 +37,8 @@ You can take the typescript example and compile it, then directly modify the jav
 
 
 ### Third Party Libraries
-https://github.com/MinusKube/SmartInvs - Inventory menu library<br />
+https://github.com/MinusKube/SmartInvs - Inventory helper library<br />
+https://github.com/lucko/helper - MinecraftVersions helper library<br />
+https://github.com/jkcclemens/khttp - HTTP helper library<br />
 https://github.com/aikar/commands - Built-in commands and auto-completion<br />
 https://github.com/graalvm/graaljs - JavaScript engine
