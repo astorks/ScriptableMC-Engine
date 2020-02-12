@@ -1,4 +1,4 @@
-name: Build
+name: Build Dev
 on:
   push:
     branches:
@@ -35,6 +35,7 @@ jobs:
       run: ./gradlew shadowJar
     - name: Copy artifacts
       run: |
+        mkdir artifacts
         cp ./build/libs/ScriptableMC.jar ./artifacts/
         cp ./lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
         cp ./lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
