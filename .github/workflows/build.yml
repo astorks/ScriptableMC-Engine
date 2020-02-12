@@ -24,27 +24,27 @@ jobs:
     - name: Export TypeScript Libraries with Gradle
       run: ./gradlew exportTypeScriptLibraries
     - name: Compile TypeScript libraries and create archives
-        run: |
-          cd ./lib/
-          npm install
-          npm run compile
-          cd ./ts/
-          zip -r ../ScriptableMC-TypeScript-Lib.zip ./*
-          cd ../js/
-          zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
-          cd ../../
-          cp ./lib/ScriptableMC-JavaScript-Lib.zip ./src/main/resources/libraries.zip
+      run: |
+        cd ./lib/
+        npm install
+        npm run compile
+        cd ./ts/
+        zip -r ../ScriptableMC-TypeScript-Lib.zip ./*
+        cd ../js/
+        zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
+        cd ../../
+        cp ./lib/ScriptableMC-JavaScript-Lib.zip ./src/main/resources/libraries.zip
     - name: Build with Gradle
-        run: ./gradlew shadowJar
+      run: ./gradlew shadowJar
     - uses: actions/upload-artifact@v1
       with:
         name: ScriptableMC.jar
         path: build/libs/ScriptableMC.jar
     - uses: actions/upload-artifact@v1
-        with:
-          name: ScriptableMC-TypeScript-Lib.zip
-          path: lib/ScriptableMC-TypeScript-Lib.zip
+      with:
+        name: ScriptableMC-TypeScript-Lib.zip
+        path: lib/ScriptableMC-TypeScript-Lib.zip
     - uses: actions/upload-artifact@v1
-        with:
-          name: ScriptableMC-JavaScript-Lib.zip
-          path: lib/ScriptableMC-JavaScript-Lib.zip
+      with:
+        name: ScriptableMC-JavaScript-Lib.zip
+        path: lib/ScriptableMC-JavaScript-Lib.zip
