@@ -19,7 +19,7 @@ jobs:
     - name: Fix gradlew permissions
       run: chmod +x ./gradlew
     - name: Export TypeScript Libraries with Gradle
-      run: ./gradlew exportTypeScriptLibraries
+      run: ./gradlew --no-daemon exportTypeScriptLibraries
     - name: Compile TypeScript libraries and create archives
       run: |
         cd ./lib/
@@ -32,7 +32,7 @@ jobs:
         cd ../../
         cp ./lib/ScriptableMC-JavaScript-Lib.zip ./src/main/resources/libraries.zip
     - name: Build with Gradle
-      run: ./gradlew shadowJar
+      run: ./gradlew --no-daemon shadowJar
     - name: Copy artifacts
       run: |
         mkdir artifacts
