@@ -13,7 +13,7 @@ import java.lang.reflect.*
 class TypescriptLibraryExporter {
     private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io)(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io|java\\.nio|khttp)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
 
     private fun safeName(name: String): String = when {
@@ -89,6 +89,7 @@ class TypescriptLibraryExporter {
 
             com.smc.utils.ItemBuilder::class.java,
             com.smc.utils.MysqlWrapper::class.java,
+            com.smc.utils.Http::class.java,
 
             com.smc.version.MinecraftVersion::class.java,
             com.smc.version.MinecraftVersions::class.java,
@@ -98,6 +99,18 @@ class TypescriptLibraryExporter {
             com.smc.smartinvs.SmartInventory::class.java,
 
             com.google.common.io.ByteStreams::class.java,
+
+            khttp.structures.files.FileLike::class.java,
+            khttp.structures.authorization.Authorization::class.java,
+            khttp.structures.authorization.BasicAuthorization::class.java,
+            khttp.structures.cookie.Cookie::class.java,
+            khttp.structures.cookie.CookieJar::class.java,
+            khttp.structures.maps.CaseInsensitiveMap::class.java,
+            khttp.structures.parameters.Parameters::class.java,
+            khttp.requests.GenericRequest::class.java,
+            khttp.requests.Request::class.java,
+            khttp.responses.GenericResponse::class.java,
+            khttp.responses.Response::class.java,
 
             java.io.File::class.java
         )

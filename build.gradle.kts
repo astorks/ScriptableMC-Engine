@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.pixlfox.scriptablemc"
-version = "1.1.9"
+version = "1.1.10"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -24,6 +24,10 @@ idea {
 repositories {
     mavenCentral()
     jcenter()
+    maven {
+        name = "JitPack"
+        url = uri("https://jitpack.io")
+    }
     maven {
         name = "spigotmc"
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
@@ -57,6 +61,7 @@ dependencies {
     implementation("org.graalvm.js:js-scriptengine:19.3.1")
     implementation("org.graalvm.truffle:truffle-api:19.3.1")
 
+    implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
     implementation("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
     implementation("fr.minuskube.inv:smart-invs:1.2.7")

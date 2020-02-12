@@ -17,12 +17,12 @@ private val helperClasses: Array<String> = arrayOf(
 
     "com.smc.utils.ItemBuilder",
     "com.smc.utils.MysqlWrapper",
+    "com.smc.utils.Http",
 
     "com.smc.smartinvs.SmartInventory",
     "com.smc.smartinvs.SmartInventoryProvider",
 
     "*me.clip.placeholderapi.PlaceholderAPI"
-
 )
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
@@ -34,12 +34,16 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         .allowHostAccess(HostAccess.ALL)
         .allowHostClassLoading(true)
         .allowIO(true)
+        .allowCreateThread(true)
         .option("js.ecmascript-version", "2020")
         .build()
     private val jsBindings: Value = graalContext.getBindings("js")
     internal val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
     internal val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
     private var enabledAllPlugins: Boolean = false
+
+    val pluginVersion: String
+    get() = "v${bootstrapPlugin.description.version}"
 
     internal fun start() {
         instance = this
@@ -154,7 +158,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
                     "    run(sender, server, servicesManager) {\n" +
                     "        $source\n" +
                     "    }\n" +
-                    "})()\n");
+                    "})()\n")
             val evalCommandSenderContext = evalFile(tempScriptFile)
 
             evalCommandSenderContext.putMember("sender", sender)

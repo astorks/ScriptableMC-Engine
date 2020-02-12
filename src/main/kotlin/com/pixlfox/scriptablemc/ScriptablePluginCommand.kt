@@ -77,34 +77,95 @@ class ScriptablePluginCommand(private val basePlugin: ScriptablePluginMain) : Ba
 @Subcommand("javascript|js")
 class ScriptablePluginJavaScriptCommand(private val basePlugin: ScriptablePluginMain) : BaseCommand() {
 
+    private val stashMap: MutableMap<CommandSender, MutableList<String>> = mutableMapOf()
+
+    @Subcommand("stash|st")
+    @CommandAlias("jss")
+    @CommandPermission("scriptablemc.js.execute")
+    @Syntax("[code]")
+    fun stash(sender: CommandSender, code: String) {
+        val stashList = stashMap.getOrPut(sender, { mutableListOf() })
+        when {
+            code.equals("clear", true) -> {
+                stashList.clear()
+                sender.sendMessage("JavaScript stash cleared!")
+            }
+            else -> {
+                stashList.add(code)
+                for ((index, stashMessage) in stashList.withIndex()) {
+                    sender.sendMessage("[${index + 1}] $stashMessage")
+                }
+            }
+        }
+    }
+
+    @Subcommand("stash|st")
+    @CommandAlias("jss")
+    @CommandPermission("scriptablemc.js.execute")
+    fun stash(sender: CommandSender) {
+        val stashList = stashMap.getOrPut(sender, { mutableListOf() })
+        for ((index, stashMessage) in stashList.withIndex()) {
+            sender.sendMessage("[${index + 1}] $stashMessage")
+        }
+    }
+
     @Subcommand("execute|ex")
     @CommandAlias("jsex")
     @CommandPermission("scriptablemc.js.execute")
     @Syntax("<code>")
     fun onSmcJsExecute(sender: CommandSender, code: String) {
-        try {
-            val response = basePlugin.scriptEngine!!.evalCommandSenderJs(code, sender)
-            if (!response.isNull) {
-                sender.sendMessage(response.toString())
-            }
-        }
-        catch (e: PolyglotException) {
-            e.printStackTrace()
+        if(code.equals("stash", true)) {
+            val stashList = stashMap.getOrPut(sender, { mutableListOf() })
+            val stashCode = stashList.joinToString("\n")
 
-            sender.sendMessage("${ChatColor.RED}$e")
-            for (stackTrace in e.stackTrace) {
-                if(stackTrace.fileName?.endsWith(".js", true) == true) {
-                    sender.sendMessage("${ChatColor.YELLOW}$stackTrace")
+            try {
+                val response = basePlugin.scriptEngine!!.evalCommandSenderJs(stashCode, sender)
+                if (!response.isNull) {
+                    sender.sendMessage(response.toString())
+                }
+            } catch (e: PolyglotException) {
+                e.printStackTrace()
+
+                sender.sendMessage("${ChatColor.RED}$e")
+                for (stackTrace in e.stackTrace) {
+                    if (stackTrace.fileName?.endsWith(".js", true) == true) {
+                        sender.sendMessage("${ChatColor.YELLOW}$stackTrace")
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+                sender.sendMessage("${ChatColor.DARK_RED}$e")
+                for (stackTrace in e.stackTrace) {
+                    if (stackTrace.className.startsWith("com.pixlfox.scriptablemc", true)) {
+                        sender.sendMessage("${ChatColor.RED}$stackTrace")
+                    }
                 }
             }
         }
-        catch (e: Exception) {
-            e.printStackTrace()
+        else {
+            try {
+                val response = basePlugin.scriptEngine!!.evalCommandSenderJs(code, sender)
+                if (!response.isNull) {
+                    sender.sendMessage(response.toString())
+                }
+            } catch (e: PolyglotException) {
+                e.printStackTrace()
 
-            sender.sendMessage("${ChatColor.DARK_RED}$e")
-            for (stackTrace in e.stackTrace) {
-                if(stackTrace.className.startsWith("com.pixlfox.scriptablemc", true)) {
-                    sender.sendMessage("${ChatColor.RED}$stackTrace")
+                sender.sendMessage("${ChatColor.RED}$e")
+                for (stackTrace in e.stackTrace) {
+                    if (stackTrace.fileName?.endsWith(".js", true) == true) {
+                        sender.sendMessage("${ChatColor.YELLOW}$stackTrace")
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+
+                sender.sendMessage("${ChatColor.DARK_RED}$e")
+                for (stackTrace in e.stackTrace) {
+                    if (stackTrace.className.startsWith("com.pixlfox.scriptablemc", true)) {
+                        sender.sendMessage("${ChatColor.RED}$stackTrace")
+                    }
                 }
             }
         }
