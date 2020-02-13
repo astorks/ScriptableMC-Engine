@@ -1,6 +1,7 @@
 package com.pixlfox.scriptablemc.core
 
 import com.pixlfox.scriptablemc.utils.UnzipUtility
+import com.smc.version.MinecraftVersion
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -26,8 +27,8 @@ private val helperClasses: Array<String> = arrayOf(
 )
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false, val extractLibs: Boolean = true): Listener {
-    private val graalContext: Context = Context
+class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false, val extractLibs: Boolean = true, val versionCheck: Boolean = true): Listener {
+    internal val graalContext: Context = Context
         .newBuilder()
         .allowAllAccess(true)
         .allowExperimentalOptions(true)

@@ -5,7 +5,6 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
 import co.aikar.commands.annotation.Syntax
-import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.smartinvs.MainMenu
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -18,55 +17,43 @@ import org.graalvm.polyglot.PolyglotException
 class ScriptablePluginCommand(private val basePlugin: ScriptablePluginMain) : BaseCommand() {
 
     @Subcommand("info|i")
+    @CommandAlias("smci")
     @CommandPermission("scriptablemc.info")
-    fun onSmcInfo(player: CommandSender) {
+    fun onSmcInfo(sender: CommandSender) {
         val scriptEngine = basePlugin.scriptEngine
         val isGraalRuntime = scriptEngine?.evalJs("if (typeof Graal != 'undefined') { Graal.isGraalRuntime() } else { false }")?.asBoolean() == true
-        player.sendMessage("${ChatColor.GREEN}ScriptableMC Version: ${basePlugin.description.version}")
-        player.sendMessage("${ if(isGraalRuntime) ChatColor.GREEN else ChatColor.YELLOW }GraalVM Java Runtime: $isGraalRuntime")
+        sender.sendMessage("${ChatColor.GREEN}ScriptableMC Version: ${basePlugin.description.version}")
+
+        sender.sendMessage("${ if(isGraalRuntime) ChatColor.GREEN else ChatColor.YELLOW }GraalVM Java Runtime: $isGraalRuntime")
+
         if(isGraalRuntime) {
-            player.sendMessage("${ChatColor.AQUA}GraalVM Runtime Version: ${scriptEngine?.evalJs("Graal.versionGraalVM")}")
-            player.sendMessage("${ChatColor.AQUA}GraalJS Engine Version: ${scriptEngine?.evalJs("Graal.versionJS")}")
+            sender.sendMessage("${ChatColor.LIGHT_PURPLE}GraalVM Runtime Version: ${scriptEngine?.evalJs("Graal.versionGraalVM")}")
+            sender.sendMessage("${ChatColor.LIGHT_PURPLE}GraalJS Engine Version: ${scriptEngine?.evalJs("Graal.versionJS")}")
+        }
+        else {
+            sender.sendMessage("${ChatColor.AQUA}GraalJS Engine Version: v19.3.1")
         }
     }
 
+    @Subcommand("version|v")
+    @CommandAlias("smcv")
+    @CommandPermission("scriptablemc.versioncheck")
+    fun versionCheck(sender: CommandSender) {
+        basePlugin.versionCheck(sender)
+    }
+
     @Subcommand("menu|m")
+    @CommandAlias("smcm")
     @CommandPermission("scriptablemc.menu")
     fun onSmcMenu(player: Player) {
         MainMenu.INVENTORY.open(player)
     }
 
     @Subcommand("reload|rl")
-    @CommandAlias("jsrl")
-    @CommandPermission("scriptablemc.js.reload")
+    @CommandAlias("smcrl")
+    @CommandPermission("scriptablemc.reload")
     fun onSmcJsReload(sender: CommandSender) {
-        basePlugin.patchClassLoader {
-            try {
-                basePlugin.scriptEngine!!.close()
-                basePlugin.logger.info("Scripting engine shutdown.")
-                basePlugin.reloadConfig()
-
-                basePlugin.scriptEngine = ScriptablePluginEngine(
-                    basePlugin,
-                    basePlugin.config.getString("root_scripts_folder", "./scripts").orEmpty(),
-                    basePlugin.config.getBoolean("debug", false),
-                    basePlugin.config.getBoolean("extract_libs", true)
-                )
-
-                basePlugin.scriptEngine!!.start()
-                basePlugin.logger.info("Scripting engine started.")
-
-                sender.sendMessage("Javascript engine reloaded.")
-            }
-            catch (e: Exception) {
-                e.printStackTrace()
-
-                sender.sendMessage("${ChatColor.DARK_RED}$e")
-                for (stackTrace in e.stackTrace) {
-                    sender.sendMessage("${ChatColor.DARK_RED}$stackTrace")
-                }
-            }
-        }
+        basePlugin.reloadScriptEngine(sender)
     }
 
 }
@@ -78,6 +65,13 @@ class ScriptablePluginCommand(private val basePlugin: ScriptablePluginMain) : Ba
 class ScriptablePluginJavaScriptCommand(private val basePlugin: ScriptablePluginMain) : BaseCommand() {
 
     private val stashMap: MutableMap<CommandSender, MutableList<String>> = mutableMapOf()
+
+    @Subcommand("reload|rl")
+    @CommandAlias("jsrl")
+    @CommandPermission("scriptablemc.js.reload")
+    fun onSmcJsReload(sender: CommandSender) {
+        basePlugin.reloadScriptEngine(sender)
+    }
 
     @Subcommand("stash|st")
     @CommandAlias("jss")
@@ -193,46 +187,6 @@ class ScriptablePluginJavaScriptCommand(private val basePlugin: ScriptablePlugin
             sender.sendMessage("${ChatColor.DARK_RED}$e")
             for (stackTrace in e.stackTrace) {
                 sender.sendMessage("${ChatColor.DARK_RED}$stackTrace")
-            }
-        }
-    }
-
-}
-
-@Suppress("unused")
-@CommandAlias("scriptablemc|smc")
-@Subcommand("typescript|ts")
-class ScriptablePluginTypeScriptCommand(private val basePlugin: ScriptablePluginMain) : BaseCommand() {
-
-    @Subcommand("reload|rl")
-    @CommandAlias("jsrl")
-    @CommandPermission("scriptablemc.js.reload")
-    fun onSmcJsReload(sender: CommandSender) {
-        basePlugin.patchClassLoader {
-            try {
-                basePlugin.scriptEngine!!.close()
-                basePlugin.logger.info("Scripting engine shutdown.")
-                basePlugin.reloadConfig()
-
-                basePlugin.scriptEngine = ScriptablePluginEngine(
-                    basePlugin,
-                    basePlugin.config.getString("root_scripts_folder", "./scripts").orEmpty(),
-                    basePlugin.config.getBoolean("debug", false),
-                    basePlugin.config.getBoolean("extract_libs", true)
-                )
-
-                basePlugin.scriptEngine!!.start()
-                basePlugin.logger.info("Scripting engine started.")
-
-                sender.sendMessage("Javascript engine reloaded.")
-            }
-            catch (e: Exception) {
-                e.printStackTrace()
-
-                sender.sendMessage("${ChatColor.DARK_RED}$e")
-                for (stackTrace in e.stackTrace) {
-                    sender.sendMessage("${ChatColor.DARK_RED}$stackTrace")
-                }
             }
         }
     }
