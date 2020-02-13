@@ -6,12 +6,10 @@ import fr.minuskube.inv.content.InventoryContents
 import fr.minuskube.inv.content.InventoryProvider
 import org.bukkit.entity.Player
 import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 import fr.minuskube.inv.ClickableItem
 import fr.minuskube.inv.SmartInventory
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
-import fr.minuskube.inv.content.SlotIterator
 
 
 

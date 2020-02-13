@@ -37,7 +37,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
             try {
                 scriptEngine?.close()
                 logger.info("Scriptable plugin engine shutdown.")
-                sender?.sendMessage("Scriptable plugin engine shutdown.")
+                sender?.sendMessage("$chatMessagePrefix Scriptable plugin engine shutdown.")
             } catch (e: Exception) {
                 logger.warning("Scriptable plugin engine failed to shutdown.")
                 e.printStackTrace()

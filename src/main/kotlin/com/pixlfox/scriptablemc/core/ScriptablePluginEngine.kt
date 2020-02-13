@@ -1,7 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
 import com.pixlfox.scriptablemc.utils.UnzipUtility
-import com.smc.version.MinecraftVersion
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
