@@ -22,13 +22,24 @@ GraalVM-CE is a free open source java runtime created by Oracle that is pre-pack
 You can take the typescript example and compile it, then directly modify the javascript if you don't want to use typescript.
 
 ## Commands and Permissions
+##### ScritableMC Base Command
+| Command       | Alias         | Description                                           | Permission               |
+| ------------- | ------------- |-----------------------------------------------------| ------------------------ |
+| `/scriptablemc menu`   | `/smc m`       | Opens an inventory menu that allows you to control the scriptable engine. | `scriptablemc.menu` |
+| `/scriptablemc info`   | `/smc i`       | Prints plugin version and GraalVM/GraalJS versions if available. | `scriptablemc.info` |
+| `/scriptablemc reload`   | `/smc rl`       | Fully reloads all script engines. | `scriptablemc.reload` |
+| `/scriptablemc version`   | `/smc v`       | Check the github releases for any updates. | `scriptablemc.version` |
+
+##### ScritableMC JavaScript Sub Command
 | Command       | Alias         | Description                                           | Permission               |
 | ------------- | ------------- |-----------------------------------------------------| ------------------------ |
 | `/scriptablemc javascript reload`   | `/smc js rl`       | Fully reloads the script engine and all script files. | `scriptablemc.js.reload` |
 | `/scriptablemc javascript execute <source>`   | `/smc js ex <source>`       | Executes javascript source and prints the return value. | `scriptablemc.js.execute` |
+| `/scriptablemc javascript execute stash`   | `/smc js ex stash`       | Executes javascript source stored in your stash. | `scriptablemc.js.execute` |
 | `/scriptablemc javascript file <filePath>`   | `/smc js f <filePath>`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
-| `/scriptablemc menu`   | `/smc menu`       | Opens an inventory menu that allows you to control the scriptable engine. | `scriptablemc.menu` |
-| `/scriptablemc info`   | `/smc info`       | Prints plugin version and GraalVM/GraalJS versions if available. | `scriptablemc.info` |
+| `/scriptablemc javascript stash`   | `/smc js st`       | Prints all stored javascript lines in your stash. | `scriptablemc.js.execute` |
+| `/scriptablemc javascript stash <source>`   | `/smc js st <source>`       | Adds a line to your javascript stash. | `scriptablemc.js.execute` |
+| `/scriptablemc javascript stash clear`   | `/smc js st clear`       | Clears your javascript stash. | `scriptablemc.js.execute` |
 
 ### `/smc javascript execute` Command Example
 > `/jsex return 1 + 1` <br>
