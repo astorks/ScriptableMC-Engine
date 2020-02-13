@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
-val chatMessagePrefix = "${ChatColor.GRAY}[${ChatColor.DARK_AQUA}ScritableMC${ChatColor.GRAY}]${ChatColor.RESET}"
+val chatMessagePrefix = "${ChatColor.GRAY}[${ChatColor.DARK_AQUA}ScriptableMC${ChatColor.GRAY}]${ChatColor.RESET}"
 
 @Suppress("unused")
 class ScriptablePluginMain : JavaPlugin(), Listener {
