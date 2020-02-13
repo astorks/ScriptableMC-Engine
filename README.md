@@ -3,7 +3,9 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/astorks/ScriptableMC-Engine?label=ScriptableMC&style=for-the-badge)](https://github.com/astorks/ScriptableMC-Engine/releases/latest)
 [![SpigotMC Resource](https://img.shields.io/badge/SpigotMC-Resource-yellow?style=for-the-badge)](https://www.spigotmc.org/resources/scriptablemc-engine.74690/)
 
-Run JavaScript/TypeScript plugins for Bukkit/Spigot/Paper Minecraft 1.15 using the GraalJS script engine.
+Run JavaScript/TypeScript plugins for Minecraft 1.15 using the GraalJS script engine.<br />
+Supported Minecraft Versions: Bukkit/Spigot/Paper 1.12, 1.13, 1.14, **1.15**<br />
+Untested but should work: 1.8+
 
 **This plugin is in a preview state, there may be breaking changes, missing features, and possibly a few bugs.**<br >
 Feel free to create an issue if you find any missing features, bugs, or just have an idea for a great feature to add.
