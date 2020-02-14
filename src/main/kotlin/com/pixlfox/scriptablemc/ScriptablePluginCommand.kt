@@ -19,7 +19,7 @@ class ScriptablePluginCommand(private val basePlugin: ScriptablePluginMain) : Ba
     @Subcommand("info|i")
     @CommandAlias("smci")
     @CommandPermission("scriptablemc.info")
-    fun onSmcInfo(sender: CommandSender) {
+    fun info(sender: CommandSender) {
         val scriptEngine = basePlugin.scriptEngine
         val isGraalRuntime = scriptEngine?.evalJs("if (typeof Graal != 'undefined') { Graal.isGraalRuntime() } else { false }")?.asBoolean() == true
         sender.sendMessage("${ChatColor.GREEN}ScriptableMC Version: ${basePlugin.description.version}")
@@ -38,21 +38,21 @@ class ScriptablePluginCommand(private val basePlugin: ScriptablePluginMain) : Ba
     @Subcommand("version|v")
     @CommandAlias("smcv")
     @CommandPermission("scriptablemc.versioncheck")
-    fun versionCheck(sender: CommandSender) {
+    fun version(sender: CommandSender) {
         basePlugin.versionCheck(sender)
     }
 
     @Subcommand("menu|m")
     @CommandAlias("smcm")
     @CommandPermission("scriptablemc.menu")
-    fun onSmcMenu(player: Player) {
+    fun menu(player: Player) {
         MainMenu.INVENTORY.open(player)
     }
 
     @Subcommand("reload|rl")
     @CommandAlias("smcrl")
     @CommandPermission("scriptablemc.reload")
-    fun onSmcJsReload(sender: CommandSender) {
+    fun reload(sender: CommandSender) {
         basePlugin.reloadScriptEngine(sender)
     }
 
@@ -69,7 +69,7 @@ class ScriptablePluginJavaScriptCommand(private val basePlugin: ScriptablePlugin
     @Subcommand("reload|rl")
     @CommandAlias("jsrl")
     @CommandPermission("scriptablemc.js.reload")
-    fun onSmcJsReload(sender: CommandSender) {
+    fun reload(sender: CommandSender) {
         basePlugin.reloadScriptEngine(sender)
     }
 
@@ -107,10 +107,9 @@ class ScriptablePluginJavaScriptCommand(private val basePlugin: ScriptablePlugin
     @CommandAlias("jsex")
     @CommandPermission("scriptablemc.js.execute")
     @Syntax("<code>")
-    fun onSmcJsExecute(sender: CommandSender, code: String) {
+    fun execute(sender: CommandSender, code: String) {
         if(code.equals("stash", true)) {
-            val stashList = stashMap.getOrPut(sender, { mutableListOf() })
-            val stashCode = stashList.joinToString("\n")
+            val stashCode = stashMap.getOrPut(sender, { mutableListOf() }).joinToString("\n")
 
             try {
                 val response = basePlugin.scriptEngine!!.evalCommandSenderJs(stashCode, sender)
@@ -169,7 +168,7 @@ class ScriptablePluginJavaScriptCommand(private val basePlugin: ScriptablePlugin
     @CommandAlias("jsexf")
     @CommandPermission("scriptablemc.js.execute.file")
     @Syntax("<filePath>")
-    fun onSmcJsExecuteFile(sender: CommandSender, filePath: String) {
+    fun executeFile(sender: CommandSender, filePath: String) {
         if(filePath.equals("main.js", true)) {
             sender.sendMessage("${ChatColor.DARK_RED}Unable to execute the main script entrypoint. Use the command /jsrl to reload scripts.")
             return

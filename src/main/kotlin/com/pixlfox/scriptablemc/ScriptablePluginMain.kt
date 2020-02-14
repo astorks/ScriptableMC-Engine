@@ -29,6 +29,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
     }
 
     override fun onDisable() {
+        commandManager?.unregisterCommands()
         unloadScriptEngine()
     }
 
