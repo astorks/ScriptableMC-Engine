@@ -11,7 +11,7 @@ import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class JavaScriptPluginEngine(override val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", override val debugEnabled: Boolean = false, val extractLibs: Boolean = true): ScriptablePluginEngine() {
-    override val graalContext: Context = Context
+    override val graalContext: Context = org.graalvm.polyglot.Context
         .newBuilder("js")
         .allowAllAccess(true)
         .allowExperimentalOptions(true)

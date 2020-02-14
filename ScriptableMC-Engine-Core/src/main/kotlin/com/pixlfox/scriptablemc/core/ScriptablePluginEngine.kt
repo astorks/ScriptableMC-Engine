@@ -49,9 +49,8 @@ abstract class ScriptablePluginEngine {
 
     companion object {
         val preLoadClasses: Array<String> = arrayOf(
-            "com.smc.version.MinecraftVersion",
+            "com.smc.version.Version",
             "com.smc.version.MinecraftVersions",
-            "com.smc.version.SnapshotVersion",
 
             "com.smc.utils.ItemBuilder",
             "com.smc.utils.MysqlWrapper",

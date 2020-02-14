@@ -2,11 +2,12 @@ package com.pixlfox.scriptablemc
 
 import co.aikar.commands.PaperCommandManager
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
-import com.smc.version.MinecraftVersion
+import com.smc.version.Version
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
+@Suppress("unused")
 abstract class ScriptEngineMain : JavaPlugin() {
     var scriptEngine: ScriptablePluginEngine? = null
     var commandManager: PaperCommandManager? = null
@@ -16,26 +17,24 @@ abstract class ScriptEngineMain : JavaPlugin() {
 
     fun versionCheck(sender: CommandSender? = null) {
         if(config.getBoolean("version_check", true)) {
-            val pluginVersion = "v${description.version}"
             khttp.async.get("https://api.github.com/repos/astorks/ScriptableMC-Engine/releases/latest") {
                 val githubReleaseInfo = this.jsonObject
-                val releaseTag = githubReleaseInfo.getString("tag_name")
-                val latestReleaseVersion = MinecraftVersion.parse(releaseTag.substring(1))
-                val currentVersion = MinecraftVersion.parse(pluginVersion.substring(1))
+                val latestReleaseVersion = Version.parse(githubReleaseInfo.getString("tag_name"))
+                val currentVersion = Version.parse("v${description.version}")
                 val releaseLink = githubReleaseInfo.getString("html_url")
 
                 if (currentVersion.isBefore(latestReleaseVersion)) {
                     sender?.sendMessage("$chatMessagePrefix ${ChatColor.YELLOW}An update was found.")
-                    sender?.sendMessage("$chatMessagePrefix CurrentVersion: $pluginVersion, LatestRelease: $releaseTag.")
+                    sender?.sendMessage("$chatMessagePrefix CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion.")
                     sender?.sendMessage("$chatMessagePrefix Download Page: $releaseLink")
-                    logger.warning("An update was found. CurrentVersion: $pluginVersion, LatestRelease: $releaseTag")
+                    logger.warning("An update was found. CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
                     logger.fine("Download Page: $releaseLink")
                 }
                 else {
                     sender?.sendMessage("$chatMessagePrefix No updates found.")
-                    sender?.sendMessage("$chatMessagePrefix CurrentVersion: $pluginVersion, LatestRelease: $releaseTag")
+                    sender?.sendMessage("$chatMessagePrefix CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
                     if (config.getBoolean("debug", false)) {
-                        logger.info("No updates found. CurrentVersion: $pluginVersion, LatestRelease: $releaseTag")
+                        logger.info("No updates found. CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
                     }
                 }
             }

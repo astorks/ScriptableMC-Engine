@@ -92,7 +92,7 @@ class TypescriptLibraryExporter {
             com.smc.utils.MysqlWrapper::class.java,
             com.smc.utils.Http::class.java,
 
-            com.smc.version.MinecraftVersion::class.java,
+            com.smc.version.Version::class.java,
             com.smc.version.MinecraftVersions::class.java,
 
             fr.minuskube.inv.SmartInventory::class.java,

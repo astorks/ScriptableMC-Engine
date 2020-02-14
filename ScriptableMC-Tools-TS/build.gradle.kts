@@ -1,8 +1,7 @@
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.3.61"
-    id("com.github.johnrengelman.shadow") version "5.2.0"
-    id("org.jetbrains.gradle.plugin.idea-ext") version "0.7"
+    id("org.jetbrains.kotlin.jvm")
+    id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
 group = "com.pixlfox.scriptablemc"
@@ -87,11 +86,6 @@ tasks.compileTestKotlin {
 
 tasks.jar {
 
-}
-
-tasks.shadowJar {
-    archiveFileName.set("ScriptableMC-Tools-TS.jar")
-    mergeServiceFiles()
 }
 
 tasks.register<JavaExec>("exportTypeScriptLibraries") {

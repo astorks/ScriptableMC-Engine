@@ -1,7 +1,7 @@
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.3.61"
-    id("org.jetbrains.gradle.plugin.idea-ext") version "0.7"
+    id("org.jetbrains.kotlin.jvm")
+    id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
 group = "com.pixlfox.scriptablemc"
