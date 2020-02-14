@@ -37,79 +37,79 @@ class MinecraftVersions private constructor(){
         /**
          * Version 1.15 - buzzy bees update
          */
-        @JvmStatic
+        @JvmField
         val v1_15 = parse("1.15")
 
         /**
          * Version 1.14 - village and pillage update
          */
-        @JvmStatic
+        @JvmField
         val v1_14 = parse("1.14")
 
         /**
          * Version 1.13 - update aquatic.
          */
-        @JvmStatic
+        @JvmField
         val v1_13 = parse("1.13")
 
         /**
          * Version 1.12 - the world of color update.
          */
-        @JvmStatic
+        @JvmField
         val v1_12 = parse("1.12")
 
         /**
          * Version 1.11 - the exploration update.
          */
-        @JvmStatic
+        @JvmField
         val v1_11 = parse("1.11")
 
         /**
          * Version 1.10 - the frostburn update.
          */
-        @JvmStatic
+        @JvmField
         val v1_10 = parse("1.10")
 
         /**
          * Version 1.9 - the combat update.
          */
-        @JvmStatic
+        @JvmField
         val v1_9 = parse("1.9")
 
         /**
          * Version 1.8 - the "bountiful" update.
          */
-        @JvmStatic
+        @JvmField
         val v1_8 = parse("1.8")
 
         /**
          * Version 1.7.8 - the update that changed the skin format (and distribution - R.I.P. player disguise)
          */
-        @JvmStatic
+        @JvmField
         val v1_7_8 = parse("1.7.8")
 
         /**
          * Version 1.7.2 - the update that changed the world.
          */
-        @JvmStatic
+        @JvmField
         val v1_7_2 = parse("1.7.2")
 
         /**
          * Version 1.6.1 - the horse update.
          */
-        @JvmStatic
+        @JvmField
         val v1_6_1 = parse("1.6.1")
 
         /**
          * Version 1.5.0 - the redstone update.
          */
-        @JvmStatic
+        @JvmField
         val v1_5_0 = parse("1.5.0")
 
         /**
          * Version 1.4.2 - the scary update (Wither Boss).
          */
-        @JvmStatic
+        @JvmField
         val v1_4_2 = parse("1.4.2")
 
         /**
@@ -121,7 +121,7 @@ class MinecraftVersions private constructor(){
         /**
          * The version of the runtime
          */
-        @JvmStatic
+        @JvmField
         val RUNTIME_VERSION = parseServerVersion(Bukkit.getVersion())
 
         private fun parseServerVersion(serverVersion: String): Version {
