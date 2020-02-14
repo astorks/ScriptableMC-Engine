@@ -19,7 +19,7 @@ jobs:
       run: chmod +x ./gradlew
     - name: Export TypeScript Libraries with Gradle
       run: ./gradlew :ScriptableMC-Tools-TS:exportTypeScriptLibraries
-    - name: Compile TypeScript libraries and create archives for release
+    - name: Compile TypeScript libraries and create archives
       run: |
         cd ./ScriptableMC-Tools-TS/lib/
         npm install
@@ -28,8 +28,8 @@ jobs:
         zip -r ../ScriptableMC-TypeScript-Lib.zip ./*
         cd ../js/
         zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
-        cd ../../
-        cp ./lib/ScriptableMC-JavaScript-Lib.zip ./src/main/resources/libraries.zip
+        cd ../
+        cp ./ScriptableMC-JavaScript-Lib.zip ../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
     - name: Build JS Engine with Gradle
       run: ./gradlew :ScriptableMC-Engine-JS:shadowJar
     - name: Upload JS Engine Plugin Jar
@@ -43,10 +43,10 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        args: 'JS-Engine/lib/ScriptableMC-TypeScript-Lib.zip'
+        args: 'ScriptableMC-Tools-TS/lib/ScriptableMC-TypeScript-Lib.zip'
     - name: Upload JavaScript Libraries
       uses: skx/github-action-publish-binaries@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        args: 'JS-Engine/lib/ScriptableMC-JavaScript-Lib.zip'
+        args: 'ScriptableMC-Tools-TS/lib/ScriptableMC-JavaScript-Lib.zip'
