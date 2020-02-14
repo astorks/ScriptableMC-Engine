@@ -1,0 +1,19 @@
+# Root scripts folder
+# Example inside plugin folder: ./plugins/ScriptableMC/scripts
+# Default: ./scripts
+root_scripts_folder: './scripts'
+
+# Prints some additional debugging messages
+# Default: false
+debug: false
+
+# Version check on script engine start
+# If enabled will make a request to the github api to check for updates
+# and notify you if any updates are available
+# Default: true
+version_check: true
+
+# Automatically extract js libraries to scripts lib folder if lib folder is missing
+# If you set this to false you'll need to download and extract the libs manually.
+# Default: true
+extract_libs: true

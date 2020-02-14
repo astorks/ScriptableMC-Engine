@@ -1,7 +1,8 @@
-name: Build and Upload Release Artifacts
+name: Build Dev
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - dev
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -32,21 +33,13 @@ jobs:
         cp ./ScriptableMC-JavaScript-Lib.zip ../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
     - name: Build JS Engine with Gradle
       run: ./gradlew :ScriptableMC-Engine-JS:shadowJar
-    - name: Upload JS Engine Plugin Jar
-      uses: skx/github-action-publish-binaries@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Copy artifacts
+      run: |
+        mkdir artifacts
+        cp ./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar ./artifacts/
+        cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
+        cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
+    - uses: actions/upload-artifact@v1
       with:
-        args: 'ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar'
-    - name: Upload TypeScript Libraries
-      uses: skx/github-action-publish-binaries@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        args: 'ScriptableMC-Tools-TS/lib/ScriptableMC-TypeScript-Lib.zip'
-    - name: Upload JavaScript Libraries
-      uses: skx/github-action-publish-binaries@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        args: 'ScriptableMC-Tools-TS/lib/ScriptableMC-JavaScript-Lib.zip'
+        name: ScriptableMC-Engine-DEV
+        path: artifacts/
