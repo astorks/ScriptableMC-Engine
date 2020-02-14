@@ -12,29 +12,25 @@ import org.graalvm.polyglot.Value
 import java.util.function.Consumer
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
-object SmartInventory {
-    @JvmStatic
-    fun builder(): SmartInventory.Builder {
-        return SmartInventory.builder().manager(ScriptablePluginEngine.instance!!.inventoryManager)
-    }
+class SmartInventory {
+    companion object {
+        @JvmStatic
+        fun builder(): SmartInventory.Builder = SmartInventory.builder().manager(ScriptablePluginEngine.instance!!.inventoryManager)
 
-    @JvmStatic
-    fun provider(scriptableObject: Value): SmartInventoryProvider {
-        if (scriptableObject.canInstantiate()) {
-            return provider(scriptableObject.newInstance())
+        @JvmStatic
+        fun provider(scriptableObject: Value): SmartInventoryProvider {
+            if (scriptableObject.canInstantiate()) {
+                return provider(scriptableObject.newInstance())
+            }
+
+            return SmartInventoryProvider(scriptableObject)
         }
 
-        return SmartInventoryProvider(scriptableObject)
-    }
+        @JvmStatic
+        fun clickableItem(item: ItemStack): ClickableItem = ClickableItem.empty(item)
 
-    @JvmStatic
-    fun clickableItem(item: ItemStack): ClickableItem {
-        return ClickableItem.empty(item)
-    }
-
-    @JvmStatic
-    fun clickableItem(item: ItemStack, consumer: Consumer<InventoryClickEvent>): ClickableItem {
-        return ClickableItem.of(item, consumer)
+        @JvmStatic
+        fun clickableItem(item: ItemStack, consumer: Consumer<InventoryClickEvent>): ClickableItem = ClickableItem.of(item, consumer)
     }
 }
 

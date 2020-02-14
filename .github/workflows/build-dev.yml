@@ -19,10 +19,10 @@ jobs:
     - name: Fix gradlew permissions
       run: chmod +x ./gradlew
     - name: Export TypeScript Libraries with Gradle
-      run: ./gradlew exportTypeScriptLibraries
+      run: ./gradlew :JS-Engine:exportTypeScriptLibraries
     - name: Compile TypeScript libraries and create archives
       run: |
-        cd ./lib/
+        cd ./JS-Engine/lib/
         npm install
         npm run compile
         cd ./ts/
@@ -32,13 +32,13 @@ jobs:
         cd ../../
         cp ./lib/ScriptableMC-JavaScript-Lib.zip ./src/main/resources/libraries.zip
     - name: Build with Gradle
-      run: ./gradlew shadowJar
+      run: ./gradlew :JS-Engine:shadowJar
     - name: Copy artifacts
       run: |
         mkdir artifacts
-        cp ./build/libs/ScriptableMC.jar ./artifacts/
-        cp ./lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
-        cp ./lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
+        cp ./JS-Engine/build/libs/ScriptableMC.jar ./artifacts/
+        cp ./JS-Engine/lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
+        cp ./JS-Engine/lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
     - uses: actions/upload-artifact@v1
       with:
         name: ScriptableMC-DEV
