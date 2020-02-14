@@ -1,3 +1,4 @@
 rootProject.name = "ScriptableMC-Engine"
 
-include("JS-Engine")
+include("ScriptableMC-Engine-JS")
+include("ScriptableMC-Tools-TS")
