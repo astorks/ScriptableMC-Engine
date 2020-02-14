@@ -68,9 +68,9 @@ dependencies {
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
     implementation("fr.minuskube.inv:smart-invs:1.2.7")
     compileOnly("me.clip:placeholderapi:2.10.4")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.thoughtworks.paranamer:paranamer:2.8")
     implementation("com.beust:klaxon:5.2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     testImplementation("junit", "junit", "4.12")
 }
