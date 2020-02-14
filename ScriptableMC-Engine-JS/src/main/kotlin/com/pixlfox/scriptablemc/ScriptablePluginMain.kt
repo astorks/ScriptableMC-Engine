@@ -122,7 +122,7 @@ class ScriptablePluginMain : JavaPlugin(), Listener {
      * A bit hackish but it works.
      * https://stackoverflow.com/questions/56712178/graalvm-no-language-and-polyglot-implementation-was-found-on-the-classpath
      */
-    internal fun patchClassLoader(callback: () -> Unit) {
+    private fun patchClassLoader(callback: () -> Unit) {
         val oldCl = Thread.currentThread().contextClassLoader
         Thread.currentThread().contextClassLoader = javaClass.classLoader
         callback()

@@ -51,7 +51,8 @@ class ItemBuilder(private val itemStack: ItemStack) {
         return this
     }
 
-    fun addEnchant(enchantment: Enchantment, level: Int, ignoreLevelRestriction: Boolean): ItemBuilder {
+    @JvmOverloads
+    fun addEnchant(enchantment: Enchantment, level: Int = 1, ignoreLevelRestriction: Boolean = false): ItemBuilder {
         val itemMeta = itemStack.itemMeta
         itemMeta?.addEnchant(enchantment, level, ignoreLevelRestriction)
         itemStack.itemMeta = itemMeta

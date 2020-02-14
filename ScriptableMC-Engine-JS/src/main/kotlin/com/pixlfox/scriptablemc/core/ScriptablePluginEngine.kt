@@ -28,7 +28,7 @@ private val helperClasses: Array<String> = arrayOf(
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false, val extractLibs: Boolean = true, val versionCheck: Boolean = true): Listener {
     internal val graalContext: Context = Context
-        .newBuilder()
+        .newBuilder("js")
         .allowAllAccess(true)
         .allowExperimentalOptions(true)
         .allowHostAccess(HostAccess.ALL)

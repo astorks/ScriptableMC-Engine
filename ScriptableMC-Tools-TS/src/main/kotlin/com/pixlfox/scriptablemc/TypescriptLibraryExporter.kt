@@ -427,13 +427,13 @@ class TypescriptLibraryExporter {
     private fun generateTypescriptGlobalExports(): String {
         var tsGlobalExportsSource = ""
 
-        for (_class in classList) {
+        for (_class in classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
             if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
                 tsGlobalExportsSource += generateTypescriptImportForClass(_class)
             }
         }
 
-        for((packageName, classes) in this.classList.groupBy { getPackageName(it.name) }) {
+        for((packageName, classes) in this.classList.sortedBy { safeClassName(stripPackageName(it.name)) }.groupBy { getPackageName(it.name) }) {
             tsGlobalExportsSource += "export namespace $packageName {\n"
             for (_class in classes) {
                 if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
@@ -447,6 +447,7 @@ class TypescriptLibraryExporter {
     }
 
     private fun generateTypescriptInterface(_class: Class<*>): String {
+        var methodCount = 0
         var tsInterfaceSource = "export default interface ${safeClassName(stripPackageName(_class.name))}"
 
         val interfaceNames = getInterfaceNames(_class)
@@ -458,8 +459,9 @@ class TypescriptLibraryExporter {
         tsInterfaceSource += " {\n"
 
         val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|(.*?)\\\$(.*?))")
-        for (_method in _class.methods) {
+        for (_method in _class.methods.sortedWith(compareBy({it.name}, {it.parameterCount}))) {
             if(!Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
+                methodCount++
                 tsInterfaceSource += if (_method.parameterCount == 0) {
                     "\t${_method.name}(): ${javaClassToTypescript(_method.returnType, _method.genericReturnType)};\n"
                 } else {
@@ -470,6 +472,10 @@ class TypescriptLibraryExporter {
 
         tsInterfaceSource += "}\n\n"
 
+        if(methodCount == 0) {
+            return ""
+        }
+
         return tsInterfaceSource
     }
 
@@ -479,20 +485,20 @@ class TypescriptLibraryExporter {
 
         tsClassSource += "\tpublic static get \$javaClass(): any {\n"
         tsClassSource += "\t\treturn Java.type('${_class.name}');\n"
-        tsClassSource += "\t}\n"
+        tsClassSource += "\t}\n\n"
 
-        for ((index, constructor) in _class.constructors.withIndex()) {
+        for ((index, constructor) in _class.constructors.sortedBy { it.parameterCount }.withIndex()) {
             tsClassSource += "\tconstructor(${getParameters(constructor).joinToString(", ")});\n"
             if(index == _class.constructors.size - 1) {
                 tsClassSource += "\tconstructor(...args: any[]) {\n"
                 tsClassSource += "\t\treturn new $className.\$javaClass(...args);\n"
-                tsClassSource += "\t}\n"
+                tsClassSource += "\t}\n\n"
             }
         }
 
         val countMap = mutableMapOf<String, Int>()
         val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
-        for (_field in _class.fields) {
+        for (_field in _class.fields.sortedBy { it.name }) {
             var jsFieldName: String = _field.name
 
             if(!countMap.containsKey(_field.name)) {
@@ -506,11 +512,11 @@ class TypescriptLibraryExporter {
             if(Modifier.isStatic(_field.modifiers) && Modifier.isPublic(_field.modifiers) && Modifier.isFinal(_field.modifiers) && !_field.name.matches(blacklistRegex)) {
                 tsClassSource += "\tpublic static get ${safeName(jsFieldName)}(): ${safeClassName(javaClassToTypescript(_field.type))} {\n"
                 tsClassSource += "\t\treturn $className.\$javaClass.${_field.name};\n"
-                tsClassSource += "\t}\n"
+                tsClassSource += "\t}\n\n"
             }
         }
 
-        for (_methodGroups in _class.methods.filter { e -> Modifier.isStatic(e.modifiers) && !Modifier.isPrivate(e.modifiers) }.groupBy { e -> e.name }) {
+        for (_methodGroups in _class.methods.sortedWith(compareBy({it.name}, {it.parameterCount})).filter { e -> Modifier.isStatic(e.modifiers) && !Modifier.isPrivate(e.modifiers) }.groupBy { e -> e.name }) {
 
             val jsMethodName: String = _methodGroups.key
 
@@ -528,7 +534,7 @@ class TypescriptLibraryExporter {
                     if(index == _methodGroups.value.size - 1) {
                         tsClassSource += "\tpublic static ${safeName(jsMethodName)}(...args: any[]): any {\n"
                         tsClassSource += "\t\treturn $className.\$javaClass.${_method.name}(...args);\n"
-                        tsClassSource += "\t}\n"
+                        tsClassSource += "\t}\n\n"
                     }
                 }
             }
@@ -547,7 +553,7 @@ class TypescriptLibraryExporter {
         tsEnumSource += "\t\treturn Java.type('${_class.name}');\n"
         tsEnumSource += "\t}\n\n"
 
-        for (enumConstant in _class.enumConstants) {
+        for (enumConstant in _class.enumConstants.sortedBy { it.name }) {
             tsEnumSource += "\tpublic static get ${enumConstant.name}(): $enumName {\n"
             tsEnumSource += "\t\treturn this.\$javaClass.${enumConstant.name};\n"
             tsEnumSource += "\t}\n"
