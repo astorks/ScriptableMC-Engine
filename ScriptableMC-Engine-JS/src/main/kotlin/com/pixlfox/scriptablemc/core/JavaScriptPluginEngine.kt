@@ -4,30 +4,14 @@ import com.pixlfox.scriptablemc.utils.UnzipUtility
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import org.bukkit.event.Listener
 import org.graalvm.polyglot.*
 import java.io.File
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
-private val helperClasses: Array<String> = arrayOf(
-    "com.smc.version.MinecraftVersion",
-    "com.smc.version.MinecraftVersions",
-    "com.smc.version.SnapshotVersion",
-
-    "com.smc.utils.ItemBuilder",
-    "com.smc.utils.MysqlWrapper",
-    "com.smc.utils.Http",
-
-    "com.smc.smartinvs.SmartInventory",
-    "com.smc.smartinvs.SmartInventoryProvider",
-
-    "*me.clip.placeholderapi.PlaceholderAPI"
-)
-
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", val debugEnabled: Boolean = false, val extractLibs: Boolean = true, val versionCheck: Boolean = true): Listener {
-    internal val graalContext: Context = Context
+class JavaScriptPluginEngine(override val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", override val debugEnabled: Boolean = false, val extractLibs: Boolean = true): ScriptablePluginEngine() {
+    override val graalContext: Context = Context
         .newBuilder("js")
         .allowAllAccess(true)
         .allowExperimentalOptions(true)
@@ -37,30 +21,18 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         .allowCreateThread(true)
         .option("js.ecmascript-version", "2020")
         .build()
-    private val jsBindings: Value = graalContext.getBindings("js")
-    internal val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
-    internal val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
+
+    override val globalBindings: Value = graalContext.getBindings("js")
+    override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
+    override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
     private var enabledAllPlugins: Boolean = false
 
-    val pluginVersion: String
-    get() = "v${bootstrapPlugin.description.version}"
-
-    internal fun start() {
+    override fun start() {
         instance = this
         inventoryManager.init()
-        jsBindings.putMember("engine", this)
+        globalBindings.putMember("engine", this)
 
-        for(helperClass in helperClasses) {
-            try {
-                javaClass.classLoader.loadClass(helperClass.replace("*", ""))
-            }
-            catch (e: Exception) {
-                if(!helperClass.startsWith("*")) {
-                    bootstrapPlugin.logger.warning("Failed to load helper class \"$helperClass\" via classloader.")
-                    e.printStackTrace()
-                }
-            }
-        }
+        loadAllHelperClasses()
 
         val mainScriptFile = File("${rootScriptsFolder}/main.js")
         if(!mainScriptFile.parentFile.exists()) {
@@ -100,7 +72,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         }
     }
 
-    internal fun close() {
+    override fun close() {
         instance = null
         for(scriptablePlugin in scriptablePlugins) {
             scriptablePlugin.disable()
@@ -110,7 +82,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         graalContext.close(true)
     }
 
-    fun evalFile(filePath: String): Value {
+    override fun evalFile(filePath: String): Value {
         val scriptFile = File("${rootScriptsFolder}/$filePath")
 
         return if(scriptFile.exists()) {
@@ -126,7 +98,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         }
     }
 
-    fun evalFile(scriptFile: File): Value {
+    override fun evalFile(scriptFile: File): Value {
         return if(scriptFile.exists()) {
             eval(
                 Source.newBuilder("js", scriptFile)
@@ -140,7 +112,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         }
     }
 
-    fun evalJs(source: String): Value {
+    override fun eval(source: String): Value {
         return graalContext.eval(
             Source.newBuilder("js", source,"${UUID.randomUUID()}.js")
                 .mimeType("application/javascript+module")
@@ -150,7 +122,7 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         )
     }
 
-    fun evalCommandSenderJs(source: String, sender: CommandSender): Value {
+    override fun evalCommandSender(source: String, sender: CommandSender): Value {
         val tempScriptFile = File("${rootScriptsFolder}/${UUID.randomUUID()}.js")
         try {
             tempScriptFile.writeText("import * as lib from './lib/global.js';\n" +
@@ -171,38 +143,38 @@ class ScriptablePluginEngine(val bootstrapPlugin: JavaPlugin, val rootScriptsFol
         }
     }
 
-    fun eval(source: Source): Value {
+    override fun eval(source: Source): Value {
         return graalContext.eval(source)
     }
 
-    fun loadPlugin(scriptableClass: Value): ScriptablePluginContext {
+    override fun loadPlugin(scriptableClass: Value): ScriptablePluginContext {
         val pluginInstance = scriptableClass.newInstance()
         val pluginName = pluginInstance.getMember("pluginName").asString()
-        val pluginContext = ScriptablePluginContext.newInstance(pluginName, this, pluginInstance)
+        val pluginContext = JavaScriptPluginContext.newInstance(pluginName, this, pluginInstance)
         pluginInstance.putMember("context", pluginContext)
         scriptablePlugins.add(pluginContext)
         pluginContext.load()
         return pluginContext
     }
 
-    fun enableAllPlugins() {
+    override fun enableAllPlugins() {
         for (pluginContext in scriptablePlugins) {
             pluginContext.enable()
         }
         enabledAllPlugins = true
     }
 
-    fun enablePlugin(pluginContext: ScriptablePluginContext) {
+    override fun enablePlugin(pluginContext: ScriptablePluginContext) {
         pluginContext.enable()
     }
 
-    fun disablePlugin(pluginContext: ScriptablePluginContext) {
+    override fun disablePlugin(pluginContext: ScriptablePluginContext) {
         pluginContext.disable()
     }
 
     companion object {
-        private var inst: ScriptablePluginEngine? = null
-        var instance: ScriptablePluginEngine?
+        private var inst: JavaScriptPluginEngine? = null
+        var instance: JavaScriptPluginEngine?
             internal set(value) { inst = value }
             get() { return inst }
     }

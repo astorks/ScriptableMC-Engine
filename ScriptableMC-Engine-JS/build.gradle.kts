@@ -55,6 +55,9 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":ScriptableMC-Engine-Core"))
+
+
     // GraalVM SDK & GraalJS Engine
     implementation("org.graalvm.sdk:graal-sdk:19.3.1")
     implementation("org.graalvm.js:js:19.3.1")

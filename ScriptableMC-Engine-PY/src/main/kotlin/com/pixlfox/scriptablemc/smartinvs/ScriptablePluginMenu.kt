@@ -1,6 +1,6 @@
 package com.pixlfox.scriptablemc.smartinvs
 
-import com.pixlfox.scriptablemc.core.JavaScriptPluginEngine
+import com.pixlfox.scriptablemc.core.PythonPluginEngine
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.smc.utils.ItemBuilder
 import fr.minuskube.inv.content.InventoryContents
@@ -49,8 +49,8 @@ class MainMenu(private val pluginEngine: ScriptablePluginEngine) : InventoryProv
         val INVENTORY: SmartInventory
             get() = SmartInventory.builder()
                     .id("spm.mainmenu")
-                    .manager(JavaScriptPluginEngine.instance!!.inventoryManager)
-                    .provider(MainMenu(JavaScriptPluginEngine.instance!!))
+                    .manager(PythonPluginEngine.instance!!.inventoryManager)
+                    .provider(MainMenu(PythonPluginEngine.instance!!))
                     .size(1, 9)
                     .title(ChatColor.LIGHT_PURPLE.toString() + "ScriptableMC | Main Menu")
                     .closeable(true)

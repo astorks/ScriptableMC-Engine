@@ -2,6 +2,7 @@ package com.smc.smartinvs
 
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import fr.minuskube.inv.ClickableItem
+import fr.minuskube.inv.InventoryManager
 import fr.minuskube.inv.SmartInventory
 import fr.minuskube.inv.content.InventoryContents
 import fr.minuskube.inv.content.InventoryProvider
@@ -15,7 +16,7 @@ import java.util.function.Consumer
 class SmartInventory {
     companion object {
         @JvmStatic
-        fun builder(): SmartInventory.Builder = SmartInventory.builder().manager(ScriptablePluginEngine.instance!!.inventoryManager)
+        fun builder(inventoryManager: InventoryManager): SmartInventory.Builder = SmartInventory.builder().manager(inventoryManager)
 
         @JvmStatic
         fun provider(scriptableObject: Value): SmartInventoryProvider {

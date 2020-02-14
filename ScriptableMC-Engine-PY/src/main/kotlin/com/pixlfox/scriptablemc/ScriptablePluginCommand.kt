@@ -61,21 +61,21 @@ class ScriptablePluginCommand(private val basePlugin: ScriptEngineMain) : BaseCo
 
 @Suppress("unused")
 @CommandAlias("scriptablemc|smc")
-@Subcommand("javascript|js")
-class ScriptablePluginJavaScriptCommand(private val basePlugin: SMCJavaScriptEngineMain) : BaseCommand() {
+@Subcommand("python|py")
+class ScriptablePluginPythonCommand(private val basePlugin: SMCPythonEngineMain) : BaseCommand() {
 
     private val stashMap: MutableMap<CommandSender, MutableList<String>> = mutableMapOf()
 
     @Subcommand("reload|rl")
-    @CommandAlias("jsrl")
-    @CommandPermission("scriptablemc.js.reload")
+    @CommandAlias("pyrl")
+    @CommandPermission("scriptablemc.py.reload")
     fun reload(sender: CommandSender) {
         basePlugin.reloadScriptEngine(sender)
     }
 
     @Subcommand("stash|st")
-    @CommandAlias("jss")
-    @CommandPermission("scriptablemc.js.execute")
+    @CommandAlias("pys")
+    @CommandPermission("scriptablemc.py.execute")
     @Syntax("[code]")
     fun stash(sender: CommandSender, code: String) {
         val stashList = stashMap.getOrPut(sender, { mutableListOf() })
@@ -94,8 +94,8 @@ class ScriptablePluginJavaScriptCommand(private val basePlugin: SMCJavaScriptEng
     }
 
     @Subcommand("stash|st")
-    @CommandAlias("jss")
-    @CommandPermission("scriptablemc.js.execute")
+    @CommandAlias("pys")
+    @CommandPermission("scriptablemc.py.execute")
     fun stash(sender: CommandSender) {
         val stashList = stashMap.getOrPut(sender, { mutableListOf() })
         for ((index, stashMessage) in stashList.withIndex()) {
@@ -104,8 +104,8 @@ class ScriptablePluginJavaScriptCommand(private val basePlugin: SMCJavaScriptEng
     }
 
     @Subcommand("execute|ex")
-    @CommandAlias("jsex")
-    @CommandPermission("scriptablemc.js.execute")
+    @CommandAlias("pyex")
+    @CommandPermission("scriptablemc.py.execute")
     @Syntax("<code>")
     fun execute(sender: CommandSender, code: String) {
         if(code.equals("stash", true)) {
@@ -165,8 +165,8 @@ class ScriptablePluginJavaScriptCommand(private val basePlugin: SMCJavaScriptEng
     }
 
     @Subcommand("file|f")
-    @CommandAlias("jsexf")
-    @CommandPermission("scriptablemc.js.execute.file")
+    @CommandAlias("pyexf")
+    @CommandPermission("scriptablemc.py.execute.file")
     @Syntax("<filePath>")
     fun executeFile(sender: CommandSender, filePath: String) {
         if(filePath.equals("main.js", true)) {

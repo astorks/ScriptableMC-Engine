@@ -86,6 +86,7 @@ class TypescriptLibraryExporter {
         addClasses(
             com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
             com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
+            ScriptEngineMain::class.java,
 
             com.smc.utils.ItemBuilder::class.java,
             com.smc.utils.MysqlWrapper::class.java,

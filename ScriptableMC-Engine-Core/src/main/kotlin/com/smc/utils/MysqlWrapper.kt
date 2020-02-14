@@ -1,7 +1,7 @@
 package com.smc.utils
 
-import com.pixlfox.scriptablemc.ScriptablePluginMain
 import org.bukkit.Bukkit
+import org.bukkit.plugin.java.JavaPlugin
 import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.PreparedStatement
@@ -22,7 +22,7 @@ class MysqlWrapper(private val host: String, private val port: Int, private val 
         }
     }
 
-    fun openConnectionAsync(callback: (() -> Unit)? = null) = executeAsync {
+    fun openConnectionAsync(javaPlugin: JavaPlugin, callback: (() -> Unit)? = null) = executeAsync(javaPlugin) {
         this.openConnection()
 
         if(callback != null) {
@@ -30,7 +30,7 @@ class MysqlWrapper(private val host: String, private val port: Int, private val 
         }
     }
 
-    fun executeAsync(asyncFunction: (() -> Unit)) = Bukkit.getScheduler().runTaskAsynchronously(ScriptablePluginMain.instance, Runnable {
+    fun executeAsync(javaPlugin: JavaPlugin, asyncFunction: (() -> Unit)) = Bukkit.getScheduler().runTaskAsynchronously(javaPlugin, Runnable {
         asyncFunction()
     });
 

@@ -1,5 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
+import fr.minuskube.inv.InventoryManager
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
@@ -7,7 +8,6 @@ import org.bukkit.Server
 import org.bukkit.command.CommandMap
 import org.bukkit.event.Event
 import org.bukkit.event.EventPriority
-import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import java.util.HashMap
 import java.lang.reflect.InvocationTargetException
@@ -21,7 +21,12 @@ import org.graalvm.polyglot.Value
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pluginName: String, val pluginInstance: Value): Listener {
+abstract class ScriptablePluginContext: Listener {
+    abstract val engine: ScriptablePluginEngine
+    abstract val pluginName: String
+    abstract val pluginInstance: Value
+    abstract val inventoryManager: InventoryManager
+
     val server: Server
         get() = Bukkit.getServer()
 
@@ -31,38 +36,13 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
     val servicesManager: ServicesManager
         get() = Bukkit.getServicesManager()
 
-    private val commands = mutableListOf<PluginCommand>()
+    val commands: MutableList<PluginCommand> = mutableListOf()
 
-    internal fun load() {
-        if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Loading scriptable plugin context.")
-        }
+    abstract fun load()
 
-        pluginInstance.invokeMember("onLoad")
-    }
+    abstract fun enable()
 
-    internal fun enable() {
-        if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Enabling scriptable plugin context.")
-        }
-
-        pluginInstance.invokeMember("onEnable")
-    }
-
-    internal fun disable() {
-        if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Disabling scriptable plugin context.")
-        }
-
-        pluginInstance.invokeMember("onDisable")
-
-        HandlerList.unregisterAll(this)
-
-        val commands = commands.toTypedArray()
-        for(command in commands) {
-            unregisterCommand(command)
-        }
-    }
+    abstract fun disable()
 
     fun registerEvent(eventClass: Class<out Event>, executor: EventExecutor) {
         Bukkit.getServer().pluginManager.registerEvent(eventClass, this, EventPriority.NORMAL, executor, javaPlugin)
@@ -171,15 +151,5 @@ class ScriptablePluginContext(private val engine: ScriptablePluginEngine, val pl
 
     fun getBukkitServiceRegistration(_class: Class<*>): Any? {
         return servicesManager.getRegistration(_class)
-    }
-
-    companion object {
-        fun newInstance(pluginName: String, engine: ScriptablePluginEngine, pluginInstance: Value): ScriptablePluginContext {
-            if(engine.debugEnabled) {
-                engine.bootstrapPlugin.logger.info("[$pluginName] Creating new scriptable plugin context.")
-            }
-
-            return ScriptablePluginContext(engine, pluginName, pluginInstance)
-        }
     }
 }
