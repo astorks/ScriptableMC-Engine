@@ -1,5 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
+import com.smc.version.Version
 import fr.minuskube.inv.InventoryManager
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
@@ -26,6 +27,7 @@ abstract class ScriptablePluginContext: Listener {
     abstract val pluginName: String
     abstract val pluginInstance: Value
     abstract val inventoryManager: InventoryManager
+    abstract val pluginVersion: Version
 
     val server: Server
         get() = Bukkit.getServer()

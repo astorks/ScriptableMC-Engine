@@ -21,20 +21,20 @@ class UnzipUtility {
          * Extracts a zip file from the zipStream to a directory specified by
          * destDirectory (will be created if does not exists)
          * @param zipStream
-         * @param destDirectory
+         * @param destDir
          * @throws IOException
          */
         @Throws(IOException::class)
-        fun unzip(zipStream: InputStream, destDirectory: String) {
-            val destDir = File(destDirectory)
-            if (!destDir.exists()) {
+        fun unzip(zipStream: InputStream, destDir: File) {
+            if(!destDir.exists()) {
                 destDir.mkdirs()
             }
+
             val zipIn = ZipInputStream(zipStream)
             var entry = zipIn.nextEntry
             // iterates over entries in the zip file
             while (entry != null) {
-                val filePath = destDirectory + File.separator + entry.name
+                val filePath = destDir.path + File.separator + entry.name
                 if (!entry.isDirectory) { // if the entry is a file, extracts it
                     extractFile(zipIn, filePath)
                 } else { // if the entry is a directory, make the directory
@@ -55,7 +55,17 @@ class UnzipUtility {
          * @throws IOException
          */
         @Throws(IOException::class)
-        fun unzip(zipFilePath: String, destDirectory: String) = unzip(FileInputStream(zipFilePath), destDirectory)
+        fun unzip(zipFilePath: String, destDirectory: String) = unzip(FileInputStream(zipFilePath), File(destDirectory))
+
+        /**
+         * Extracts a zip file specified by the zipFilePath to a directory specified by
+         * destDirectory (will be created if does not exists)
+         * @param zipFilePath
+         * @param destDir
+         * @throws IOException
+         */
+        @Throws(IOException::class)
+        fun unzip(zipFilePath: String, destDir: File) = unzip(FileInputStream(zipFilePath), destDir)
 
         /**
          * Extracts a zip entry (file entry)

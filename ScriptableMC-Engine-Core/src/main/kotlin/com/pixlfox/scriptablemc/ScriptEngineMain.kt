@@ -12,6 +12,10 @@ abstract class ScriptEngineMain : JavaPlugin() {
     var scriptEngine: ScriptablePluginEngine? = null
     var commandManager: PaperCommandManager? = null
     abstract val chatMessagePrefix: String
+    abstract val scriptLanguage: String
+
+    val pluginVersion: Version
+        get() = Version.parse("v${description.version}")
 
     abstract fun reloadScriptEngine(sender: CommandSender? = null)
 
@@ -42,15 +46,15 @@ abstract class ScriptEngineMain : JavaPlugin() {
     }
 
     companion object {
-        private val scriptEngines: MutableMap<String, ScriptEngineMain> = mutableMapOf()
+        private val scriptEngines: MutableMap<String, ScriptEngineMain?> = mutableMapOf()
         /**
          * Patches the bukkit class loader to allow for GraalVM class loading from inside plugin jar.
          * A bit hackish but it works.
          * https://stackoverflow.com/questions/56712178/graalvm-no-language-and-polyglot-implementation-was-found-on-the-classpath
          */
-        fun patchClassLoader(callback: () -> Unit) {
+        fun patchClassLoader(_class: Class<*>, callback: () -> Unit) {
             val oldCl = Thread.currentThread().contextClassLoader
-            Thread.currentThread().contextClassLoader = ScriptEngineMain::class.java.classLoader
+            Thread.currentThread().contextClassLoader = _class.classLoader
             callback()
             Thread.currentThread().contextClassLoader = oldCl
         }
@@ -61,13 +65,18 @@ abstract class ScriptEngineMain : JavaPlugin() {
         }
 
         @JvmStatic
+        fun releaseScriptEngine(language: String) {
+            scriptEngines[language] = null
+        }
+
+        @JvmStatic
         fun resolveScriptEngine(language: String): ScriptEngineMain? {
             return scriptEngines.getOrDefault(language, null)
         }
 
         @JvmStatic
         fun getAllScriptEngines(): Array<ScriptEngineMain> {
-            return scriptEngines.values.toTypedArray()
+            return scriptEngines.values.filterNotNull().toTypedArray()
         }
 
         @JvmStatic @JvmOverloads

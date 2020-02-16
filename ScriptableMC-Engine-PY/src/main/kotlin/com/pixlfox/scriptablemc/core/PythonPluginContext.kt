@@ -1,5 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
+import com.smc.version.Version
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.event.HandlerList
 import org.graalvm.polyglot.Value
@@ -10,9 +11,12 @@ class PythonPluginContext(override val engine: ScriptablePluginEngine, override 
     override val inventoryManager: InventoryManager
         get() = engine.inventoryManager
 
+    override val pluginVersion: Version
+        get() = engine.pluginVersion
+
     override fun load() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Loading python plugin context.")
+            engine.bootstrapPlugin.logger.info("[$pluginName] Loading Python plugin context.")
         }
 
         pluginInstance.invokeMember("onLoad")
@@ -20,7 +24,7 @@ class PythonPluginContext(override val engine: ScriptablePluginEngine, override 
 
     override fun enable() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Enabling python plugin context.")
+            engine.bootstrapPlugin.logger.info("[$pluginName] Enabling Python plugin context.")
         }
 
         pluginInstance.invokeMember("onEnable")
@@ -28,7 +32,7 @@ class PythonPluginContext(override val engine: ScriptablePluginEngine, override 
 
     override fun disable() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Disabling python plugin context.")
+            engine.bootstrapPlugin.logger.info("[$pluginName] Disabling Python plugin context.")
         }
 
         pluginInstance.invokeMember("onDisable")
@@ -44,7 +48,7 @@ class PythonPluginContext(override val engine: ScriptablePluginEngine, override 
     companion object {
         fun newInstance(pluginName: String, engine: ScriptablePluginEngine, pluginInstance: Value): ScriptablePluginContext {
             if(engine.debugEnabled) {
-                engine.bootstrapPlugin.logger.info("[$pluginName] Creating new python plugin context.")
+                engine.bootstrapPlugin.logger.info("[$pluginName] Creating new Python plugin context.")
             }
 
             return PythonPluginContext(engine, pluginName, pluginInstance)

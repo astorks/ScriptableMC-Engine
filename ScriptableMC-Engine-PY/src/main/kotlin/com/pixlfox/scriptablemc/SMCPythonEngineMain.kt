@@ -10,28 +10,30 @@ import org.bukkit.command.CommandSender
 @Suppress("unused")
 class SMCPythonEngineMain : ScriptEngineMain() {
     override val chatMessagePrefix = "${ChatColor.GRAY}[${ChatColor.DARK_AQUA}ScriptableMC-PY${ChatColor.GRAY}]${ChatColor.RESET}"
+    override val scriptLanguage = "python"
 
     override fun onLoad() {
         instance = this
-        registerScriptEngine("py", this)
     }
 
     override fun onEnable() {
+        registerScriptEngine(scriptLanguage, this)
         commandManager = PaperCommandManager(this)
-        commandManager?.registerCommand(ScriptablePluginCommand(this))
-        commandManager?.registerCommand(ScriptablePluginPythonCommand(this))
+        commandManager?.registerCommand(ScriptEngineGlobalCommands(this))
+        commandManager?.registerCommand(SMCPythonEngineCommands(this))
 
         saveDefaultConfig()
         loadScriptEngine()
     }
 
     override fun onDisable() {
+        releaseScriptEngine(scriptLanguage)
         commandManager?.unregisterCommands()
         unloadScriptEngine()
     }
 
     private fun unloadScriptEngine(sender: CommandSender? = null) {
-        patchClassLoader {
+        patchClassLoader(javaClass) {
             try {
                 scriptEngine?.close()
                 logger.info("Python engine shutdown.")
@@ -47,19 +49,21 @@ class SMCPythonEngineMain : ScriptEngineMain() {
 
     private fun loadScriptEngine(sender: CommandSender? = null) {
         versionCheck()
-        patchClassLoader {
+        patchClassLoader(javaClass) {
             try {
-                scriptEngine = PythonPluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false))
+                scriptEngine = PythonPluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false), config.getBoolean("extract_libs", true))
                 scriptEngine!!.start()
                 logger.info("Python engine started.")
                 sender?.sendMessage("$chatMessagePrefix ${ChatColor.GREEN}Python engine started.")
             } catch (e: IllegalStateException) {
                 if (e.message?.contains("Make sure the truffle-api.jar is on the classpath.", true) == true) {
-                    logger.warning("Scriptable plugin engine failed to start.")
+                    logger.warning("Python engine failed to start.")
                     e.printStackTrace()
                     logger.severe("Unable to find truffle-api.jar. This shouldn't happen since it's now packaged inside the plugin, you might want to check for an updated ScriptableMC Engine release.")
-                    logger.severe("ScriptableMC Engine Version: v${description.version}")
+                    logger.severe("ScriptableMC Engine Version: $pluginVersion")
                     logger.severe("ScriptableMC-Engine Download Page: https://github.com/astorks/ScriptableMC-Engine/releases/latest")
+
+                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}Python engine failed to start. Check the server console.")
                 } else {
                     logger.warning("Scriptable plugin engine failed to start.")
                     e.printStackTrace()

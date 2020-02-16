@@ -1,31 +1,58 @@
 package com.pixlfox.scriptablemc.core
 
+import com.pixlfox.scriptablemc.ScriptEngineMain
+import com.pixlfox.scriptablemc.exceptions.ScriptNotFoundException
 import com.pixlfox.scriptablemc.utils.UnzipUtility
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
 import java.io.File
-import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class JavaScriptPluginEngine(override val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", override val debugEnabled: Boolean = false, val extractLibs: Boolean = true): ScriptablePluginEngine() {
-    override val graalContext: Context = org.graalvm.polyglot.Context
-        .newBuilder("js")
-        .allowAllAccess(true)
-        .allowExperimentalOptions(true)
-        .allowHostAccess(HostAccess.ALL)
-        .allowHostClassLoading(true)
-        .allowIO(true)
-        .allowCreateThread(true)
-        .option("js.ecmascript-version", "2020")
-        .build()
-
-    override val globalBindings: Value = graalContext.getBindings("js")
+class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val rootScriptsFolder: String = "./scripts", override val debugEnabled: Boolean = false, extractLibs: Boolean = true): ScriptablePluginEngine() {
+    override val graalContext: Context
+    override val globalBindings: Value
     override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
     override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
     private var enabledAllPlugins: Boolean = false
+
+    init {
+        if(extractLibs) {
+            val librariesResource = bootstrapPlugin.getResource("libraries.zip")
+            val libFolder = File("${rootScriptsFolder}/lib")
+            if (librariesResource != null && !libFolder.exists()) {
+                if(debugEnabled) {
+                    bootstrapPlugin.logger.info("Extracting javascript libraries from ScriptableMC-Engine-JS resources to ${libFolder.path}...")
+                }
+                UnzipUtility.unzip(librariesResource, libFolder)
+            }
+        }
+
+        var contextBuilder = Context
+            .newBuilder("js")
+            .allowAllAccess(true)
+            .allowExperimentalOptions(true)
+            .allowHostAccess(HostAccess.ALL)
+            .allowHostClassLoading(true)
+            .allowIO(true)
+            .allowCreateThread(true)
+            .option("js.ecmascript-version", "2020")
+
+        if(debugEnabled) {
+            contextBuilder = contextBuilder
+                .option("inspect", "4242")
+                .option("inspect.Path", "smc-engine-js")
+                .option("inspect.Remote", "true")
+
+            bootstrapPlugin.logger.info("Chrome debugger running: chrome-devtools://devtools/bundled/js_app.html?ws=localhost:4242/smc-engine-js")
+        }
+
+        graalContext = contextBuilder.build()
+
+        globalBindings = graalContext.getBindings("js")
+    }
 
     override fun start() {
         instance = this
@@ -37,13 +64,6 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: JavaPlugin, val rootS
         val mainScriptFile = File("${rootScriptsFolder}/main.js")
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
-        }
-
-        if(extractLibs) {
-            val librariesResource = bootstrapPlugin.getResource("libraries.zip")
-            if (librariesResource != null) {
-                UnzipUtility.unzip(librariesResource, "${rootScriptsFolder}/lib")
-            }
         }
 
         if(mainScriptFile.exists()) {
@@ -179,5 +199,3 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: JavaPlugin, val rootS
             get() { return inst }
     }
 }
-
-class ScriptNotFoundException(scriptFile: File) : Exception("Unable to load script: ${scriptFile.path}.")

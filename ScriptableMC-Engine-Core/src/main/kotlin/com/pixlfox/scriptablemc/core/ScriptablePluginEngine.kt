@@ -1,14 +1,15 @@
 package com.pixlfox.scriptablemc.core
 
+import com.pixlfox.scriptablemc.ScriptEngineMain
+import com.smc.version.Version
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
 import java.io.File
-import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 abstract class ScriptablePluginEngine {
-    abstract val bootstrapPlugin: JavaPlugin
+    abstract val bootstrapPlugin: ScriptEngineMain
     abstract val debugEnabled: Boolean
 
     abstract val scriptablePlugins: MutableList<ScriptablePluginContext>
@@ -17,8 +18,8 @@ abstract class ScriptablePluginEngine {
     abstract val graalContext: Context
     abstract val globalBindings: Value
 
-    val pluginVersion: String
-        get() = "v${bootstrapPlugin.description.version}"
+    val pluginVersion: Version
+        get() = bootstrapPlugin.pluginVersion
 
     abstract fun start()
     abstract fun close()

@@ -1,29 +1,48 @@
 package com.pixlfox.scriptablemc.core
 
+import com.pixlfox.scriptablemc.ScriptEngineMain
+import com.pixlfox.scriptablemc.exceptions.ScriptNotFoundException
+import com.pixlfox.scriptablemc.utils.UnzipUtility
 import fr.minuskube.inv.InventoryManager
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
 import java.io.File
-import org.bukkit.plugin.java.JavaPlugin
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class PythonPluginEngine(override val bootstrapPlugin: JavaPlugin, val rootScriptsFolder: String = "./scripts", override val debugEnabled: Boolean = false): ScriptablePluginEngine() {
-    override val graalContext: Context = Context
-        .newBuilder("python")
-        .allowAllAccess(true)
-        .allowExperimentalOptions(true)
-        .allowHostAccess(HostAccess.ALL)
-        .allowHostClassLoading(true)
-        .allowIO(true)
-        .option("python.CoreHome", "$rootScriptsFolder/lib-py/lib-graalpython/")
-        .option("python.StdLibHome", "$rootScriptsFolder/lib-py/lib-python/3/")
-        .build()
+class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val rootScriptsFolder: String = "./scripts", override val debugEnabled: Boolean = false, extractLibs: Boolean = true): ScriptablePluginEngine() {
+    override val graalContext: Context
 
-    override val globalBindings: Value = graalContext.getBindings("python")
+    override val globalBindings: Value
     override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
     override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
     private var enabledAllPlugins: Boolean = false
+
+    init {
+        if(extractLibs) {
+            val librariesResource = bootstrapPlugin.getResource("lib-py.zip")
+            val libFolder = File("${rootScriptsFolder}/lib-py")
+            if (librariesResource != null && !libFolder.exists()) {
+                if(debugEnabled) {
+                    bootstrapPlugin.logger.info("Extracting python libraries from ScriptableMC-Engine-PY resources to ${libFolder.path}...")
+                }
+                UnzipUtility.unzip(librariesResource, libFolder)
+            }
+        }
+
+        graalContext = Context
+            .newBuilder("python")
+            .allowAllAccess(true)
+            .allowExperimentalOptions(true)
+            .allowHostAccess(HostAccess.ALL)
+            .allowHostClassLoading(true)
+            .allowIO(true)
+            .option("python.CoreHome", "$rootScriptsFolder/lib-py/lib-graalpython/")
+            .option("python.StdLibHome", "$rootScriptsFolder/lib-py/lib-python/3/")
+            .build()
+
+        globalBindings = graalContext.getBindings("python")
+    }
 
     override fun start() {
         instance = this
@@ -158,5 +177,3 @@ class PythonPluginEngine(override val bootstrapPlugin: JavaPlugin, val rootScrip
             get() { return inst }
     }
 }
-
-class ScriptNotFoundException(scriptFile: File) : Exception("Unable to load script: ${scriptFile.path}.")
