@@ -26,6 +26,8 @@ dependencies {
     implementation("org.graalvm.js:js:19.3.1")
     implementation("org.graalvm.js:js-scriptengine:19.3.1")
     implementation("org.graalvm.truffle:truffle-api:19.3.1")
+    implementation("org.graalvm.tools:chromeinspector:19.3.1")
+    implementation("org.graalvm.tools:profiler:19.3.1")
 
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")

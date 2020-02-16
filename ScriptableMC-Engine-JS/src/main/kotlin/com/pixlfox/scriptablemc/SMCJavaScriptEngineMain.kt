@@ -51,7 +51,7 @@ class SMCJavaScriptEngineMain : ScriptEngineMain() {
         versionCheck()
         patchClassLoader(javaClass) {
             try {
-                scriptEngine = JavaScriptPluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false), config.getBoolean("extract_libs", true))
+                scriptEngine = JavaScriptPluginEngine(this, SMCJavaScriptConfig(config))
                 scriptEngine!!.start()
                 logger.info("JavaScript engine started.")
                 sender?.sendMessage("$chatMessagePrefix ${ChatColor.GREEN}JavaScript engine started.")

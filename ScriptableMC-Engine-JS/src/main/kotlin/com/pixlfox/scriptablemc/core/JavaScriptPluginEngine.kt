@@ -1,5 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
+import com.pixlfox.scriptablemc.SMCJavaScriptConfig
 import com.pixlfox.scriptablemc.ScriptEngineMain
 import com.pixlfox.scriptablemc.exceptions.ScriptNotFoundException
 import com.pixlfox.scriptablemc.utils.UnzipUtility
@@ -11,7 +12,9 @@ import java.io.File
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val rootScriptsFolder: String = "./scripts", override val debugEnabled: Boolean = false, extractLibs: Boolean = true): ScriptablePluginEngine() {
+class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private val config: SMCJavaScriptConfig): ScriptablePluginEngine() {
+
+    override val debugEnabled: Boolean = config.debug
     override val graalContext: Context
     override val globalBindings: Value
     override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
@@ -19,9 +22,9 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val
     private var enabledAllPlugins: Boolean = false
 
     init {
-        if(extractLibs) {
+        if(config.extractLibs) {
             val librariesResource = bootstrapPlugin.getResource("libraries.zip")
-            val libFolder = File("${rootScriptsFolder}/lib")
+            val libFolder = File("${config.rootScriptFolder}/lib")
             if (librariesResource != null && !libFolder.exists()) {
                 if(debugEnabled) {
                     bootstrapPlugin.logger.info("Extracting javascript libraries from ScriptableMC-Engine-JS resources to ${libFolder.path}...")
@@ -40,13 +43,13 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val
             .allowCreateThread(true)
             .option("js.ecmascript-version", "2020")
 
-        if(debugEnabled) {
+        if(config.debugger.enabled) {
             contextBuilder = contextBuilder
-                .option("inspect", "4242")
+                .option("inspect", config.debugger.address)
                 .option("inspect.Path", "smc-engine-js")
-                .option("inspect.Remote", "true")
-
-            bootstrapPlugin.logger.info("Chrome debugger running: chrome-devtools://devtools/bundled/js_app.html?ws=localhost:4242/smc-engine-js")
+                .option("inspect.Suspend", "false")
+                .option("inspect.Secure", "false")
+                .option("inspect.WaitAttached", "${config.debugger.waitAttached}")
         }
 
         graalContext = contextBuilder.build()
@@ -61,7 +64,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val
 
         loadAllHelperClasses()
 
-        val mainScriptFile = File("${rootScriptsFolder}/main.js")
+        val mainScriptFile = File("${config.rootScriptFolder}/main.js")
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
         }
@@ -103,7 +106,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val
     }
 
     override fun evalFile(filePath: String): Value {
-        val scriptFile = File("${rootScriptsFolder}/$filePath")
+        val scriptFile = File("${config.rootScriptFolder}/$filePath")
 
         return if(scriptFile.exists()) {
             eval(
@@ -143,7 +146,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val
     }
 
     override fun evalCommandSender(source: String, sender: CommandSender): Value {
-        val tempScriptFile = File("${rootScriptsFolder}/${UUID.randomUUID()}.js")
+        val tempScriptFile = File("${config.rootScriptFolder}/${UUID.randomUUID()}.js")
         try {
             tempScriptFile.writeText("import * as lib from './lib/global.js';\n" +
                     "new (class EvalCommandSenderContext {\n" +
