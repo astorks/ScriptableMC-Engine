@@ -35,6 +35,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.10.4")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("commons-io:commons-io:2.6")
 
     testImplementation("junit", "junit", "4.12")
 }

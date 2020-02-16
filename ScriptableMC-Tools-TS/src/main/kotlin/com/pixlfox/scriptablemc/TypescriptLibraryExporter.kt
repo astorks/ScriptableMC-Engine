@@ -13,7 +13,7 @@ import java.lang.reflect.*
 class TypescriptLibraryExporter {
     private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io|java\\.nio|khttp)(.*)?")
+    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io|java\\.nio|khttp|org\\.apache\\.commons\\.io)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
 
     private fun safeName(name: String): String = when {
@@ -98,6 +98,8 @@ class TypescriptLibraryExporter {
             fr.minuskube.inv.SmartInventory::class.java,
             com.smc.smartinvs.SmartInventoryProvider::class.java,
             com.smc.smartinvs.SmartInventory::class.java,
+
+            org.apache.commons.io.FileUtils::class.java,
 
             com.google.common.io.ByteStreams::class.java,
 

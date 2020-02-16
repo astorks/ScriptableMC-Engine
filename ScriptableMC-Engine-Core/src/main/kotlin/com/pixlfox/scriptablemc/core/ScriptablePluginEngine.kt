@@ -59,6 +59,7 @@ abstract class ScriptablePluginEngine {
 
             "com.smc.smartinvs.SmartInventory",
             "com.smc.smartinvs.SmartInventoryProvider",
+            "org.apache.commons.io.FileUtils",
 
             "*me.clip.placeholderapi.PlaceholderAPI"
         )
