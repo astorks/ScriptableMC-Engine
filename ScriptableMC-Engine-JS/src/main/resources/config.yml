@@ -20,5 +20,5 @@ extract_libs: true
 
 debugger:
   enabled: false
-  address: 0.0.0.0:9229
+  address: 127.0.0.1:9229
   wait_attached: true

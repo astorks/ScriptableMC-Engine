@@ -21,7 +21,7 @@ class SMCJavaScriptDebuggerConfig(private val config: FileConfiguration) {
         get() = config.getBoolean("debugger.enabled", false)
 
     val address: String
-        get() = config.getString("debugger.address", "0.0.0.0:9229").orEmpty()
+        get() = config.getString("debugger.address", "127.0.0.1:9229").orEmpty()
 
     val waitAttached: Boolean
         get() = config.getBoolean("debugger.wait_attached", true)
