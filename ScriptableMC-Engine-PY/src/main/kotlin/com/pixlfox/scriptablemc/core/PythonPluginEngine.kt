@@ -1,5 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
+import com.pixlfox.scriptablemc.SMCPythonConfig
 import com.pixlfox.scriptablemc.ScriptEngineMain
 import com.pixlfox.scriptablemc.exceptions.ScriptNotFoundException
 import com.pixlfox.scriptablemc.utils.UnzipUtility
@@ -10,18 +11,18 @@ import java.io.File
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val rootScriptsFolder: String = "./scripts", override val debugEnabled: Boolean = false, extractLibs: Boolean = true): ScriptablePluginEngine() {
+class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private val config: SMCPythonConfig): ScriptablePluginEngine() {
     override val graalContext: Context
-
+    override val debugEnabled: Boolean = config.debug
     override val globalBindings: Value
     override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
     override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
     private var enabledAllPlugins: Boolean = false
 
     init {
-        if(extractLibs) {
+        if(config.extractLibs) {
             val librariesResource = bootstrapPlugin.getResource("lib-py.zip")
-            val libFolder = File("${rootScriptsFolder}/lib-py")
+            val libFolder = File("${config.rootScriptFolder}/lib-py")
             if (librariesResource != null && !libFolder.exists()) {
                 if(debugEnabled) {
                     bootstrapPlugin.logger.info("Extracting python libraries from ScriptableMC-Engine-PY resources to ${libFolder.path}...")
@@ -30,17 +31,26 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val roo
             }
         }
 
-        graalContext = Context
+        var contextBuilder = Context
             .newBuilder("python")
             .allowAllAccess(true)
             .allowExperimentalOptions(true)
             .allowHostAccess(HostAccess.ALL)
             .allowHostClassLoading(true)
             .allowIO(true)
-            .option("python.CoreHome", "$rootScriptsFolder/lib-py/lib-graalpython/")
-            .option("python.StdLibHome", "$rootScriptsFolder/lib-py/lib-python/3/")
-            .build()
+            .option("python.CoreHome", "${config.rootScriptFolder}/lib-py/lib-graalpython/")
+            .option("python.StdLibHome", "${config.rootScriptFolder}/lib-py/lib-python/3/")
 
+        if(config.debugger.enabled) {
+            contextBuilder = contextBuilder
+                .option("inspect", config.debugger.address)
+                .option("inspect.Path", "smc-engine-py")
+                .option("inspect.Suspend", "false")
+                .option("inspect.Secure", "false")
+                .option("inspect.WaitAttached", "${config.debugger.waitAttached}")
+        }
+
+        graalContext = contextBuilder.build()
         globalBindings = graalContext.getBindings("python")
     }
 
@@ -51,7 +61,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val roo
 
         loadAllHelperClasses()
 
-        val mainScriptFile = File("${rootScriptsFolder}/main.py")
+        val mainScriptFile = File("${config.rootScriptFolder}/main.py")
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
         }
@@ -92,7 +102,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val roo
     }
 
     override fun evalFile(filePath: String): Value {
-        val scriptFile = File("${rootScriptsFolder}/$filePath")
+        val scriptFile = File("${config.rootScriptFolder}/$filePath")
 
         return if(scriptFile.exists()) {
             eval(
@@ -129,7 +139,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, val roo
     }
 
     override fun evalCommandSender(source: String, sender: CommandSender): Value {
-        val tempScriptFile = File("${rootScriptsFolder}/${UUID.randomUUID()}/__init__.py")
+        val tempScriptFile = File("${config.rootScriptFolder}/${UUID.randomUUID()}/__init__.py")
         try {
             tempScriptFile.parentFile.mkdirs()
             tempScriptFile.writeText(source)

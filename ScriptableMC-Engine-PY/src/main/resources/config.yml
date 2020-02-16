@@ -17,3 +17,8 @@ version_check: true
 # If you set this to false you'll need to download and extract the python libs manually.
 # Default: true
 extract_libs: true
+
+debugger:
+  enabled: false
+  address: 127.0.0.1:9229
+  wait_attached: true

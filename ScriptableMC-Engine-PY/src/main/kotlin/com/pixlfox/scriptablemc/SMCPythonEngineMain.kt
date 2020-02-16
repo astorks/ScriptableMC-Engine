@@ -51,7 +51,7 @@ class SMCPythonEngineMain : ScriptEngineMain() {
         versionCheck()
         patchClassLoader(javaClass) {
             try {
-                scriptEngine = PythonPluginEngine(this, config.getString("root_scripts_folder", "./scripts").orEmpty(), config.getBoolean("debug", false), config.getBoolean("extract_libs", true))
+                scriptEngine = PythonPluginEngine(this, SMCPythonConfig(config))
                 scriptEngine!!.start()
                 logger.info("Python engine started.")
                 sender?.sendMessage("$chatMessagePrefix ${ChatColor.GREEN}Python engine started.")
