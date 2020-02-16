@@ -18,16 +18,15 @@ idea {
 }
 
 dependencies {
-    implementation(project(":ScriptableMC-Engine-Core"))
+    implementation(project(":ScriptableMC-Engine-PY"))
 
+    // GraalVM SDK & GraalPython Engine
+    implementation("org.graalvm.sdk:graal-sdk:19.3.1")
+    implementation("org.graalvm.truffle:truffle-api:19.3.1")
+    implementation(files("libraries/graalpython.jar"))
+    implementation(files("libraries/sulong-api.jar"))
+    implementation(files("libraries/sulong.jar"))
 
-    // GraalVM SDK & GraalJS Engine
-    compileOnly("org.graalvm.sdk:graal-sdk:19.3.1")
-    compileOnly("org.graalvm.js:js:19.3.1")
-    compileOnly("org.graalvm.js:js-scriptengine:19.3.1")
-    compileOnly("org.graalvm.truffle:truffle-api:19.3.1")
-    compileOnly("org.graalvm.tools:chromeinspector:19.3.1")
-    compileOnly("org.graalvm.tools:profiler:19.3.1")
 
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
@@ -54,7 +53,7 @@ tasks.jar {
 }
 
 tasks.shadowJar {
-    archiveFileName.set("ScriptableMC-Engine-JS.jar")
+    archiveFileName.set("ScriptableMC-Engine-PY-Bundled.jar")
     relocate("co.aikar.commands", "com.pixlfox.scriptablemc.acf")
     mergeServiceFiles()
 }

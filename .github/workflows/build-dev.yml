@@ -39,8 +39,10 @@ jobs:
     - name: Copy artifacts
       run: |
         mkdir artifacts
-        cp ./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar ./artifacts/
-        cp ./ScriptableMC-Engine-PY/build/libs/ScriptableMC-Engine-PY.jar ./artifacts/
+        cp ./build/ScriptableMC-Engine-JS.jar ./artifacts/
+        cp ./build/ScriptableMC-Engine-JS-Bundled.jar ./artifacts/
+        cp ./build/ScriptableMC-Engine-PY.jar ./artifacts/
+        cp ./build/ScriptableMC-Engine-PY-Bundled.jar ./artifacts/
         cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
         cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
     - uses: actions/upload-artifact@v1
