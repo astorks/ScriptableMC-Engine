@@ -46,12 +46,6 @@ allprojects {
 tasks.register("shadowJarAll") {
     group = "shadow"
 
-    val rootBuildPath = file("./build")
-    if(!rootBuildPath.exists()) rootBuildPath.mkdirs()
-
     dependsOn(":ScriptableMC-Engine-JS:shadowJar")
     dependsOn(":ScriptableMC-Engine-PY:shadowJar")
-
-    file("./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar").copyTo(file("./build/ScriptableMC-Engine-JS.jar"), overwrite = true)
-    file("./ScriptableMC-Engine-PY/build/libs/ScriptableMC-Engine-PY.jar").copyTo(file("./build/ScriptableMC-Engine-PY.jar"), overwrite = true)
 }
