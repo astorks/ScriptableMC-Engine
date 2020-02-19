@@ -3,7 +3,7 @@ package com.pixlfox.scriptablemc
 import org.bukkit.configuration.file.FileConfiguration
 
 class SMCJavaScriptConfig(private val config: FileConfiguration) {
-    val rootScriptFolder: String
+    val rootScriptsFolder: String
         get() = config.getString("root_scripts_folder", "./scripts").orEmpty()
 
     val debug: Boolean

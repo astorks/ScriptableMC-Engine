@@ -21,8 +21,8 @@ dependencies {
     implementation(project(":ScriptableMC-Engine-Core"))
 
     // GraalVM SDK & GraalPython Engine
-    compileOnly("org.graalvm.sdk:graal-sdk:19.3.1")
-    compileOnly("org.graalvm.truffle:truffle-api:19.3.1")
+    compileOnly("org.graalvm.sdk:graal-sdk:20.0.0")
+    compileOnly("org.graalvm.truffle:truffle-api:20.0.0")
 
 
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")

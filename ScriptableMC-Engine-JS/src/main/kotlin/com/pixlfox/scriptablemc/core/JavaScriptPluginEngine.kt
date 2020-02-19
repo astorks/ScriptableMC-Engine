@@ -24,7 +24,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
     init {
         if(config.extractLibs) {
             val librariesResource = bootstrapPlugin.getResource("libraries.zip")
-            val libFolder = File("${config.rootScriptFolder}/lib")
+            val libFolder = File("${config.rootScriptsFolder}/lib")
             if (librariesResource != null && !libFolder.exists()) {
                 if(debugEnabled) {
                     bootstrapPlugin.logger.info("Extracting javascript libraries from ScriptableMC-Engine-JS resources to ${libFolder.path}...")
@@ -42,6 +42,19 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
             .allowIO(true)
             .allowCreateThread(true)
             .option("js.ecmascript-version", "2020")
+
+        contextBuilder = contextBuilder
+            .option("js.commonjs-require", "true")
+
+        if(File("${config.rootScriptsFolder}/node_modules/").exists()) {
+            contextBuilder = contextBuilder
+                .option("js.commonjs-require-cwd", "${config.rootScriptsFolder}/node_modules")
+        }
+
+        if(File("${config.rootScriptsFolder}/__globals__.js").exists()) {
+            contextBuilder = contextBuilder
+                .option("js.commonjs-global-properties", "${config.rootScriptsFolder}/__globals__.js")
+        }
 
         if(config.debugger.enabled) {
             contextBuilder = contextBuilder
@@ -64,7 +77,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
 
         loadAllHelperClasses()
 
-        val mainScriptFile = File("${config.rootScriptFolder}/main.js")
+        val mainScriptFile = File("${config.rootScriptsFolder}/main.js")
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
         }
@@ -106,7 +119,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
     }
 
     override fun evalFile(filePath: String): Value {
-        val scriptFile = File("${config.rootScriptFolder}/$filePath")
+        val scriptFile = File("${config.rootScriptsFolder}/$filePath")
 
         return if(scriptFile.exists()) {
             eval(
@@ -146,7 +159,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
     }
 
     override fun evalCommandSender(source: String, sender: CommandSender): Value {
-        val tempScriptFile = File("${config.rootScriptFolder}/${UUID.randomUUID()}.js")
+        val tempScriptFile = File("${config.rootScriptsFolder}/${UUID.randomUUID()}.js")
         try {
             tempScriptFile.writeText("import * as lib from './lib/global.js';\n" +
                     "new (class EvalCommandSenderContext {\n" +

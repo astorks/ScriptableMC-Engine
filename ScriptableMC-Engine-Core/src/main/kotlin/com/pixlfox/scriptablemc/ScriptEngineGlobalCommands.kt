@@ -30,13 +30,13 @@ class ScriptEngineGlobalCommands(private val basePlugin: ScriptEngineMain) : Bas
                     sender.sendMessage("${ChatColor.GREEN}GraalJS Version: ${scriptEngine?.eval("Graal.versionJS")}")
                 }
                 else {
-                    sender.sendMessage("- ${ChatColor.GREEN}GraalJS Engine Version: v19.3.1")
+                    sender.sendMessage("- ${ChatColor.GREEN}GraalJS Engine Version: v20.0.0")
                 }
                 sender.sendMessage("-----------------------------------------------------")
             }
             else if(scriptEngineMain.scriptLanguage == "python") {
                 sender.sendMessage("- ${ChatColor.DARK_BLUE}ScriptableMC Python Engine: ${scriptEngineMain.pluginVersion}")
-                sender.sendMessage("- ${ChatColor.BLUE}GraalPython Version: v19.3.1")
+                sender.sendMessage("- ${ChatColor.BLUE}GraalPython Version: v20.0.0")
                 sender.sendMessage("-----------------------------------------------------")
 
             }

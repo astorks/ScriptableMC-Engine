@@ -22,12 +22,8 @@ dependencies {
 
 
     // GraalVM SDK & GraalJS Engine
-    compileOnly("org.graalvm.sdk:graal-sdk:19.3.1")
-    compileOnly("org.graalvm.js:js:19.3.1")
-    compileOnly("org.graalvm.js:js-scriptengine:19.3.1")
-    compileOnly("org.graalvm.truffle:truffle-api:19.3.1")
-    compileOnly("org.graalvm.tools:chromeinspector:19.3.1")
-    compileOnly("org.graalvm.tools:profiler:19.3.1")
+    compileOnly("org.graalvm.sdk:graal-sdk:20.0.0")
+    compileOnly("org.graalvm.truffle:truffle-api:20.0.0")
 
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
