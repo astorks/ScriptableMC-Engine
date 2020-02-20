@@ -5,6 +5,7 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
+import org.bukkit.plugin.PluginDescriptionFile
 import java.io.File
 import java.lang.reflect.*
 
@@ -422,17 +423,25 @@ class TypescriptLibraryExporter {
                 "    ]\n" +
                 "}")
 
+        File("$basePath/.npmrc").writeText("//npm.pkg.github.com/:_authToken=\${GITHUB_TOKEN}\n" +
+                "registry=https://npm.pkg.github.com/astorks")
+
+        val pluginDescription = PluginDescriptionFile(File("../ScriptableMC-Engine-JS/src/main/resources/plugin.yml").inputStream())
+
         File("$basePath/package.json").writeText("{\n" +
-                "  \"name\": \"@astorks/lib-smc\",\n" +
-                "  \"repository\": \"git@github.com:astorks/ScriptableMC-Engine.git\",\n" +
-                "  \"version\": \"1.0.0\",\n" +
+                "  \"name\": \"lib-smc\",\n" +
+                "  \"version\": \"${pluginDescription.version}\",\n" +
                 "  \"description\": \"JavaScript CommonJS libraries for ScriptableMC\",\n" +
-                "  \"publishConfig\": { \"registry\": \"https://npm.pkg.github.com/\" },\n" +
+                "  \"publishConfig\": {\n" +
+                "    \"registry\": \"https://npm.pkg.github.com/\"\n" +
+                "  },\n" +
                 "  \"directories\": {\n" +
                 "    \"bin\": \"./js\"\n" +
                 "  },\n" +
                 "  \"scripts\": {\n" +
-                "    \"compile\": \"npx tsc\"\n" +
+                "    \"compile\": \"npx tsc\",\n" +
+                "    \"postcompile\": \"cp ./package.json ./js/package.json && cp ./.npmrc ./js/.npmrc\",\n" +
+                "    \"publish\": \"npm publish ./js/\"\n" +
                 "  },\n" +
                 "  \"author\": \"Ashton Storks\",\n" +
                 "  \"license\": \"ISC\",\n" +
@@ -459,6 +468,7 @@ class TypescriptLibraryExporter {
 
         return source
     }
+
 
     private fun generateTypescriptImports(_class: Class<*>): String {
         var tsImportsSource = ""

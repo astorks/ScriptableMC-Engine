@@ -34,11 +34,12 @@ jobs:
         zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
         cd ../
         cp ./ScriptableMC-JavaScript-Lib.zip ../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
-    - name: Compile lib-smc and create archive
+    - name: Compile lib-smc, create archive, and publish
       run: |
         cd ./ScriptableMC-Tools-TS/lib-smc/
         npm install
         npm run compile
+        npm run publish
         zip -r ./Lib-SMC.zip ./*
     - name: Build All Plugins with Gradle
       run: ./gradlew :shadowJarAll
