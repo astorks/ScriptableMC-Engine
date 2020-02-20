@@ -33,7 +33,7 @@ You can take the typescript example and compile it, then directly modify the jav
 ##### ScritableMC JavaScript Sub Command
 | Command       | Alias         | Description                                           | Permission               |
 | ------------- | ------------- |-----------------------------------------------------| ------------------------ |
-| `/scriptablemc javascript reload`   | `/smc js rl`       | Fully reloads the script engine and all script files. | `scriptablemc.js.reload` |
+| `/scriptablemc reload`   | `/smc rl /jsrl`       | Fully reloads the script engine and all script files. | `scriptablemc.reload` |
 | `/scriptablemc javascript execute <source>`   | `/smc js ex <source>`       | Executes javascript source and prints the return value. | `scriptablemc.js.execute` |
 | `/scriptablemc javascript execute stash`   | `/smc js ex stash`       | Executes javascript source stored in your stash. | `scriptablemc.js.execute` |
 | `/scriptablemc javascript file <filePath>`   | `/smc js f <filePath>`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
