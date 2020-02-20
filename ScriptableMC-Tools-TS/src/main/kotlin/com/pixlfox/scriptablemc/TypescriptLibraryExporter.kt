@@ -376,7 +376,8 @@ class TypescriptLibraryExporter {
                 "  \"version\": \"1.0.0\",\n" +
                 "  \"description\": \"Typescript plugin example and libraries for Minecraft 1.15\",\n" +
                 "  \"scripts\": {\n" +
-                "    \"compile\": \"npx tsc\"\n" +
+                "    \"compile\": \"npx tsc\",\n" +
+                "    \"compile_commonjs\": \"npx tsc -m commonjs --outDir ./commonjs\"\n" +
                 "  },\n" +
                 "  \"author\": \"Ashton Storks\",\n" +
                 "  \"license\": \"ISC\",\n" +
