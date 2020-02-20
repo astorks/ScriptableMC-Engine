@@ -28,15 +28,18 @@ jobs:
         cd ./ScriptableMC-Tools-TS/lib/
         npm install
         npm run compile
-        npm run compile_commonjs
         cd ./ts/
         zip -r ../ScriptableMC-TypeScript-Lib.zip ./*
         cd ../js/
         zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
-        cd ../commonjs/
-        zip -r ../ScriptableMC-CommonJS-Lib.zip ./*
         cd ../
         cp ./ScriptableMC-JavaScript-Lib.zip ../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
+    - name: Compile lib-smc and create archive
+      run: |
+        cd ./ScriptableMC-Tools-TS/lib-smc/
+        npm install
+        npm run compile
+        zip -r ./Lib-SMC.zip ./*
     - name: Build All Plugins with Gradle
       run: ./gradlew :shadowJarAll
     - name: Copy artifacts
@@ -48,7 +51,7 @@ jobs:
         cp ./build/ScriptableMC-Engine-PY-Bundled.jar ./artifacts/
         cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
         cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
-        cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-CommonJS-Lib.zip ./artifacts/
+        cp ./ScriptableMC-Tools-TS/lib-smc/Lib-SMC.zip ./artifacts/
     - uses: actions/upload-artifact@v1
       with:
         name: ScriptableMC-Engine-DEV

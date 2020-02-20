@@ -349,6 +349,18 @@ class TypescriptLibraryExporter {
         return this
     }
 
+    fun exportIndexLibrary(): TypescriptLibraryExporter {
+        val file = File("$basePath/ts/index.ts")
+        if(!file.exists()) {
+            file.parentFile.mkdirs()
+            file.createNewFile()
+            file.writeText(generateTypescriptGlobalExports())
+            println("Exported index.ts.")
+        }
+
+        return this
+    }
+
     fun copyStaticSources(): TypescriptLibraryExporter {
         File("./src/main/ts/").copyRecursively(File("$basePath/ts/"), true)
 
@@ -390,6 +402,49 @@ class TypescriptLibraryExporter {
                 "    \"typescript\": \"^3.7.5\"\n" +
                 "  }\n" +
                 "}\n")
+
+        return this
+    }
+
+    fun exportCommonJSProjectFiles(): TypescriptLibraryExporter {
+        File("$basePath/tsconfig.json").writeText("{\n" +
+                "    \"compilerOptions\": {\n" +
+                "        \"target\": \"es2019\",\n" +
+                "        \"module\": \"commonjs\",\n" +
+                "        \"sourceMap\": false,\n" +
+                "        \"allowJs\": true,\n" +
+                "        \"outDir\": \"js\",\n" +
+                "        \"rootDir\": \"ts\",\n" +
+                "        \"declaration\": true\n" +
+                "    },\n" +
+                "    \"include\": [\n" +
+                "        \"ts/**/*\"\n" +
+                "    ]\n" +
+                "}")
+
+        File("$basePath/package.json").writeText("{\n" +
+                "  \"name\": \"@astorks/lib-smc\",\n" +
+                "  \"repository\": \"git@github.com:astorks/ScriptableMC-Engine.git\",\n" +
+                "  \"version\": \"1.0.0\",\n" +
+                "  \"description\": \"JavaScript CommonJS libraries for ScriptableMC\",\n" +
+                "  \"publishConfig\": { \"registry\": \"https://npm.pkg.github.com/\" },\n" +
+                "  \"directories\": {\n" +
+                "    \"bin\": \"./js\"\n" +
+                "  },\n" +
+                "  \"scripts\": {\n" +
+                "    \"compile\": \"npx tsc\"\n" +
+                "  },\n" +
+                "  \"author\": \"Ashton Storks\",\n" +
+                "  \"license\": \"ISC\",\n" +
+                "  \"bugs\": {\n" +
+                "    \"url\": \"https://github.com/astorks/ScriptableMC-TypeScript/issues\"\n" +
+                "  },\n" +
+                "  \"homepage\": \"https://github.com/astorks/ScriptableMC-TypeScript#readme\",\n" +
+                "  \"dependencies\": {},\n" +
+                "  \"devDependencies\": {\n" +
+                "    \"typescript\": \"^3.7.5\"\n" +
+                "  }\n" +
+                "}")
 
         return this
     }
@@ -675,6 +730,16 @@ class TypescriptLibraryExporter {
                 .exportGlobalLibrary()
                 .copyStaticSources()
                 .exportProjectFiles()
+
+            TypescriptLibraryExporter()
+                .basePath("./lib-smc")
+                .addHelperClasses()
+                .addBukkitClasses()
+                .clean()
+                .exportLibraries()
+                .exportIndexLibrary()
+                .copyStaticSources()
+                .exportCommonJSProjectFiles()
         }
     }
 }
