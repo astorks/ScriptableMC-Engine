@@ -43,17 +43,41 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
             .allowCreateThread(true)
             .option("js.ecmascript-version", "2020")
 
-        contextBuilder = contextBuilder
-            .option("js.commonjs-require", "true")
+        if(config.commonJsModulesEnabled) {
+            if(config.debug) {
+                bootstrapPlugin.logger.info("Enabling CommonJS support...")
+            }
 
-        if(File("${config.rootScriptsFolder}/node_modules/").exists()) {
-            contextBuilder = contextBuilder
-                .option("js.commonjs-require-cwd", "${config.rootScriptsFolder}/node_modules")
-        }
+            if (!File(config.commonJsModulesPath).exists()) {
+                if(config.debug) {
+                    bootstrapPlugin.logger.info("CommonJS creating modules folder: ${config.commonJsModulesPath}")
+                }
+                File(config.commonJsModulesPath).mkdirs()
+            }
+            else {
+                if(config.debug) {
+                    bootstrapPlugin.logger.info("CommonJS using modules folder: ${config.commonJsModulesPath}")
+                }
+            }
 
-        if(File("${config.rootScriptsFolder}/__globals__.js").exists()) {
             contextBuilder = contextBuilder
-                .option("js.commonjs-global-properties", "${config.rootScriptsFolder}/__globals__.js")
+                .option("js.commonjs-require", "true")
+                .option("js.commonjs-require-cwd", config.commonJsModulesPath)
+
+            if (File(config.commonJsGlobalsPath).exists()) {
+                if(config.debug) {
+                    bootstrapPlugin.logger.info("CommonJS using globals: ${config.commonJsGlobalsPath}")
+                }
+                contextBuilder = contextBuilder
+                    .option("js.commonjs-global-properties", config.commonJsGlobalsPath)
+            }
+            else {
+                if(config.debug) {
+                    bootstrapPlugin.logger.warning("CommonJS unable to read globals: ${config.commonJsGlobalsPath}")
+                }
+            }
+
+            bootstrapPlugin.logger.info("CommonJS support enabled.")
         }
 
         if(config.debugger.enabled) {

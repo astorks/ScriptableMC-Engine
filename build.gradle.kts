@@ -7,7 +7,7 @@ plugins {
 
 allprojects {
     group = "com.pixlfox.scriptablemc"
-    version = "1.2.0"
+    version = "1.2.1"
 
     repositories {
         mavenCentral()

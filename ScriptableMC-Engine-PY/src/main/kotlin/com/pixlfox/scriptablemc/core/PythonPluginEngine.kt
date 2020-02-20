@@ -22,7 +22,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private
     init {
         if(config.extractLibs) {
             val librariesResource = bootstrapPlugin.getResource("lib-py.zip")
-            val libFolder = File("${config.rootScriptFolder}/lib-py")
+            val libFolder = File("${config.rootScriptsFolder}/lib-py")
             if (librariesResource != null && !libFolder.exists()) {
                 if(debugEnabled) {
                     bootstrapPlugin.logger.info("Extracting python libraries from ScriptableMC-Engine-PY resources to ${libFolder.path}...")
@@ -38,8 +38,8 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private
             .allowHostAccess(HostAccess.ALL)
             .allowHostClassLoading(true)
             .allowIO(true)
-            .option("python.CoreHome", "${config.rootScriptFolder}/lib-py/lib-graalpython/")
-            .option("python.StdLibHome", "${config.rootScriptFolder}/lib-py/lib-python/3/")
+            .option("python.CoreHome", "${config.rootScriptsFolder}/lib-py/lib-graalpython/")
+            .option("python.StdLibHome", "${config.rootScriptsFolder}/lib-py/lib-python/3/")
 
         if(config.debugger.enabled) {
             contextBuilder = contextBuilder
@@ -61,7 +61,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private
 
         loadAllHelperClasses()
 
-        val mainScriptFile = File("${config.rootScriptFolder}/main.py")
+        val mainScriptFile = File("${config.rootScriptsFolder}/main.py")
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
         }
@@ -102,7 +102,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private
     }
 
     override fun evalFile(filePath: String): Value {
-        val scriptFile = File("${config.rootScriptFolder}/$filePath")
+        val scriptFile = File("${config.rootScriptsFolder}/$filePath")
 
         return if(scriptFile.exists()) {
             eval(
@@ -139,7 +139,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private
     }
 
     override fun evalCommandSender(source: String, sender: CommandSender): Value {
-        val tempScriptFile = File("${config.rootScriptFolder}/${UUID.randomUUID()}/__init__.py")
+        val tempScriptFile = File("${config.rootScriptsFolder}/${UUID.randomUUID()}/__init__.py")
         try {
             tempScriptFile.parentFile.mkdirs()
             tempScriptFile.writeText(source)

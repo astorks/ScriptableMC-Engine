@@ -18,6 +18,11 @@ version_check: true
 # Default: true
 extract_libs: true
 
+# Chrome debugger settings
+# Default: enabled: false, address: 127.0.0.1:9229, wait_attached: true
+# If enabled: true and wait_attached: true the whole minecraft server will hang until chrome debugger is attached
+# this is useful for debugging the script engine on startup
+# To enable remote debugging set address: 0.0.0.0:9229
 debugger:
   enabled: false
   address: 127.0.0.1:9229

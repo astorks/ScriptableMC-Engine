@@ -2,27 +2,13 @@ package com.pixlfox.scriptablemc
 
 import org.bukkit.configuration.file.FileConfiguration
 
-class SMCJavaScriptConfig(private val config: FileConfiguration) {
-    val rootScriptsFolder: String
-        get() = config.getString("root_scripts_folder", "./scripts").orEmpty()
+class SMCJavaScriptConfig(config: FileConfiguration) : ScriptEngineConfig(config) {
+    val commonJsModulesEnabled: Boolean
+        get() = readConfigBoolean("common_js.modules_enabled", true)
 
-    val debug: Boolean
-        get() = config.getBoolean("debug", false)
+    val commonJsModulesPath: String
+        get() = readConfigString("common_js.modules_path", "\${root_scripts_folder}/node_modules")
 
-    val extractLibs: Boolean
-        get() = config.getBoolean("extract_libs", true)
-
-    val debugger: SMCJavaScriptDebuggerConfig
-        get() = SMCJavaScriptDebuggerConfig(config)
-}
-
-class SMCJavaScriptDebuggerConfig(private val config: FileConfiguration) {
-    val enabled: Boolean
-        get() = config.getBoolean("debugger.enabled", false)
-
-    val address: String
-        get() = config.getString("debugger.address", "127.0.0.1:9229").orEmpty()
-
-    val waitAttached: Boolean
-        get() = config.getBoolean("debugger.wait_attached", true)
+    val commonJsGlobalsPath: String
+        get() = readConfigString("common_js.globals_path", "\${root_scripts_folder}/__globals__.js")
 }
