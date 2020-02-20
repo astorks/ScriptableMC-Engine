@@ -17,9 +17,9 @@ GraalVM-CE is a free open source java runtime created by Oracle that is pre-pack
 
 ## Installing The JavaScript Engine Plugin
 ##### If your server is running on a Standard JDK
-- [Download the latest `ScriptableMC-Engine-JS-Bundled.jar`](https://github.com/astorks/ScriptableMC-Engine/releases/latest) and place it in your plugins folder.
+- Download the latest [`ScriptableMC-Engine-JS-Bundled.jar`](https://github.com/astorks/ScriptableMC-Engine/releases/latest/download/ScriptableMC-Engine-JS-Bundled.jar) and place it in your plugins folder.
 ##### If your server is running on a GraalVM JDK
-- [Download the latest `ScriptableMC-Engine-JS.jar`](https://github.com/astorks/ScriptableMC-Engine/releases/latest) and place it in your plugins folder.
+- Download the latest [`ScriptableMC-Engine-JS.jar`](https://github.com/astorks/ScriptableMC-Engine/releases/latest/download/ScriptableMC-Engine-JS.jar) and place it in your plugins folder.
 
 Take a look at [ScriptableMC-TypeScript](https://github.com/astorks/ScriptableMC-TypeScript) for a full typescript plugin example.
 You can take the typescript example and compile it, then directly modify the javascript if you don't want to use typescript.
