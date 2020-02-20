@@ -3,6 +3,11 @@
 # Default: ./scripts
 root_scripts_folder: './scripts'
 
+# Main script file
+# The main entry point python script file
+# Default: ${root_scripts_folder}/main.py
+main_script_file: '${root_scripts_folder}/main.py'
+
 # Prints some additional debugging messages
 # Default: false
 debug: false

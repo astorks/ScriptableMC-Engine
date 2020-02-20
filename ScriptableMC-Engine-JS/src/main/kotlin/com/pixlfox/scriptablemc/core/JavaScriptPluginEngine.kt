@@ -101,7 +101,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
 
         loadAllHelperClasses()
 
-        val mainScriptFile = File("${config.rootScriptsFolder}/main.js")
+        val mainScriptFile = File(config.mainScriptFile)
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
         }
@@ -109,7 +109,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
         if(mainScriptFile.exists()) {
             val mainReturn = eval(
                 Source.newBuilder("js", mainScriptFile)
-                    .name("main.js")
+                    .name(mainScriptFile.name)
                     .mimeType("application/javascript+module")
                     .interactive(false)
                     .build()

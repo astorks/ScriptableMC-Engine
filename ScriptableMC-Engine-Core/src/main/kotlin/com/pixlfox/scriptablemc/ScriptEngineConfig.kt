@@ -6,6 +6,8 @@ abstract class ScriptEngineConfig(private val config: FileConfiguration) {
     val rootScriptsFolder: String
         get() = readConfigString("root_scripts_folder", "./scripts")
 
+    abstract val mainScriptFile: String
+
     val debug: Boolean
         get() = readConfigBoolean("debug", false)
 

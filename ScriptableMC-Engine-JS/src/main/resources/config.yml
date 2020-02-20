@@ -3,6 +3,11 @@
 # Default: ./scripts
 root_scripts_folder: './scripts'
 
+# Main script file
+# The main entry point javascript file
+# Default: ${root_scripts_folder}/main.js
+main_script_file: '${root_scripts_folder}/main.js'
+
 # Prints some additional debugging messages
 # Default: false
 debug: false

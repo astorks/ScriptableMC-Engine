@@ -61,7 +61,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private
 
         loadAllHelperClasses()
 
-        val mainScriptFile = File("${config.rootScriptsFolder}/main.py")
+        val mainScriptFile = File(config.mainScriptFile)
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
         }
@@ -69,7 +69,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private
         if(mainScriptFile.exists()) {
             val mainReturn = eval(
                 Source.newBuilder("python", mainScriptFile)
-                    .name("main.py")
+                    .name(mainScriptFile.name)
                     .interactive(false)
                     .build()
             )
