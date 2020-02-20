@@ -1,18 +1,14 @@
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.3.61"
-    id("com.github.johnrengelman.shadow") version "5.2.0"
-    id("org.jetbrains.gradle.plugin.idea-ext") version "0.7"
+    id("org.jetbrains.kotlin.jvm")
+    id("com.github.johnrengelman.shadow")
+    id("org.jetbrains.gradle.plugin.idea-ext")
 }
-
-group = "com.pixlfox.scriptablemc"
-version = "1.1.10"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility  = JavaVersion.VERSION_1_8
 }
-
 
 idea {
     module {
@@ -21,45 +17,13 @@ idea {
     }
 }
 
-repositories {
-    mavenCentral()
-    jcenter()
-    maven {
-        name = "JitPack"
-        url = uri("https://jitpack.io")
-    }
-    maven {
-        name = "spigotmc"
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-    }
-    maven {
-        name = "spigotmc nexus"
-        url = uri("https://hub.spigotmc.org/nexus/content/repositories/sonatype-nexus-snapshots/")
-    }
-    maven {
-        name = "minecraft"
-        url = uri("https://libraries.minecraft.net")
-    }
-    maven {
-        name = "papermc"
-        url = uri("https://papermc.io/repo/repository/maven-public/")
-    }
-    maven {
-        name = "placeholderapi"
-        url = uri("http://repo.extendedclip.com/content/repositories/placeholderapi/")
-    }
-    maven {
-        name = "aikar-acf"
-        url = uri("https://repo.aikar.co/content/groups/aikar/")
-    }
-}
-
 dependencies {
+    implementation(project(":ScriptableMC-Engine-Core"))
+
+
     // GraalVM SDK & GraalJS Engine
-    implementation("org.graalvm.sdk:graal-sdk:19.3.1")
-    implementation("org.graalvm.js:js:19.3.1")
-    implementation("org.graalvm.js:js-scriptengine:19.3.1")
-    implementation("org.graalvm.truffle:truffle-api:19.3.1")
+    compileOnly("org.graalvm.sdk:graal-sdk:20.0.0")
+    compileOnly("org.graalvm.truffle:truffle-api:20.0.0")
 
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
@@ -67,6 +31,8 @@ dependencies {
     implementation("fr.minuskube.inv:smart-invs:1.2.7")
     compileOnly("me.clip:placeholderapi:2.10.4")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("commons-io:commons-io:2.6")
 
     testImplementation("junit", "junit", "4.12")
 }
