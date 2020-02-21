@@ -428,12 +428,12 @@ class TypescriptLibraryExporter {
 
         val pluginDescription = PluginDescriptionFile(File("../ScriptableMC-Engine-JS/src/main/resources/plugin.yml").inputStream())
         val githubSha = System.getenv().getOrElse("GITHUB_SHA") { "" }
+        val githubTag = System.getenv().getOrElse("GITHUB_REF") { "" }
 
-        val version = if(githubSha.isNullOrEmpty()) {
-            pluginDescription.version
-        }
-        else {
-            "${pluginDescription.version}-dev-$githubSha"
+        val version = when {
+            githubTag.startsWith("v1") -> githubTag.substring(1)
+            githubSha.isNullOrEmpty() -> pluginDescription.version
+            else -> "${pluginDescription.version}-dev-$githubSha"
         }
 
         File("$basePath/package.json").writeText("{\n" +

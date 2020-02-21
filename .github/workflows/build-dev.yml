@@ -36,7 +36,6 @@ jobs:
         cp ./ScriptableMC-JavaScript-Lib.zip ../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
     - name: Compile lib-smc, create archive, and publish
       env:
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd ./ScriptableMC-Tools-TS/lib-smc/
