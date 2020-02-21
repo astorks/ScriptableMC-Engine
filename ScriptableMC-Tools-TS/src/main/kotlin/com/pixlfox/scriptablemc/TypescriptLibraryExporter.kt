@@ -11,11 +11,12 @@ import java.lang.reflect.*
 
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
-class TypescriptLibraryExporter {
+class TypescriptLibraryExporter(private var args: Array<String> = arrayOf()) {
     private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
     private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io|java\\.nio|khttp|org\\.apache\\.commons\\.io)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
+    private val isRelease: Boolean = args.contains("--release")
 
     private fun safeName(name: String): String = when {
         name.equals("function", true) -> "_function"
@@ -427,15 +428,15 @@ class TypescriptLibraryExporter {
         val githubSha = System.getenv().getOrElse("GITHUB_SHA") { "" }
         val githubTag = System.getenv().getOrElse("GITHUB_REF") { "" }
 
-        val isReleaseTag = githubTag.startsWith("refs/tags/v")
+        val isReleaseTag = githubTag.startsWith("refs/tags/v") && isRelease
 
         val version = when {
             isReleaseTag -> githubTag.substring(11)
-            githubSha.isNullOrEmpty() -> pluginDescription.version
+            isRelease && githubSha.isNullOrEmpty() -> pluginDescription.version
             else -> "${pluginDescription.version}-dev-$githubSha"
         }
 
-        if(isReleaseTag) {
+        if(isRelease) {
             File("$basePath/.npmrc").writeText("//registry.npmjs.org/:_authToken=\${NPM_TOKEN}")
         }
         else {
@@ -444,7 +445,7 @@ class TypescriptLibraryExporter {
         }
 
         File("$basePath/package.json").writeText("{\n" +
-                "  \"name\": \"@astorks/lib-smc\",\n" +
+                "  \"name\": \"${if(isRelease) "lib-smc" else "@astorks/lib-smc"}\",\n" +
                 "  \"repository\": \"git@github.com:astorks/ScriptableMC-Engine.git\",\n" +
                 "  \"version\": \"$version\",\n" +
                 "  \"description\": \"JavaScript CommonJS libraries for ScriptableMC\",\n" +
@@ -741,24 +742,27 @@ class TypescriptLibraryExporter {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            TypescriptLibraryExporter()
-                .addHelperClasses()
-                .addBukkitClasses()
-                .clean()
-                .exportLibraries()
-                .exportGlobalLibrary()
-                .copyStaticSources()
-                .exportProjectFiles()
-
-            TypescriptLibraryExporter()
-                .basePath("./lib-smc")
-                .addHelperClasses()
-                .addBukkitClasses()
-                .clean()
-                .exportLibraries()
-                .exportIndexLibrary()
-                .copyStaticSources()
-                .exportCommonJSProjectFiles()
+            if(args.contains("--lib-smc")) {
+                TypescriptLibraryExporter(args)
+                    .basePath("./lib-smc")
+                    .addHelperClasses()
+                    .addBukkitClasses()
+                    .clean()
+                    .exportLibraries()
+                    .exportIndexLibrary()
+                    .copyStaticSources()
+                    .exportCommonJSProjectFiles()
+            }
+            else {
+                TypescriptLibraryExporter(args)
+                    .addHelperClasses()
+                    .addBukkitClasses()
+                    .clean()
+                    .exportLibraries()
+                    .exportGlobalLibrary()
+                    .copyStaticSources()
+                    .exportProjectFiles()
+            }
         }
     }
 }

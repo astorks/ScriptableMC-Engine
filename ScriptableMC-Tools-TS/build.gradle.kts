@@ -57,5 +57,20 @@ tasks.register<JavaExec>("exportTypeScriptLibraries") {
     group = "libraries"
     main = "com.pixlfox.scriptablemc.TypescriptLibraryExporter"
     classpath = sourceSets["main"].runtimeClasspath
-    //classpath = sourceSets["main"].java.srcDirs
+}
+
+tasks.register<JavaExec>("generateLibSMC") {
+    dependsOn(":ScriptableMC-Tools-TS:classes")
+    group = "libraries"
+    main = "com.pixlfox.scriptablemc.TypescriptLibraryExporter"
+    args = mutableListOf("--lib-smc")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register<JavaExec>("generateLibSMCRelease") {
+    dependsOn(":ScriptableMC-Tools-TS:classes")
+    group = "libraries"
+    main = "com.pixlfox.scriptablemc.TypescriptLibraryExporter"
+    args = mutableListOf("--lib-smc", "--release")
+    classpath = sourceSets["main"].runtimeClasspath
 }
