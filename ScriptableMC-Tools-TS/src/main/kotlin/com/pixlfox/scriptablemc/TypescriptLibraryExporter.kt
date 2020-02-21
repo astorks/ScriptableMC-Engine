@@ -431,7 +431,7 @@ class TypescriptLibraryExporter {
         val githubTag = System.getenv().getOrElse("GITHUB_REF") { "" }
 
         val version = when {
-            githubTag.startsWith("v1") -> githubTag.substring(1)
+            githubTag.startsWith("refs/tags/v") -> githubTag.substring(11)
             githubSha.isNullOrEmpty() -> pluginDescription.version
             else -> "${pluginDescription.version}-dev-$githubSha"
         }
