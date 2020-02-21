@@ -436,11 +436,11 @@ class TypescriptLibraryExporter {
         }
 
         if(isReleaseTag) {
-            File("$basePath/.npmrc").writeText("//npm.pkg.github.com/:_authToken=\${GITHUB_TOKEN}\n" +
-                    "registry=https://npm.pkg.github.com/astorks")
+            File("$basePath/.npmrc").writeText("//registry.npmjs.org/:_authToken=\${NPM_TOKEN}")
         }
         else {
-            File("$basePath/.npmrc").writeText("//registry.npmjs.org/:_authToken=\${NPM_TOKEN}")
+            File("$basePath/.npmrc").writeText("//npm.pkg.github.com/:_authToken=\${GITHUB_TOKEN}\n" +
+                    "registry=https://npm.pkg.github.com/astorks")
         }
 
         File("$basePath/package.json").writeText("{\n" +
