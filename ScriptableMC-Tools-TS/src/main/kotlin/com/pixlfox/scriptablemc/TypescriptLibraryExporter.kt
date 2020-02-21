@@ -441,13 +441,9 @@ class TypescriptLibraryExporter {
                 "  \"repository\": \"git@github.com:astorks/ScriptableMC-Engine.git\",\n" +
                 "  \"version\": \"$version\",\n" +
                 "  \"description\": \"JavaScript CommonJS libraries for ScriptableMC\",\n" +
-                "  \"directories\": {\n" +
-                "    \"bin\": \"./js\"\n" +
-                "  },\n" +
                 "  \"scripts\": {\n" +
                 "    \"compile\": \"npx tsc\",\n" +
-                "    \"postcompile\": \"cp ./package.json ./js/package.json && cp ./.npmrc ./js/.npmrc\",\n" +
-                "    \"publish\": \"npm publish ./js/\"\n" +
+                "    \"postcompile\": \"cp ./package.json ./js/package.json && cp ./.npmrc ./js/.npmrc\"\n" +
                 "  },\n" +
                 "  \"author\": \"Ashton Storks\",\n" +
                 "  \"license\": \"ISC\",\n" +
