@@ -446,7 +446,7 @@ class TypescriptLibraryExporter {
                 "  \"scripts\": {\n" +
                 "    \"compile\": \"npx tsc\",\n" +
                 "    \"postcompile\": \"cp ./package.json ./js/package.json && cp ./.npmrc ./js/.npmrc\",\n" +
-                "    \"publish\": \"npm publish ./js/\",\n" +
+                "    \"publish\": \"npm publish ./js/\"\n" +
                 "  },\n" +
                 "  \"author\": \"Ashton Storks\",\n" +
                 "  \"license\": \"ISC\",\n" +
