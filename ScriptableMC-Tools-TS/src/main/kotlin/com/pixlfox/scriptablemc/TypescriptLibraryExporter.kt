@@ -438,6 +438,7 @@ class TypescriptLibraryExporter {
 
         File("$basePath/package.json").writeText("{\n" +
                 "  \"name\": \"@astorks/lib-smc\",\n" +
+                "  \"repository\": \"git@github.com:astorks/ScriptableMC-Engine.git\",\n" +
                 "  \"version\": \"$version\",\n" +
                 "  \"description\": \"JavaScript CommonJS libraries for ScriptableMC\",\n" +
                 "  \"directories\": {\n" +
