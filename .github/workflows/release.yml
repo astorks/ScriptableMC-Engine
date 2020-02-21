@@ -40,7 +40,7 @@ jobs:
         cd ./ScriptableMC-Tools-TS/lib-smc/
         npm install
         npm run compile
-        npm publish ./js
+        npm publish ./js --access public
         zip -r ./Lib-SMC.zip ./*
     - name: Build JS Engine with Gradle
       run: ./gradlew :shadowJarAll

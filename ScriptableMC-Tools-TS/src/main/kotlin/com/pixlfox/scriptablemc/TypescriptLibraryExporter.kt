@@ -11,7 +11,7 @@ import java.lang.reflect.*
 
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
-class TypescriptLibraryExporter(private var args: Array<String> = arrayOf()) {
+class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
     private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
     private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io|java\\.nio|khttp|org\\.apache\\.commons\\.io)(.*)?")
@@ -445,7 +445,7 @@ class TypescriptLibraryExporter(private var args: Array<String> = arrayOf()) {
         }
 
         File("$basePath/package.json").writeText("{\n" +
-                "  \"name\": \"${if(isRelease) "lib-smc" else "@astorks/lib-smc"}\",\n" +
+                "  \"name\": \"@astorks/lib-smc\",\n" +
                 "  \"repository\": \"git@github.com:astorks/ScriptableMC-Engine.git\",\n" +
                 "  \"version\": \"$version\",\n" +
                 "  \"description\": \"JavaScript CommonJS libraries for ScriptableMC\",\n" +
