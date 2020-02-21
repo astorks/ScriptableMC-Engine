@@ -429,8 +429,8 @@ class TypescriptLibraryExporter {
         val pluginDescription = PluginDescriptionFile(File("../ScriptableMC-Engine-JS/src/main/resources/plugin.yml").inputStream())
 
         File("$basePath/package.json").writeText("{\n" +
-                "  \"name\": \"lib-smc\",\n" +
-                "  \"version\": \"${pluginDescription.version}\",\n" +
+                "  \"name\": \"@astorks/lib-smc\",\n" +
+                "  \"version\": \"1.2.1\",\n" +
                 "  \"description\": \"JavaScript CommonJS libraries for ScriptableMC\",\n" +
                 "  \"publishConfig\": {\n" +
                 "    \"registry\": \"https://npm.pkg.github.com/\"\n" +
@@ -441,7 +441,8 @@ class TypescriptLibraryExporter {
                 "  \"scripts\": {\n" +
                 "    \"compile\": \"npx tsc\",\n" +
                 "    \"postcompile\": \"cp ./package.json ./js/package.json && cp ./.npmrc ./js/.npmrc\",\n" +
-                "    \"publish\": \"npm publish ./js/\"\n" +
+                "    \"publish\": \"npm publish ./js/\",\n" +
+                "    \"publish-dev\": \"npm publish ./js/ --tag dev-${GITHUB_SHA}\"\n" +
                 "  },\n" +
                 "  \"author\": \"Ashton Storks\",\n" +
                 "  \"license\": \"ISC\",\n" +

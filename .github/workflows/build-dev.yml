@@ -41,7 +41,7 @@ jobs:
         cd ./ScriptableMC-Tools-TS/lib-smc/
         npm install
         npm run compile
-        npm run publish
+        npm run publish-dev
         zip -r ./Lib-SMC.zip ./*
     - name: Build All Plugins with Gradle
       run: ./gradlew :shadowJarAll
