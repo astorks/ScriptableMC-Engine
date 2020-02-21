@@ -423,17 +423,24 @@ class TypescriptLibraryExporter {
                 "    ]\n" +
                 "}")
 
-        File("$basePath/.npmrc").writeText("//npm.pkg.github.com/:_authToken=\${GITHUB_TOKEN}\n" +
-                "registry=https://npm.pkg.github.com/astorks")
-
         val pluginDescription = PluginDescriptionFile(File("../ScriptableMC-Engine-JS/src/main/resources/plugin.yml").inputStream())
         val githubSha = System.getenv().getOrElse("GITHUB_SHA") { "" }
         val githubTag = System.getenv().getOrElse("GITHUB_REF") { "" }
 
+        val isReleaseTag = githubTag.startsWith("refs/tags/v")
+
         val version = when {
-            githubTag.startsWith("refs/tags/v") -> githubTag.substring(11)
+            isReleaseTag -> githubTag.substring(11)
             githubSha.isNullOrEmpty() -> pluginDescription.version
             else -> "${pluginDescription.version}-dev-$githubSha"
+        }
+
+        if(isReleaseTag) {
+            File("$basePath/.npmrc").writeText("//npm.pkg.github.com/:_authToken=\${GITHUB_TOKEN}\n" +
+                    "registry=https://npm.pkg.github.com/astorks")
+        }
+        else {
+            File("$basePath/.npmrc").writeText("//registry.npmjs.org/:_authToken=\${NPM_TOKEN}")
         }
 
         File("$basePath/package.json").writeText("{\n" +
