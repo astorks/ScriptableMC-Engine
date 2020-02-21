@@ -35,6 +35,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd ./ScriptableMC-Tools-TS/lib-smc/
+        echo "$GITHUB_REF"
+        cat ./package.json
         npm install
         npm run compile
         npm publish ./js
