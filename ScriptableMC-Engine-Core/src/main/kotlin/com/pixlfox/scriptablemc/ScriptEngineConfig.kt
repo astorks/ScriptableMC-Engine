@@ -6,7 +6,10 @@ abstract class ScriptEngineConfig(private val config: FileConfiguration) {
     val rootScriptsFolder: String
         get() = readConfigString("root_scripts_folder", "./scripts")
 
-    abstract val mainScriptFile: String
+    abstract val mainScriptFiles: List<String>
+
+    val autoEnablePlugins: Boolean
+        get() = readConfigBoolean("auto_enable_plugins", true)
 
     val debug: Boolean
         get() = readConfigBoolean("debug", false)
@@ -25,6 +28,24 @@ abstract class ScriptEngineConfig(private val config: FileConfiguration) {
             val configValue = readConfigString(it.groups[1]!!.value)
             configValue
         }
+    }
+
+    fun readConfigStringList(path: String, def: List<String> = listOf()): List<String> {
+        val inputList = config.getStringList(path)
+        val regex = Regex("\\\$\\{(.*)}")
+
+        if(inputList.isEmpty()) {
+            inputList.addAll(def)
+        }
+
+        for((index, input) in inputList.withIndex()) {
+            inputList[index] = regex.replace(input) {
+                val configValue = readConfigString(it.groups[1]!!.value)
+                configValue
+            }
+        }
+
+        return inputList
     }
 
     fun readConfigBoolean(path: String, def: Boolean = false): Boolean {

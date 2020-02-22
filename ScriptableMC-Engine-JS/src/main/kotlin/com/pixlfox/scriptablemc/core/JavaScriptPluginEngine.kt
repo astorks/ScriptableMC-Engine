@@ -12,14 +12,13 @@ import java.io.File
 import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private val config: SMCJavaScriptConfig): ScriptablePluginEngine() {
+class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, override val config: SMCJavaScriptConfig): ScriptablePluginEngine() {
 
     override val debugEnabled: Boolean = config.debug
     override val graalContext: Context
     override val globalBindings: Value
     override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
     override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
-    private var enabledAllPlugins: Boolean = false
 
     init {
         if(config.extractLibs) {
@@ -94,14 +93,8 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
         globalBindings = graalContext.getBindings("js")
     }
 
-    override fun start() {
-        instance = this
-        inventoryManager.init()
-        globalBindings.putMember("engine", this)
-
-        loadAllHelperClasses()
-
-        val mainScriptFile = File(config.mainScriptFile)
+    override fun loadMainScript(path: String) {
+        val mainScriptFile = File(path)
         if(!mainScriptFile.parentFile.exists()) {
             mainScriptFile.parentFile.mkdirs()
         }
@@ -120,11 +113,6 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
                 for (i in 0 until mainReturn.arraySize) {
                     this.loadPlugin(mainReturn.getArrayElement(i))
                 }
-
-                // Enable all plugins if not already enabled
-                if(!enabledAllPlugins) {
-                    enableAllPlugins()
-                }
             }
         }
         else {
@@ -132,14 +120,14 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
         }
     }
 
+    override fun start() {
+        instance = this
+        super.start()
+    }
+
     override fun close() {
         instance = null
-        for(scriptablePlugin in scriptablePlugins) {
-            scriptablePlugin.disable()
-        }
-        scriptablePlugins.clear()
-
-        graalContext.close(true)
+        super.close()
     }
 
     override fun evalFile(filePath: String): Value {
@@ -203,10 +191,6 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
         }
     }
 
-    override fun eval(source: Source): Value {
-        return graalContext.eval(source)
-    }
-
     override fun loadPlugin(scriptableClass: Value): ScriptablePluginContext {
         val pluginInstance = scriptableClass.newInstance()
         val pluginName = pluginInstance.getMember("pluginName").asString()
@@ -217,25 +201,8 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
         return pluginContext
     }
 
-    override fun enableAllPlugins() {
-        for (pluginContext in scriptablePlugins) {
-            pluginContext.enable()
-        }
-        enabledAllPlugins = true
-    }
-
-    override fun enablePlugin(pluginContext: ScriptablePluginContext) {
-        pluginContext.enable()
-    }
-
-    override fun disablePlugin(pluginContext: ScriptablePluginContext) {
-        pluginContext.disable()
-    }
-
     companion object {
-        private var inst: JavaScriptPluginEngine? = null
-        var instance: JavaScriptPluginEngine?
-            internal set(value) { inst = value }
-            get() { return inst }
+        var instance: JavaScriptPluginEngine? = null
+            private set
     }
 }

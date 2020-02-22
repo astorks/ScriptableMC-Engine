@@ -3,10 +3,17 @@
 # Default: ./scripts
 root_scripts_folder: './scripts'
 
-# Main script file
-# The main entry point javascript file
+# Main script files
+# The main entry point javascript files
 # Default: ${root_scripts_folder}/main.js
-main_script_file: '${root_scripts_folder}/main.js'
+main_script_files:
+  - '${root_scripts_folder}/main.js'
+
+# Auto-Enable all scriptable plugins after loading main scripts
+# If set to false you will have to manually enable all plugins
+# via engine.enableAllPlugins() after you have loaded all plugins
+# Default: true
+auto_enable_plugins: true
 
 # Prints some additional debugging messages
 # Default: false

@@ -53,33 +53,36 @@ class SMCJavaScriptEngineMain : ScriptEngineMain() {
             try {
                 scriptEngine = JavaScriptPluginEngine(this, SMCJavaScriptConfig(config))
                 scriptEngine!!.start()
-                logger.info("JavaScript engine started.")
-                sender?.sendMessage("$chatMessagePrefix ${ChatColor.GREEN}JavaScript engine started.")
-            } catch (e: IllegalStateException) {
-                if (e.message?.contains("Make sure the truffle-api.jar is on the classpath.", true) == true) {
-                    logger.warning("JavaScript engine failed to start.")
-                    e.printStackTrace()
-                    logger.severe("Unable to find truffle-api.jar. This shouldn't happen since it's now packaged inside the plugin, you might want to check for an updated ScriptableMC Engine release.")
-                    logger.severe("ScriptableMC Engine Version: $pluginVersion")
-                    logger.severe("ScriptableMC-Engine Download Page: https://github.com/astorks/ScriptableMC-Engine/releases/latest")
+                if(scriptEngine!!.startupErrors.any()) {
+                    for(error in scriptEngine!!.startupErrors) {
+                        error.printStackTrace()
+                        if(sender != null) {
+                            sender.sendMessage("$chatMessagePrefix ${ChatColor.RED}$error")
+                            for (stackTrace in error.stackTrace.filter { it.fileName?.endsWith(".js") == true }) {
+                                sender.sendMessage("${ChatColor.RED}$stackTrace")
+                            }
+                        }
+                    }
 
-                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}JavaScript engine failed to start. Check the server console.")
-                } else {
-                    logger.warning("JavaScript engine failed to start.")
-                    e.printStackTrace()
-
-                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}JavaScript engine failed to start. Check the server console.")
+                    logger.warning("JavaScript engine started with errors.")
+                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.YELLOW}JavaScript engine started with errors.")
                 }
-            } catch (e: Exception) {
-                logger.warning("JavaScript engine failed to start.")
-                e.printStackTrace()
-
+                else {
+                    logger.info("JavaScript engine started.")
+                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.GREEN}JavaScript engine started.")
+                }
+            }
+            catch (error: Exception) {
+                error.printStackTrace()
                 if(sender != null) {
-                    sender.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}$e")
-                    for (stackTrace in e.stackTrace) {
-                        sender.sendMessage("${ChatColor.DARK_RED}$stackTrace")
+                    sender.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}$error")
+                    for (stackTrace in error.stackTrace) {
+                        sender.sendMessage("${ChatColor.RED}$stackTrace")
                     }
                 }
+
+                logger.severe("JavaScript engine failed to start.")
+                sender?.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}JavaScript engine failed to start.")
             }
         }
     }
@@ -91,9 +94,7 @@ class SMCJavaScriptEngineMain : ScriptEngineMain() {
     }
 
     companion object {
-        private var inst: SMCJavaScriptEngineMain? = null
-        var instance: SMCJavaScriptEngineMain
-            internal set(value) { inst = value }
-            get() { return inst!! }
+        var instance: SMCJavaScriptEngineMain? = null
+            private set
     }
 }
