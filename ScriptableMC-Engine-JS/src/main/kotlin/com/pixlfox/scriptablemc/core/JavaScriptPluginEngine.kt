@@ -64,16 +64,16 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
                 .option("js.commonjs-require", "true")
                 .option("js.commonjs-require-cwd", config.commonJsModulesPath)
 
-            if (File(config.commonJsGlobalsPath).exists()) {
+            if (File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).exists()) {
                 if(config.debug) {
-                    bootstrapPlugin.logger.info("CommonJS using globals: ${config.commonJsGlobalsPath}")
+                    bootstrapPlugin.logger.info("CommonJS using globals: ${File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).path}")
                 }
                 contextBuilder = contextBuilder
-                    .option("js.commonjs-global-properties", config.commonJsGlobalsPath)
+                    .option("js.commonjs-global-properties", config.commonJsGlobalsFile)
             }
             else {
                 if(config.debug) {
-                    bootstrapPlugin.logger.warning("CommonJS unable to read globals: ${config.commonJsGlobalsPath}")
+                    bootstrapPlugin.logger.warning("CommonJS unable to read globals: ${File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).path}")
                 }
             }
 

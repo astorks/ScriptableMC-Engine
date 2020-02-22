@@ -34,10 +34,11 @@ common_js:
   # Default: ${root_scripts_folder}/node_modules
   modules_path: '${root_scripts_folder}/node_modules'
 
-  # CommonJS globals path
-  # The path to the CommonJS globals.js file used to define global CommonJS values
-  # Default: ${common_js.modules_path}/__globals__.js
-  globals_path: '${common_js.modules_path}/__globals__.js'
+  # CommonJS globals file name
+  # The CommonJS globals file used to define global CommonJS values
+  # Relative to the `common_js.modules_path` value
+  # Default: globals.js
+  globals_file: 'globals.js'
 
 # Chrome debugger settings
 # **WARNING** THE DEBUGGER SHOULD NEVER BE ENABLED ON A PUBLIC SERVER

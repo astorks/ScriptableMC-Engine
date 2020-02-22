@@ -12,6 +12,6 @@ class SMCJavaScriptConfig(config: FileConfiguration) : ScriptEngineConfig(config
     val commonJsModulesPath: String
         get() = readConfigString("common_js.modules_path", "\${root_scripts_folder}/node_modules")
 
-    val commonJsGlobalsPath: String
-        get() = readConfigString("common_js.globals_path", "\${root_scripts_folder}/__globals__.js")
+    val commonJsGlobalsFile: String
+        get() = readConfigString("common_js.globals_file", "globals.js")
 }
