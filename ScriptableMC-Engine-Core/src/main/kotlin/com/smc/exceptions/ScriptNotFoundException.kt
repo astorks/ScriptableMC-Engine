@@ -1,4 +1,4 @@
-package com.pixlfox.scriptablemc.exceptions
+package com.smc.exceptions
 
 import java.io.File
 

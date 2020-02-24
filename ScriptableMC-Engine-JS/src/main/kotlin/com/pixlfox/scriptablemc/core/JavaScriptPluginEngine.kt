@@ -2,18 +2,17 @@ package com.pixlfox.scriptablemc.core
 
 import com.pixlfox.scriptablemc.SMCJavaScriptConfig
 import com.pixlfox.scriptablemc.ScriptEngineMain
-import com.pixlfox.scriptablemc.exceptions.ScriptNotFoundException
+import com.smc.exceptions.ScriptNotFoundException
 import com.pixlfox.scriptablemc.utils.UnzipUtility
 import fr.minuskube.inv.InventoryManager
-import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
 import java.io.File
-import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, override val config: SMCJavaScriptConfig): ScriptablePluginEngine() {
 
+    override val languageName: String = "js"
+    override val languageFileExtension: String = "js"
     override val debugEnabled: Boolean = config.debug
     override val graalContext: Context
     override val globalBindings: Value
@@ -33,7 +32,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, ove
         }
 
         var contextBuilder = Context
-            .newBuilder("js")
+            .newBuilder(languageName)
             .allowAllAccess(true)
             .allowExperimentalOptions(true)
             .allowHostAccess(HostAccess.ALL)
@@ -90,7 +89,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, ove
 
         graalContext = contextBuilder.build()
 
-        globalBindings = graalContext.getBindings("js")
+        globalBindings = graalContext.getBindings(languageName)
     }
 
     override fun loadMainScript(path: String) {
@@ -101,9 +100,9 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, ove
 
         if(mainScriptFile.exists()) {
             val mainReturn = eval(
-                Source.newBuilder("js", mainScriptFile)
+                Source.newBuilder(languageName, mainScriptFile)
                     .name(mainScriptFile.name)
-                    .mimeType("application/javascript+module")
+                    .mimeType(config.scriptMimeType)
                     .interactive(false)
                     .build()
             )
@@ -128,67 +127,6 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, ove
     override fun close() {
         instance = null
         super.close()
-    }
-
-    override fun evalFile(filePath: String): Value {
-        val scriptFile = File("${config.rootScriptsFolder}/$filePath")
-
-        return if(scriptFile.exists()) {
-            eval(
-                Source.newBuilder("js", scriptFile)
-                    .name(scriptFile.name)
-                    .mimeType("application/javascript+module")
-                    .interactive(false)
-                    .build()
-            )
-        } else {
-            throw ScriptNotFoundException(scriptFile)
-        }
-    }
-
-    override fun evalFile(scriptFile: File): Value {
-        return if(scriptFile.exists()) {
-            eval(
-                Source.newBuilder("js", scriptFile)
-                    .name(scriptFile.name)
-                    .mimeType("application/javascript+module")
-                    .interactive(false)
-                    .build()
-            )
-        } else {
-            throw ScriptNotFoundException(scriptFile)
-        }
-    }
-
-    override fun eval(source: String): Value {
-        return graalContext.eval(
-            Source.newBuilder("js", source,"${UUID.randomUUID()}.js")
-                .mimeType("application/javascript+module")
-                .interactive(false)
-                .cached(false)
-                .build()
-        )
-    }
-
-    override fun evalCommandSender(source: String, sender: CommandSender): Value {
-        val tempScriptFile = File("${config.rootScriptsFolder}/${UUID.randomUUID()}.js")
-        try {
-            tempScriptFile.writeText("import * as lib from './lib/global.js';\n" +
-                    "new (class EvalCommandSenderContext {\n" +
-                    "    run(sender, server, servicesManager) {\n" +
-                    "        $source\n" +
-                    "    }\n" +
-                    "})()\n")
-            val evalCommandSenderContext = evalFile(tempScriptFile)
-
-            evalCommandSenderContext.putMember("sender", sender)
-            evalCommandSenderContext.putMember("server", Bukkit.getServer())
-            evalCommandSenderContext.putMember("servicesManager", Bukkit.getServicesManager())
-            return evalCommandSenderContext.invokeMember("run", sender, Bukkit.getServer(), Bukkit.getServicesManager())
-        }
-        finally {
-            tempScriptFile.delete()
-        }
     }
 
     override fun loadPlugin(scriptableClass: Value): ScriptablePluginContext {

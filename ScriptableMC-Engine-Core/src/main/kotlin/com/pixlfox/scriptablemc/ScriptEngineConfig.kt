@@ -7,6 +7,8 @@ abstract class ScriptEngineConfig(private val config: FileConfiguration) {
         get() = readConfigString("root_scripts_folder", "./scripts")
 
     abstract val mainScriptFiles: List<String>
+    abstract val executeCommandTemplate: String
+    abstract val scriptMimeType: String
 
     val autoEnablePlugins: Boolean
         get() = readConfigBoolean("auto_enable_plugins", true)

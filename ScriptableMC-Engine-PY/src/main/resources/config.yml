@@ -3,6 +3,12 @@
 # Default: ./scripts
 root_scripts_folder: './scripts'
 
+# Script MIME type
+# .py text/x-python
+# .pyc application/x-python-code
+# Default: text/x-python
+script_mime_type: 'text/x-python'
+
 # Main script files
 # The main entry point python script files
 # Default: ${root_scripts_folder}/main.py
@@ -29,6 +35,17 @@ version_check: true
 # If you set this to false you'll need to download and extract the python libs manually.
 # Default: true
 extract_libs: true
+
+# Execute command template
+# This is the code that will be executed with /pyex and /smc python execute
+# If a class is returned it will be instantiated and continued on as an object
+# If object is returned and has a method execute script engine will call
+# returnedObject.execute(sender: CommandSender, server: BukkitServer, servicesManager)
+# as well as set returnedObject.sender, returnedObject.server, and returnedObject.servicesManager
+# you can also add additional methods, vars to the template source below
+# Otherwise the script engine will return last execute code
+# %SOURCE% will be replaced with with the command source.
+execute_command_template: "%SOURCE%"
 
 # Chrome debugger settings
 # **WARNING** THE DEBUGGER SHOULD NEVER BE ENABLED ON A PUBLIC SERVER

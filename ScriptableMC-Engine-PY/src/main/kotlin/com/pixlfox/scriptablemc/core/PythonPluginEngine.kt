@@ -2,16 +2,16 @@ package com.pixlfox.scriptablemc.core
 
 import com.pixlfox.scriptablemc.SMCPythonConfig
 import com.pixlfox.scriptablemc.ScriptEngineMain
-import com.pixlfox.scriptablemc.exceptions.ScriptNotFoundException
+import com.smc.exceptions.ScriptNotFoundException
 import com.pixlfox.scriptablemc.utils.UnzipUtility
 import fr.minuskube.inv.InventoryManager
-import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
 import java.io.File
-import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, override val config: SMCPythonConfig): ScriptablePluginEngine() {
+    override val languageName: String = "python"
+    override val languageFileExtension: String = "py"
     override val graalContext: Context
     override val debugEnabled: Boolean = config.debug
     override val globalBindings: Value
@@ -31,7 +31,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, overrid
         }
 
         var contextBuilder = Context
-            .newBuilder("python")
+            .newBuilder(languageName)
             .allowAllAccess(true)
             .allowExperimentalOptions(true)
             .allowHostAccess(HostAccess.ALL)
@@ -50,7 +50,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, overrid
         }
 
         graalContext = contextBuilder.build()
-        globalBindings = graalContext.getBindings("python")
+        globalBindings = graalContext.getBindings(languageName)
     }
 
     override fun loadMainScript(path: String) {
@@ -61,7 +61,7 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, overrid
 
         if(mainScriptFile.exists()) {
             val mainReturn = eval(
-                Source.newBuilder("python", mainScriptFile)
+                Source.newBuilder(languageName, mainScriptFile)
                     .name(mainScriptFile.name)
                     .interactive(false)
                     .build()
@@ -92,56 +92,6 @@ class PythonPluginEngine(override val bootstrapPlugin: ScriptEngineMain, overrid
     override fun close() {
         instance = null
         super.close()
-    }
-
-    override fun evalFile(filePath: String): Value {
-        val scriptFile = File("${config.rootScriptsFolder}/$filePath")
-
-        return if(scriptFile.exists()) {
-            eval(
-                Source.newBuilder("python", scriptFile)
-                    .name(scriptFile.name)
-                    .interactive(false)
-                    .build()
-            )
-        } else {
-            throw ScriptNotFoundException(scriptFile)
-        }
-    }
-
-    override fun evalFile(scriptFile: File): Value {
-        return if(scriptFile.exists()) {
-            eval(
-                Source.newBuilder("python", scriptFile)
-                    .name(scriptFile.name)
-                    .interactive(false)
-                    .build()
-            )
-        } else {
-            throw ScriptNotFoundException(scriptFile)
-        }
-    }
-
-    override fun eval(source: String): Value {
-        return graalContext.eval(
-            Source.newBuilder("python", source,"${UUID.randomUUID()}.py")
-                .interactive(false)
-                .cached(false)
-                .build()
-        )
-    }
-
-    override fun evalCommandSender(source: String, sender: CommandSender): Value {
-        val tempScriptFile = File("${config.rootScriptsFolder}/${UUID.randomUUID()}/__init__.py")
-        try {
-            tempScriptFile.parentFile.mkdirs()
-            tempScriptFile.writeText(source)
-            return evalFile(tempScriptFile)
-        }
-        finally {
-            tempScriptFile.delete()
-            tempScriptFile.parentFile.delete()
-        }
     }
 
     override fun loadPlugin(scriptableClass: Value): ScriptablePluginContext {

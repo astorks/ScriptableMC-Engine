@@ -90,6 +90,7 @@ class SMCPythonEngineMain : ScriptEngineMain() {
 
     override fun reloadScriptEngine(sender: CommandSender?) {
         unloadScriptEngine(sender)
+        saveDefaultConfig()
         reloadConfig()
         loadScriptEngine(sender)
     }
