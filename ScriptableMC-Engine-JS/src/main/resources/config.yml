@@ -15,7 +15,7 @@ script_mime_type: 'application/javascript+module'
 main_script_files:
   - '${root_scripts_folder}/main.js'
 
-# Auto-Enable all scriptable plugins after loading main scripts
+# Auto-Enable all scriptable plugins after executing all main scripts
 # If set to false you will have to manually enable all plugins
 # via engine.enableAllPlugins() after you have loaded all plugins
 # Default: true
@@ -37,7 +37,7 @@ version_check: true
 extract_libs: true
 
 # Execute command template
-# This is the code that will be executed with /pyex and /smc python execute
+# This is the code that will be executed with /jsex and /smc javascript execute
 # If a class is returned it will be instantiated and continued on as an object
 # If object is returned and has a method execute script engine will call
 # returnedObject.execute(sender: CommandSender, server: BukkitServer, servicesManager)

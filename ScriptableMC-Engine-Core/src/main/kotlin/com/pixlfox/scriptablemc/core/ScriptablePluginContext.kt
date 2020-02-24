@@ -29,6 +29,9 @@ abstract class ScriptablePluginContext: Listener {
     abstract val inventoryManager: InventoryManager
     abstract val pluginVersion: Version
 
+    var isEnabled: Boolean = false
+        internal set
+
     val server: Server
         get() = Bukkit.getServer()
 

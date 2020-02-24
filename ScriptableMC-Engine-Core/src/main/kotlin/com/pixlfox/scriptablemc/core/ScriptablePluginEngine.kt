@@ -68,7 +68,7 @@ abstract class ScriptablePluginEngine {
     open fun loadAllHelperClasses() {
         for(helperClass in preLoadClasses) {
             try {
-                javaClass.classLoader.loadClass(helperClass.replace("*", ""))
+                javaClass.classLoader.loadClass(if(helperClass.startsWith("*")) helperClass.substring(1) else helperClass)
             }
             catch (e: Exception) {
                 if(!helperClass.startsWith("*")) {
@@ -80,18 +80,35 @@ abstract class ScriptablePluginEngine {
     }
 
     open fun enableAllPlugins() {
-        for (pluginContext in scriptablePlugins) {
-            pluginContext.enable()
+        for (pluginContext in scriptablePlugins.filter { !it.isEnabled }) {
+            enablePlugin(pluginContext)
         }
         enabledAllPlugins = true
     }
 
+    open fun disableAllPlugins() {
+        for (pluginContext in scriptablePlugins.filter { it.isEnabled }) {
+            disablePlugin(pluginContext)
+        }
+        enabledAllPlugins = false
+    }
+
     open fun enablePlugin(pluginContext: ScriptablePluginContext) {
-        pluginContext.enable()
+        if(!pluginContext.isEnabled) {
+            pluginContext.enable()
+        }
+        else {
+            bootstrapPlugin.logger.warning("Trying to enable an already-enabled scriptable plugin context.")
+        }
     }
 
     open fun disablePlugin(pluginContext: ScriptablePluginContext) {
-        pluginContext.disable()
+        if(pluginContext.isEnabled) {
+            pluginContext.disable()
+        }
+        else {
+            bootstrapPlugin.logger.warning("Trying to disabled an already-disabled scriptable plugin context.")
+        }
     }
 
     open fun eval(source: Source): Value {

@@ -28,6 +28,7 @@ class PythonPluginContext(override val engine: ScriptablePluginEngine, override 
         }
 
         pluginInstance.invokeMember("onEnable")
+        isEnabled = true
     }
 
     override fun disable() {
@@ -43,6 +44,7 @@ class PythonPluginContext(override val engine: ScriptablePluginEngine, override 
         for(command in commands) {
             unregisterCommand(command)
         }
+        isEnabled = false
     }
 
     companion object {
