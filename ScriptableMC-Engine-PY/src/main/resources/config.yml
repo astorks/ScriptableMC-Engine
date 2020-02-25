@@ -3,6 +3,24 @@
 # Default: ./scripts
 root_scripts_folder: './scripts'
 
+# Script MIME type
+# .py text/x-python
+# .pyc application/x-python-code
+# Default: text/x-python
+script_mime_type: 'text/x-python'
+
+# Main script files
+# The main entry point python script files
+# Default: ${root_scripts_folder}/main.py
+main_script_files:
+  - '${root_scripts_folder}/main.py'
+
+# Auto-Enable all scriptable plugins after loading main scripts
+# If set to false you will have to manually enable all plugins
+# via engine.enableAllPlugins() after you have loaded all plugins
+# Default: true
+auto_enable_plugins: true
+
 # Prints some additional debugging messages
 # Default: false
 debug: false
@@ -18,6 +36,24 @@ version_check: true
 # Default: true
 extract_libs: true
 
+# Execute command template
+# This is the code that will be executed with /pyex and /smc python execute
+# If a class is returned it will be instantiated and continued on as an object
+# If object is returned and has a method execute script engine will call
+# returnedObject.execute(sender: CommandSender, server: BukkitServer, servicesManager)
+# as well as set returnedObject.sender, returnedObject.server, and returnedObject.servicesManager
+# you can also add additional methods, vars to the template source below
+# Otherwise the script engine will return last execute code
+# %SOURCE% will be replaced with with the command source.
+execute_command_template: "%SOURCE%"
+
+# Chrome debugger settings
+# **WARNING** THE DEBUGGER SHOULD NEVER BE ENABLED ON A PUBLIC SERVER
+# IT IS INTENDED ONLY FOR DEBUGGING THE SCRIPT ENGINE AND CAN BREAK/FREEZE YOUR WHOLE SERVER
+# Default: enabled: false, address: 127.0.0.1:9229, wait_attached: true
+# If enabled: true and wait_attached: true the whole minecraft server will freeze until the chrome debugger is attached
+# this is useful for debugging the script engine startup
+# To enable remote debugging set address: 0.0.0.0:9229
 debugger:
   enabled: false
   address: 127.0.0.1:9229

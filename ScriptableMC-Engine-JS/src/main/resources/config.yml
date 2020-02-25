@@ -3,6 +3,24 @@
 # Default: ./scripts
 root_scripts_folder: './scripts'
 
+# Script MIME type
+# ES2020 Module: application/javascript+module
+# Pure JavaScript: application/javascript
+# Default: application/javascript+module
+script_mime_type: 'application/javascript+module'
+
+# Main script files
+# The main entry point javascript files
+# Default: ${root_scripts_folder}/main.js
+main_script_files:
+  - '${root_scripts_folder}/main.js'
+
+# Auto-Enable all scriptable plugins after executing all main scripts
+# If set to false you will have to manually enable all plugins
+# via engine.enableAllPlugins() after you have loaded all plugins
+# Default: true
+auto_enable_plugins: true
+
 # Prints some additional debugging messages
 # Default: false
 debug: false
@@ -18,6 +36,48 @@ version_check: true
 # Default: true
 extract_libs: true
 
+# Execute command template
+# This is the code that will be executed with /jsex and /smc javascript execute
+# If a class is returned it will be instantiated and continued on as an object
+# If object is returned and has a method execute script engine will call
+# returnedObject.execute(sender: CommandSender, server: BukkitServer, servicesManager)
+# as well as set returnedObject.sender, returnedObject.server, and returnedObject.servicesManager
+# you can also add additional methods, vars to the template source below
+# Otherwise the script engine will return last execute code
+# %SOURCE% will be replaced with with the command source.
+execute_command_template: "
+import * as lib from './lib/global.js';
+
+new (class EvalCommandSenderContext {
+  execute(sender, server, servicesManager) {
+    %SOURCE%
+  }
+})()"
+
+common_js:
+  # Enable CommonJS `require()` support
+  # Allows the use of CommonJS NPM modules
+  # Default: true
+  enabled: true
+
+  # CommonJS modules path
+  # The default path to load CommonJS modules from.
+  # Default: ${root_scripts_folder}/node_modules
+  modules_path: '${root_scripts_folder}/node_modules'
+
+  # CommonJS globals file name
+  # The CommonJS globals file used to define global CommonJS values
+  # Relative to the `common_js.modules_path` folder
+  # Default: globals.js
+  globals_file: 'globals.js'
+
+# Chrome debugger settings
+# **WARNING** THE DEBUGGER SHOULD NEVER BE ENABLED ON A PUBLIC SERVER
+# IT IS INTENDED ONLY FOR DEBUGGING THE SCRIPT ENGINE AND CAN BREAK/FREEZE YOUR WHOLE SERVER
+# Default: enabled: false, address: 127.0.0.1:9229, wait_attached: true
+# If enabled: true and wait_attached: true the whole minecraft server will freeze until the chrome debugger is attached
+# this is useful for debugging the script engine startup
+# To enable remote debugging set address: 0.0.0.0:9229
 debugger:
   enabled: false
   address: 127.0.0.1:9229

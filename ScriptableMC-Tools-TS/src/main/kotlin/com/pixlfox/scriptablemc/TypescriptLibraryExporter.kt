@@ -5,16 +5,18 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
+import org.bukkit.plugin.PluginDescriptionFile
 import java.io.File
 import java.lang.reflect.*
 
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
-class TypescriptLibraryExporter {
+class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
     private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
     private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io|java\\.nio|khttp|org\\.apache\\.commons\\.io)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
+    private val isRelease: Boolean = args.contains("--release")
 
     private fun safeName(name: String): String = when {
         name.equals("function", true) -> "_function"
@@ -349,6 +351,18 @@ class TypescriptLibraryExporter {
         return this
     }
 
+    fun exportIndexLibrary(): TypescriptLibraryExporter {
+        val file = File("$basePath/ts/index.ts")
+        if(!file.exists()) {
+            file.parentFile.mkdirs()
+            file.createNewFile()
+            file.writeText(generateTypescriptGlobalExports())
+            println("Exported index.ts.")
+        }
+
+        return this
+    }
+
     fun copyStaticSources(): TypescriptLibraryExporter {
         File("./src/main/ts/").copyRecursively(File("$basePath/ts/"), true)
 
@@ -376,7 +390,8 @@ class TypescriptLibraryExporter {
                 "  \"version\": \"1.0.0\",\n" +
                 "  \"description\": \"Typescript plugin example and libraries for Minecraft 1.15\",\n" +
                 "  \"scripts\": {\n" +
-                "    \"compile\": \"npx tsc\"\n" +
+                "    \"compile\": \"npx tsc\",\n" +
+                "    \"compile_commonjs\": \"npx tsc -m commonjs --outDir ./commonjs\"\n" +
                 "  },\n" +
                 "  \"author\": \"Ashton Storks\",\n" +
                 "  \"license\": \"ISC\",\n" +
@@ -393,6 +408,66 @@ class TypescriptLibraryExporter {
         return this
     }
 
+    fun exportCommonJSProjectFiles(): TypescriptLibraryExporter {
+        File("$basePath/tsconfig.json").writeText("{\n" +
+                "    \"compilerOptions\": {\n" +
+                "        \"target\": \"es2019\",\n" +
+                "        \"module\": \"commonjs\",\n" +
+                "        \"sourceMap\": false,\n" +
+                "        \"allowJs\": true,\n" +
+                "        \"outDir\": \"js\",\n" +
+                "        \"rootDir\": \"ts\",\n" +
+                "        \"declaration\": true\n" +
+                "    },\n" +
+                "    \"include\": [\n" +
+                "        \"ts/**/*\"\n" +
+                "    ]\n" +
+                "}")
+
+        val pluginDescription = PluginDescriptionFile(File("../ScriptableMC-Engine-JS/src/main/resources/plugin.yml").inputStream())
+        val githubSha = System.getenv().getOrElse("GITHUB_SHA") { "" }
+        val githubTag = System.getenv().getOrElse("GITHUB_REF") { "" }
+
+        val isReleaseTag = githubTag.startsWith("refs/tags/v") && isRelease
+
+        val version = when {
+            isReleaseTag -> githubTag.substring(11)
+            isRelease && githubSha.isNullOrEmpty() -> pluginDescription.version
+            else -> "${pluginDescription.version}-dev-$githubSha"
+        }
+
+        if(isRelease) {
+            File("$basePath/.npmrc").writeText("//registry.npmjs.org/:_authToken=\${NPM_TOKEN}")
+        }
+        else {
+            File("$basePath/.npmrc").writeText("//npm.pkg.github.com/:_authToken=\${GITHUB_TOKEN}\n" +
+                    "registry=https://npm.pkg.github.com/astorks")
+        }
+
+        File("$basePath/package.json").writeText("{\n" +
+                "  \"name\": \"@astorks/lib-smc\",\n" +
+                "  \"repository\": \"git@github.com:astorks/ScriptableMC-Engine.git\",\n" +
+                "  \"version\": \"$version\",\n" +
+                "  \"description\": \"JavaScript CommonJS libraries for ScriptableMC\",\n" +
+                "  \"scripts\": {\n" +
+                "    \"compile\": \"npx tsc\",\n" +
+                "    \"postcompile\": \"cp ./package.json ./js/package.json && cp ./.npmrc ./js/.npmrc\"\n" +
+                "  },\n" +
+                "  \"author\": \"Ashton Storks\",\n" +
+                "  \"license\": \"ISC\",\n" +
+                "  \"bugs\": {\n" +
+                "    \"url\": \"https://github.com/astorks/ScriptableMC-TypeScript/issues\"\n" +
+                "  },\n" +
+                "  \"homepage\": \"https://github.com/astorks/ScriptableMC-TypeScript#readme\",\n" +
+                "  \"dependencies\": {},\n" +
+                "  \"devDependencies\": {\n" +
+                "    \"typescript\": \"^3.7.5\"\n" +
+                "  }\n" +
+                "}")
+
+        return this
+    }
+
     @Suppress("UNCHECKED_CAST")
     private fun generateTypescriptSource(_class: Class<*>): String {
         var source = "declare var Java: any;\n"
@@ -403,6 +478,7 @@ class TypescriptLibraryExporter {
 
         return source
     }
+
 
     private fun generateTypescriptImports(_class: Class<*>): String {
         var tsImportsSource = ""
@@ -666,14 +742,27 @@ class TypescriptLibraryExporter {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            TypescriptLibraryExporter()
-                .addHelperClasses()
-                .addBukkitClasses()
-                .clean()
-                .exportLibraries()
-                .exportGlobalLibrary()
-                .copyStaticSources()
-                .exportProjectFiles()
+            if(args.contains("--lib-smc")) {
+                TypescriptLibraryExporter(args)
+                    .basePath("./lib-smc")
+                    .addHelperClasses()
+                    .addBukkitClasses()
+                    .clean()
+                    .exportLibraries()
+                    .exportIndexLibrary()
+                    .copyStaticSources()
+                    .exportCommonJSProjectFiles()
+            }
+            else {
+                TypescriptLibraryExporter(args)
+                    .addHelperClasses()
+                    .addBukkitClasses()
+                    .clean()
+                    .exportLibraries()
+                    .exportGlobalLibrary()
+                    .copyStaticSources()
+                    .exportProjectFiles()
+            }
         }
     }
 }

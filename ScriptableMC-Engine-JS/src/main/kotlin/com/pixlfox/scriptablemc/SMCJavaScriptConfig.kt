@@ -2,27 +2,27 @@ package com.pixlfox.scriptablemc
 
 import org.bukkit.configuration.file.FileConfiguration
 
-class SMCJavaScriptConfig(private val config: FileConfiguration) {
-    val rootScriptsFolder: String
-        get() = config.getString("root_scripts_folder", "./scripts").orEmpty()
+class SMCJavaScriptConfig(config: FileConfiguration) : ScriptEngineConfig(config) {
+    override val mainScriptFiles: List<String>
+        get() = readConfigStringList("main_script_files", listOf("\${root_scripts_folder}/main.js"))
 
-    val debug: Boolean
-        get() = config.getBoolean("debug", false)
+    override val executeCommandTemplate: String
+        get() = readConfigString("execute_command_template", "import * as lib from './lib/global.js';\n" +
+                "new (class EvalCommandSenderContext {\n" +
+                "  execute(sender, server, servicesManager) {\n" +
+                "    %SOURCE%\n" +
+                "  }\n" +
+                "})()")
 
-    val extractLibs: Boolean
-        get() = config.getBoolean("extract_libs", true)
+    override val scriptMimeType: String
+        get() = readConfigString("script_mime_type", "application/javascript+module")
 
-    val debugger: SMCJavaScriptDebuggerConfig
-        get() = SMCJavaScriptDebuggerConfig(config)
-}
+    val commonJsModulesEnabled: Boolean
+        get() = readConfigBoolean("common_js.modules_enabled", true)
 
-class SMCJavaScriptDebuggerConfig(private val config: FileConfiguration) {
-    val enabled: Boolean
-        get() = config.getBoolean("debugger.enabled", false)
+    val commonJsModulesPath: String
+        get() = readConfigString("common_js.modules_path", "\${root_scripts_folder}/node_modules")
 
-    val address: String
-        get() = config.getString("debugger.address", "127.0.0.1:9229").orEmpty()
-
-    val waitAttached: Boolean
-        get() = config.getBoolean("debugger.wait_attached", true)
+    val commonJsGlobalsFile: String
+        get() = readConfigString("common_js.globals_file", "globals.js")
 }

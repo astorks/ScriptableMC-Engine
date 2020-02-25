@@ -2,27 +2,13 @@ package com.pixlfox.scriptablemc
 
 import org.bukkit.configuration.file.FileConfiguration
 
-class SMCPythonConfig(private val config: FileConfiguration) {
-    val rootScriptFolder: String
-        get() = config.getString("root_scripts_folder", "./scripts").orEmpty()
+class SMCPythonConfig(config: FileConfiguration) : ScriptEngineConfig(config) {
+    override val mainScriptFiles: List<String>
+        get() = readConfigStringList("main_script_files", listOf("\${root_scripts_folder}/main.py"))
 
-    val debug: Boolean
-        get() = config.getBoolean("debug", false)
+    override val executeCommandTemplate: String
+        get() = readConfigString("execute_command_template", "")
 
-    val extractLibs: Boolean
-        get() = config.getBoolean("extract_libs", true)
-
-    val debugger: SMCPythonDebuggerConfig
-        get() = SMCPythonDebuggerConfig(config)
-}
-
-class SMCPythonDebuggerConfig(private val config: FileConfiguration) {
-    val enabled: Boolean
-        get() = config.getBoolean("debugger.enabled", false)
-
-    val address: String
-        get() = config.getString("debugger.address", "127.0.0.1:9229").orEmpty()
-
-    val waitAttached: Boolean
-        get() = config.getBoolean("debugger.wait_attached", true)
+    override val scriptMimeType: String
+        get() = readConfigString("script_mime_type", "text/x-python")
 }

@@ -2,24 +2,22 @@ package com.pixlfox.scriptablemc.core
 
 import com.pixlfox.scriptablemc.SMCJavaScriptConfig
 import com.pixlfox.scriptablemc.ScriptEngineMain
-import com.pixlfox.scriptablemc.exceptions.ScriptNotFoundException
+import com.smc.exceptions.ScriptNotFoundException
 import com.pixlfox.scriptablemc.utils.UnzipUtility
 import fr.minuskube.inv.InventoryManager
-import org.bukkit.Bukkit
-import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
 import java.io.File
-import java.util.*
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, private val config: SMCJavaScriptConfig): ScriptablePluginEngine() {
+class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, override val config: SMCJavaScriptConfig): ScriptablePluginEngine() {
 
+    override val languageName: String = "js"
+    override val languageFileExtension: String = "js"
     override val debugEnabled: Boolean = config.debug
     override val graalContext: Context
     override val globalBindings: Value
     override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
     override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
-    private var enabledAllPlugins: Boolean = false
 
     init {
         if(config.extractLibs) {
@@ -34,7 +32,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
         }
 
         var contextBuilder = Context
-            .newBuilder("js")
+            .newBuilder(languageName)
             .allowAllAccess(true)
             .allowExperimentalOptions(true)
             .allowHostAccess(HostAccess.ALL)
@@ -43,17 +41,41 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
             .allowCreateThread(true)
             .option("js.ecmascript-version", "2020")
 
-        contextBuilder = contextBuilder
-            .option("js.commonjs-require", "true")
+        if(config.commonJsModulesEnabled) {
+            if(config.debug) {
+                bootstrapPlugin.logger.info("Enabling CommonJS support...")
+            }
 
-        if(File("${config.rootScriptsFolder}/node_modules/").exists()) {
-            contextBuilder = contextBuilder
-                .option("js.commonjs-require-cwd", "${config.rootScriptsFolder}/node_modules")
-        }
+            if (!File(config.commonJsModulesPath).exists()) {
+                if(config.debug) {
+                    bootstrapPlugin.logger.info("CommonJS creating modules folder: ${config.commonJsModulesPath}")
+                }
+                File(config.commonJsModulesPath).mkdirs()
+            }
+            else {
+                if(config.debug) {
+                    bootstrapPlugin.logger.info("CommonJS using modules folder: ${config.commonJsModulesPath}")
+                }
+            }
 
-        if(File("${config.rootScriptsFolder}/__globals__.js").exists()) {
             contextBuilder = contextBuilder
-                .option("js.commonjs-global-properties", "${config.rootScriptsFolder}/__globals__.js")
+                .option("js.commonjs-require", "true")
+                .option("js.commonjs-require-cwd", config.commonJsModulesPath)
+
+            if (File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).exists()) {
+                if(config.debug) {
+                    bootstrapPlugin.logger.info("CommonJS using globals: ${File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).path}")
+                }
+                contextBuilder = contextBuilder
+                    .option("js.commonjs-global-properties", config.commonJsGlobalsFile)
+            }
+            else {
+                if(config.debug) {
+                    bootstrapPlugin.logger.warning("CommonJS unable to read globals: ${File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).path}")
+                }
+            }
+
+            bootstrapPlugin.logger.info("CommonJS support enabled.")
         }
 
         if(config.debugger.enabled) {
@@ -67,120 +89,49 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
 
         graalContext = contextBuilder.build()
 
-        globalBindings = graalContext.getBindings("js")
+        globalBindings = graalContext.getBindings(languageName)
+    }
+
+    override fun loadMainScript(path: String) {
+        try {
+            val mainScriptFile = File(path)
+            if(!mainScriptFile.parentFile.exists()) {
+                mainScriptFile.parentFile.mkdirs()
+            }
+
+            if(mainScriptFile.exists()) {
+                val mainReturn = eval(
+                    Source.newBuilder(languageName, mainScriptFile)
+                        .name(mainScriptFile.name)
+                        .mimeType(config.scriptMimeType)
+                        .interactive(false)
+                        .build()
+                )
+
+                // Load all plugin types returned as an array
+                if(mainReturn.hasArrayElements()) {
+                    for (i in 0 until mainReturn.arraySize) {
+                        this.loadPlugin(mainReturn.getArrayElement(i))
+                    }
+                }
+            }
+            else {
+                throw ScriptNotFoundException(mainScriptFile)
+            }
+        }
+        catch(ex: Exception) {
+            startupErrors.add(ex)
+        }
     }
 
     override fun start() {
         instance = this
-        inventoryManager.init()
-        globalBindings.putMember("engine", this)
-
-        loadAllHelperClasses()
-
-        val mainScriptFile = File("${config.rootScriptsFolder}/main.js")
-        if(!mainScriptFile.parentFile.exists()) {
-            mainScriptFile.parentFile.mkdirs()
-        }
-
-        if(mainScriptFile.exists()) {
-            val mainReturn = eval(
-                Source.newBuilder("js", mainScriptFile)
-                    .name("main.js")
-                    .mimeType("application/javascript+module")
-                    .interactive(false)
-                    .build()
-            )
-
-            // Load all plugin types returned as an array
-            if(mainReturn.hasArrayElements()) {
-                for (i in 0 until mainReturn.arraySize) {
-                    this.loadPlugin(mainReturn.getArrayElement(i))
-                }
-
-                // Enable all plugins if not already enabled
-                if(!enabledAllPlugins) {
-                    enableAllPlugins()
-                }
-            }
-        }
-        else {
-            throw ScriptNotFoundException(mainScriptFile)
-        }
+        super.start()
     }
 
     override fun close() {
         instance = null
-        for(scriptablePlugin in scriptablePlugins) {
-            scriptablePlugin.disable()
-        }
-        scriptablePlugins.clear()
-
-        graalContext.close(true)
-    }
-
-    override fun evalFile(filePath: String): Value {
-        val scriptFile = File("${config.rootScriptsFolder}/$filePath")
-
-        return if(scriptFile.exists()) {
-            eval(
-                Source.newBuilder("js", scriptFile)
-                    .name(scriptFile.name)
-                    .mimeType("application/javascript+module")
-                    .interactive(false)
-                    .build()
-            )
-        } else {
-            throw ScriptNotFoundException(scriptFile)
-        }
-    }
-
-    override fun evalFile(scriptFile: File): Value {
-        return if(scriptFile.exists()) {
-            eval(
-                Source.newBuilder("js", scriptFile)
-                    .name(scriptFile.name)
-                    .mimeType("application/javascript+module")
-                    .interactive(false)
-                    .build()
-            )
-        } else {
-            throw ScriptNotFoundException(scriptFile)
-        }
-    }
-
-    override fun eval(source: String): Value {
-        return graalContext.eval(
-            Source.newBuilder("js", source,"${UUID.randomUUID()}.js")
-                .mimeType("application/javascript+module")
-                .interactive(false)
-                .cached(false)
-                .build()
-        )
-    }
-
-    override fun evalCommandSender(source: String, sender: CommandSender): Value {
-        val tempScriptFile = File("${config.rootScriptsFolder}/${UUID.randomUUID()}.js")
-        try {
-            tempScriptFile.writeText("import * as lib from './lib/global.js';\n" +
-                    "new (class EvalCommandSenderContext {\n" +
-                    "    run(sender, server, servicesManager) {\n" +
-                    "        $source\n" +
-                    "    }\n" +
-                    "})()\n")
-            val evalCommandSenderContext = evalFile(tempScriptFile)
-
-            evalCommandSenderContext.putMember("sender", sender)
-            evalCommandSenderContext.putMember("server", Bukkit.getServer())
-            evalCommandSenderContext.putMember("servicesManager", Bukkit.getServicesManager())
-            return evalCommandSenderContext.invokeMember("run", sender, Bukkit.getServer(), Bukkit.getServicesManager())
-        }
-        finally {
-            tempScriptFile.delete()
-        }
-    }
-
-    override fun eval(source: Source): Value {
-        return graalContext.eval(source)
+        super.close()
     }
 
     override fun loadPlugin(scriptableClass: Value): ScriptablePluginContext {
@@ -193,25 +144,8 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, pri
         return pluginContext
     }
 
-    override fun enableAllPlugins() {
-        for (pluginContext in scriptablePlugins) {
-            pluginContext.enable()
-        }
-        enabledAllPlugins = true
-    }
-
-    override fun enablePlugin(pluginContext: ScriptablePluginContext) {
-        pluginContext.enable()
-    }
-
-    override fun disablePlugin(pluginContext: ScriptablePluginContext) {
-        pluginContext.disable()
-    }
-
     companion object {
-        private var inst: JavaScriptPluginEngine? = null
-        var instance: JavaScriptPluginEngine?
-            internal set(value) { inst = value }
-            get() { return inst }
+        var instance: JavaScriptPluginEngine? = null
+            private set
     }
 }

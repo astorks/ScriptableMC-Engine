@@ -30,6 +30,18 @@ jobs:
         zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
         cd ../
         cp ./ScriptableMC-JavaScript-Lib.zip ../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
+    - name: Export lib-smc with gradle
+      run: ./gradlew :ScriptableMC-Tools-TS:generateLibSMCRelease
+    - name: Compile lib-smc, create archive, and publish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      run: |
+        cd ./ScriptableMC-Tools-TS/lib-smc/
+        npm install
+        npm run compile
+        npm publish ./js --access public
+        zip -r ./Lib-SMC.zip ./*
     - name: Build JS Engine with Gradle
       run: ./gradlew :shadowJarAll
     - name: Upload JavaScript Engine Plugin Jar
@@ -49,13 +61,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        args: 'ScriptableMC-Engine-JS-Bundled/build/libs/ScriptableMC-Engine-JS-Bundled.jar'
+        args: 'ScriptableMC-Engine-JS/Bundled/build/libs/ScriptableMC-Engine-JS-Bundled.jar'
     - name: Upload Bundled Python Engine Plugin Jar
       uses: skx/github-action-publish-binaries@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        args: 'ScriptableMC-Engine-PY-Bundled/build/libs/ScriptableMC-Engine-PY-Bundled.jar'
+        args: 'ScriptableMC-Engine-PY/Bundled/build/libs/ScriptableMC-Engine-PY-Bundled.jar'
     - name: Upload TypeScript Libraries
       uses: skx/github-action-publish-binaries@master
       env:

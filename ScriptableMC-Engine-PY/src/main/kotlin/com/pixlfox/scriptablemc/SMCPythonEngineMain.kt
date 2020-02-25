@@ -53,47 +53,50 @@ class SMCPythonEngineMain : ScriptEngineMain() {
             try {
                 scriptEngine = PythonPluginEngine(this, SMCPythonConfig(config))
                 scriptEngine!!.start()
-                logger.info("Python engine started.")
-                sender?.sendMessage("$chatMessagePrefix ${ChatColor.GREEN}Python engine started.")
-            } catch (e: IllegalStateException) {
-                if (e.message?.contains("Make sure the truffle-api.jar is on the classpath.", true) == true) {
-                    logger.warning("Python engine failed to start.")
-                    e.printStackTrace()
-                    logger.severe("Unable to find truffle-api.jar. This shouldn't happen since it's now packaged inside the plugin, you might want to check for an updated ScriptableMC Engine release.")
-                    logger.severe("ScriptableMC Engine Version: $pluginVersion")
-                    logger.severe("ScriptableMC-Engine Download Page: https://github.com/astorks/ScriptableMC-Engine/releases/latest")
 
-                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}Python engine failed to start. Check the server console.")
-                } else {
-                    logger.warning("Scriptable plugin engine failed to start.")
-                    e.printStackTrace()
+                if(scriptEngine!!.startupErrors.any()) {
+                    for(error in scriptEngine!!.startupErrors) {
+                        error.printStackTrace()
+                        if(sender != null) {
+                            sender.sendMessage("$chatMessagePrefix ${ChatColor.RED}$error")
+                            for (stackTrace in error.stackTrace.filter { it.fileName?.endsWith(".py") == true }) {
+                                sender.sendMessage("${ChatColor.RED}$stackTrace")
+                            }
+                        }
+                    }
 
-                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}Python engine failed to start. Check the server console.")
+                    logger.warning("Python engine started with errors.")
+                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.YELLOW}Python engine started with errors.")
                 }
-            } catch (e: Exception) {
-                logger.warning("Python engine failed to start.")
-                e.printStackTrace()
-
+                else {
+                    logger.info("Python engine started.")
+                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.GREEN}Python engine started.")
+                }
+            }
+            catch (error: Exception) {
+                error.printStackTrace()
                 if(sender != null) {
-                    sender.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}$e")
-                    for (stackTrace in e.stackTrace) {
-                        sender.sendMessage("${ChatColor.DARK_RED}$stackTrace")
+                    sender.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}$error")
+                    for (stackTrace in error.stackTrace) {
+                        sender.sendMessage("${ChatColor.RED}$stackTrace")
                     }
                 }
+
+                logger.severe("Python engine failed to start.")
+                sender?.sendMessage("$chatMessagePrefix ${ChatColor.DARK_RED}Python engine failed to start.")
             }
         }
     }
 
     override fun reloadScriptEngine(sender: CommandSender?) {
         unloadScriptEngine(sender)
+        saveDefaultConfig()
         reloadConfig()
         loadScriptEngine(sender)
     }
 
     companion object {
-        private var inst: SMCPythonEngineMain? = null
-        var instance: SMCPythonEngineMain
-            internal set(value) { inst = value }
-            get() { return inst!! }
+        var instance: SMCPythonEngineMain? = null
+            private set
     }
 }
