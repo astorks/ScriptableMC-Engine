@@ -22,6 +22,7 @@ abstract class ScriptEngineConfig(private val config: FileConfiguration) {
     val debugger: ScriptEngineDebuggerConfig
         get() = ScriptEngineDebuggerConfig(this)
 
+    @JvmOverloads
     fun readConfigString(path: String, def: String = ""): String {
         val input = config.getString(path, def).orEmpty()
         val regex = Regex("\\\$\\{(.*)}")
@@ -32,6 +33,7 @@ abstract class ScriptEngineConfig(private val config: FileConfiguration) {
         }
     }
 
+    @JvmOverloads
     fun readConfigStringList(path: String, def: List<String> = listOf()): List<String> {
         val inputList = config.getStringList(path)
         val regex = Regex("\\\$\\{(.*)}")
@@ -50,6 +52,7 @@ abstract class ScriptEngineConfig(private val config: FileConfiguration) {
         return inputList
     }
 
+    @JvmOverloads
     fun readConfigBoolean(path: String, def: Boolean = false): Boolean {
         return readConfigString(path, def.toString()).equals("true", true)
     }

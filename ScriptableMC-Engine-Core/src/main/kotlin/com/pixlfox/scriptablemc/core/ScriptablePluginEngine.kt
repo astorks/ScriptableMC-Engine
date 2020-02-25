@@ -32,9 +32,7 @@ abstract class ScriptablePluginEngine {
     var enabledAllPlugins: Boolean = false
         internal set
 
-    private val _startupErrors = mutableListOf<Exception>()
-    val startupErrors: Array<Exception>
-        get() = _startupErrors.toTypedArray()
+    val startupErrors: MutableList<Exception> = mutableListOf()
 
     open fun start() {
         inventoryManager.init()
@@ -43,12 +41,7 @@ abstract class ScriptablePluginEngine {
         loadAllHelperClasses()
 
         for(mainScriptFile in config.mainScriptFiles) {
-            try {
-                loadMainScript(mainScriptFile)
-            }
-            catch(ex: Exception) {
-                _startupErrors.add(ex)
-            }
+            loadMainScript(mainScriptFile)
         }
 
         if(!enabledAllPlugins && config.autoEnablePlugins) {

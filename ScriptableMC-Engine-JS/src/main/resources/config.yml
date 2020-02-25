@@ -67,14 +67,9 @@ common_js:
 
   # CommonJS globals file name
   # The CommonJS globals file used to define global CommonJS values
-  # Relative to the `common_js.modules_path` value
+  # Relative to the `common_js.modules_path` folder
   # Default: globals.js
   globals_file: 'globals.js'
-
-java_libraries:
-  - path: ""
-    preload_classes:
-      - ""
 
 # Chrome debugger settings
 # **WARNING** THE DEBUGGER SHOULD NEVER BE ENABLED ON A PUBLIC SERVER
