@@ -92,38 +92,6 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, ove
         globalBindings = graalContext.getBindings(languageName)
     }
 
-    override fun loadMainScript(path: String) {
-        try {
-            val mainScriptFile = File(path)
-            if(!mainScriptFile.parentFile.exists()) {
-                mainScriptFile.parentFile.mkdirs()
-            }
-
-            if(mainScriptFile.exists()) {
-                val mainReturn = eval(
-                    Source.newBuilder(languageName, mainScriptFile)
-                        .name(mainScriptFile.name)
-                        .mimeType(config.scriptMimeType)
-                        .interactive(false)
-                        .build()
-                )
-
-                // Load all plugin types returned as an array
-                if(mainReturn.hasArrayElements()) {
-                    for (i in 0 until mainReturn.arraySize) {
-                        this.loadPlugin(mainReturn.getArrayElement(i))
-                    }
-                }
-            }
-            else {
-                throw ScriptNotFoundException(mainScriptFile)
-            }
-        }
-        catch(ex: Exception) {
-            startupErrors.add(ex)
-        }
-    }
-
     override fun start() {
         instance = this
         super.start()
