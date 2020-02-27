@@ -56,5 +56,6 @@ tasks.jar {
 tasks.shadowJar {
     archiveFileName.set("ScriptableMC-Engine-JS-Bundled.jar")
     relocate("co.aikar.commands", "com.pixlfox.scriptablemc.acf")
+    relocate("de.tr7zw.changeme.nbtapi", "com.smc.nbtapi")
     mergeServiceFiles()
 }

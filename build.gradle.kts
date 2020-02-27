@@ -40,6 +40,10 @@ allprojects {
             name = "aikar-acf"
             url = uri("https://repo.aikar.co/content/groups/aikar/")
         }
+        maven {
+            name = "codemc-repo"
+            url = uri("https://repo.codemc.org/repository/maven-public/")
+        }
     }
 }
 

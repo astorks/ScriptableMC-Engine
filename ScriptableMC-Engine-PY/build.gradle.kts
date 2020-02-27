@@ -33,6 +33,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("commons-io:commons-io:2.6")
+    implementation("de.tr7zw:item-nbt-api:2.2.0")
 
     testImplementation("junit", "junit", "4.12")
 }
@@ -53,5 +54,6 @@ tasks.jar {
 tasks.shadowJar {
     archiveFileName.set("ScriptableMC-Engine-PY.jar")
     relocate("co.aikar.commands", "com.pixlfox.scriptablemc.acf")
+    relocate("de.tr7zw.changeme.nbtapi", "com.smc.nbtapi")
     mergeServiceFiles()
 }

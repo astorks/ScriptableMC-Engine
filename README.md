@@ -69,5 +69,6 @@ https://github.com/MinusKube/SmartInvs - Inventory helper library<br />
 https://github.com/lucko/helper - MinecraftVersions helper library<br />
 https://github.com/jkcclemens/khttp - HTTP helper library<br />
 https://github.com/aikar/commands - Built-in commands and auto-completion<br />
+https://github.com/tr7zw/Item-NBT-API - NBT helper library<br />
 https://github.com/apache/commons-io - FileUtils helper library<br />
 https://github.com/graalvm/graaljs - JavaScript engine

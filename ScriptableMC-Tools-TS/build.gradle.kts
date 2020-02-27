@@ -35,6 +35,7 @@ dependencies {
     implementation("com.beust:klaxon:5.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("commons-io:commons-io:2.6")
+    implementation("de.tr7zw:item-nbt-api:2.2.0")
 
     testImplementation("junit", "junit", "4.12")
 }
