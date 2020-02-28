@@ -749,7 +749,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         }
 
         for(_interface in _class.interfaces) {
-            if(_interface.name.startsWith("org.bukkit")) {
+            if(_interface.name.matches(allowedPackagesRegex)) {
                 interfaceNames.add(stripPackageName(_interface.name))
             }
         }
@@ -769,10 +769,10 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
     private fun getParameters(_method: Method): Array<String> {
         val parameterNames = mutableListOf<String>()
-        val paranames = paranamer.lookupParameterNames(_method, false)
+        val parameterNamesLookup = paranamer.lookupParameterNames(_method, false)
 
         for((index, _parameter) in _method.parameters.withIndex()) {
-            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
+            parameterNames.add("${safeName(parameterNamesLookup.getOrElse(index) { _parameter.name })}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
         }
 
         return parameterNames.toTypedArray()

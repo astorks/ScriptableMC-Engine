@@ -5,6 +5,7 @@ import com.pixlfox.scriptablemc.ScriptEngineMain
 import com.smc.exceptions.ScriptNotFoundException
 import com.pixlfox.scriptablemc.utils.UnzipUtility
 import fr.minuskube.inv.InventoryManager
+import org.bukkit.Material
 import org.graalvm.polyglot.*
 import java.io.File
 
@@ -105,7 +106,16 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, ove
     override fun loadPlugin(scriptableClass: Value): ScriptablePluginContext {
         val pluginInstance = scriptableClass.newInstance()
         val pluginName = pluginInstance.getMember("pluginName").asString()
-        val pluginContext = JavaScriptPluginContext.newInstance(pluginName, this, pluginInstance)
+        var pluginIcon = Material.STONE
+        if(pluginInstance.hasMember("pluginIcon")) {
+            try {
+                pluginIcon = pluginInstance.getMember("pluginIcon").`as`(Material::class.java)
+            }
+            catch(e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        val pluginContext = JavaScriptPluginContext.newInstance(pluginName, pluginIcon, this, pluginInstance)
         pluginInstance.putMember("context", pluginContext)
         scriptablePlugins.add(pluginContext)
         pluginContext.load()
