@@ -51,6 +51,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         name.equals("name", true) -> "_name"
         name.equals("<set-?>", true) -> "value"
         name.equals("in", true) -> "_in"
+        name.equals("with", true) -> "_with"
         else -> name
     }
 
