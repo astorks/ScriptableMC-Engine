@@ -21,8 +21,8 @@ dependencies {
     implementation(project(":ScriptableMC-Engine-PY"))
 
     // GraalVM SDK & GraalPython Engine
-    implementation("org.graalvm.sdk:graal-sdk:20.0.0")
-    implementation("org.graalvm.truffle:truffle-api:20.0.0")
+    implementation("org.graalvm.sdk:graal-sdk:20.1.0")
+    implementation("org.graalvm.truffle:truffle-api:20.1.0")
     implementation(files("libraries/graalpython.jar"))
     implementation(files("libraries/sulong-api.jar"))
     implementation(files("libraries/sulong.jar"))

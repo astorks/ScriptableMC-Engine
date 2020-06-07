@@ -143,6 +143,17 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
             ScriptEngineMain::class.java,
 
+            net.md_5.bungee.api.chat.BaseComponent::class.java,
+            net.md_5.bungee.api.chat.TextComponent::class.java,
+            net.md_5.bungee.api.chat.ComponentBuilder::class.java,
+            net.md_5.bungee.api.chat.ClickEvent::class.java,
+            net.md_5.bungee.api.chat.HoverEvent::class.java,
+            net.md_5.bungee.api.chat.KeybindComponent::class.java,
+            net.md_5.bungee.api.chat.ScoreComponent::class.java,
+            net.md_5.bungee.api.chat.SelectorComponent::class.java,
+            net.md_5.bungee.api.chat.TranslatableComponent::class.java,
+            net.md_5.bungee.api.chat.Keybinds::class.java,
+
             com.smc.utils.ItemBuilder::class.java,
             com.smc.utils.MysqlWrapper::class.java,
             com.smc.utils.Http::class.java,

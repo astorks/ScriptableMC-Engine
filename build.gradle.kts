@@ -52,22 +52,22 @@ tasks.register("shadowJarAll") {
 
     dependsOn(":ScriptableMC-Engine-JS:shadowJar")
     dependsOn(":ScriptableMC-Engine-JS:Bundled:shadowJar")
-    dependsOn(":ScriptableMC-Engine-PY:shadowJar")
-    dependsOn(":ScriptableMC-Engine-PY:Bundled:shadowJar")
+//    dependsOn(":ScriptableMC-Engine-PY:shadowJar")
+//    dependsOn(":ScriptableMC-Engine-PY:Bundled:shadowJar")
 
     doFirst {
         if(!file("./build").exists()) file("./build").mkdirs()
         if(file("./build/ScriptableMC-Engine-JS.jar").exists()) file("./build/ScriptableMC-Engine-JS.jar").delete()
         if(file("./build/ScriptableMC-Engine-JS-Bundled.jar").exists()) file("./build/ScriptableMC-Engine-JS-Bundled.jar").delete()
-        if(file("./build/ScriptableMC-Engine-PY.jar").exists()) file("./build/ScriptableMC-Engine-PY.jar").delete()
-        if(file("./build/ScriptableMC-Engine-PY-Bundled.jar").exists()) file("./build/ScriptableMC-Engine-PY-Bundled.jar").delete()
+//        if(file("./build/ScriptableMC-Engine-PY.jar").exists()) file("./build/ScriptableMC-Engine-PY.jar").delete()
+//        if(file("./build/ScriptableMC-Engine-PY-Bundled.jar").exists()) file("./build/ScriptableMC-Engine-PY-Bundled.jar").delete()
     }
 
     doLast {
         file("./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar").copyTo(file("./build/ScriptableMC-Engine-JS.jar"), overwrite = true)
         file("./ScriptableMC-Engine-JS/Bundled/build/libs/ScriptableMC-Engine-JS-Bundled.jar").copyTo(file("./build/ScriptableMC-Engine-JS-Bundled.jar"), overwrite = true)
-        file("./ScriptableMC-Engine-PY/build/libs/ScriptableMC-Engine-PY.jar").copyTo(file("./build/ScriptableMC-Engine-PY.jar"), overwrite = true)
-        file("./ScriptableMC-Engine-PY/Bundled/build/libs/ScriptableMC-Engine-PY-Bundled.jar").copyTo(file("./build/ScriptableMC-Engine-PY-Bundled.jar"), overwrite = true)
+//        file("./ScriptableMC-Engine-PY/build/libs/ScriptableMC-Engine-PY.jar").copyTo(file("./build/ScriptableMC-Engine-PY.jar"), overwrite = true)
+//        file("./ScriptableMC-Engine-PY/Bundled/build/libs/ScriptableMC-Engine-PY-Bundled.jar").copyTo(file("./build/ScriptableMC-Engine-PY-Bundled.jar"), overwrite = true)
     }
 
 }

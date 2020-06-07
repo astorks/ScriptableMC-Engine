@@ -21,12 +21,12 @@ dependencies {
     implementation(project(":ScriptableMC-Engine-JS"))
 
     // GraalVM SDK & GraalJS Engine
-    implementation("org.graalvm.sdk:graal-sdk:20.0.0")
-    implementation("org.graalvm.js:js:20.0.0")
-    implementation("org.graalvm.js:js-scriptengine:20.0.0")
-    implementation("org.graalvm.truffle:truffle-api:20.0.0")
-    implementation("org.graalvm.tools:chromeinspector:20.0.0")
-    implementation("org.graalvm.tools:profiler:20.0.0")
+    implementation("org.graalvm.sdk:graal-sdk:20.1.0")
+    implementation("org.graalvm.js:js:20.1.0")
+    implementation("org.graalvm.js:js-scriptengine:20.1.0")
+    implementation("org.graalvm.truffle:truffle-api:20.1.0")
+    implementation("org.graalvm.tools:chromeinspector:20.1.0")
+    implementation("org.graalvm.tools:profiler:20.1.0")
 
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")

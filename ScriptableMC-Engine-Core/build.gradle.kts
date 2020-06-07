@@ -18,8 +18,8 @@ idea {
 
 dependencies {
     // GraalVM SDK & GraalJS Engine
-    compileOnly("org.graalvm.sdk:graal-sdk:20.0.0")
-    compileOnly("org.graalvm.truffle:truffle-api:20.0.0")
+    compileOnly("org.graalvm.sdk:graal-sdk:20.1.0")
+    compileOnly("org.graalvm.truffle:truffle-api:20.1.0")
 
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
     compileOnly("org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT")
