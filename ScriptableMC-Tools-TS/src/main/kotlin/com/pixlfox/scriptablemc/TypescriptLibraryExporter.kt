@@ -18,6 +18,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
     private val isRelease: Boolean = args.contains("--release")
     private val packageWhitelist: MutableList<String> = mutableListOf(
         "org.bukkit",
+        "net.md_5.bungee.api",
         "com.pixlfox.scriptablemc",
         "com.smc",
         "fr.minuskube.inv",
@@ -336,7 +337,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             }
         }
 
-        val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
+        val blacklistRegex = Regex("(wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
         for (_field in _class.fields.filter { Modifier.isStatic(it.modifiers) &&Modifier.isPublic(it.modifiers) && !it.name.matches(blacklistRegex) }) {
                 val type = fixClass(_field.type)
                 if (!classList.contains(type) && type.name.matches(allowedPackagesRegex)) {
@@ -366,7 +367,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
         for ((packageName, classes) in classList.sortedBy { stripPackageName(it.name) }.groupBy { getPackageName(it.name) }) {
             for (_class in classes) {
-                if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+                if(_class.name.matches(allowedPackagesRegex)) {
                     count++
 
                     val file = File("$basePath/ts/${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
@@ -547,7 +548,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             val packageName = getPackageName(requiredClass.name)
 
             if(!stripPackageName(_class.name).equals(stripPackageName(requiredClass.name), true)) {
-                if (packageName.matches(allowedPackagesRegex) && !requiredClass.name.endsWith("\$Spigot")) {
+                if (packageName.matches(allowedPackagesRegex)) {
                     val scriptPathUri = File("$basePath/ts/${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js").absoluteFile.toURI()
                     val relativeScriptUri = packageFolderUri.relativize(scriptPathUri)
 
@@ -572,7 +573,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         var tsGlobalExportsSource = ""
 
         for (_class in classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
-            if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+            if(_class.name.matches(allowedPackagesRegex)) {
                 tsGlobalExportsSource += generateTypescriptImportForClass(_class)
             }
         }
@@ -580,7 +581,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         for((packageName, classes) in this.classList.sortedBy { safeClassName(stripPackageName(it.name)) }.groupBy { getPackageName(it.name) }) {
             tsGlobalExportsSource += "export namespace $packageName {\n"
             for (_class in classes) {
-                if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+                if(_class.name.matches(allowedPackagesRegex)) {
                     tsGlobalExportsSource += "\texport const ${safeClassName(stripPackageName(_class.name))} = ${getPackageName(_class.name).replace('.', '_')}_${safeClassName(stripPackageName(_class.name))};\n"
                 }
             }
@@ -594,7 +595,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         var tsGlobalExportsSource = ""
 
         for (_class in classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
-            if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+            if(_class.name.matches(allowedPackagesRegex)) {
                 tsGlobalExportsSource += generateTypescriptImportForClass(_class)
             }
         }
@@ -602,7 +603,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         for((packageName, classes) in this.classList.sortedBy { safeClassName(stripPackageName(it.name)) }.groupBy { getPackageName(it.name) }) {
             tsGlobalExportsSource += "export namespace Packages.$packageName {\n"
             for (_class in classes) {
-                if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+                if(_class.name.matches(allowedPackagesRegex)) {
                     tsGlobalExportsSource += "\texport const ${safeClassName(stripPackageName(_class.name))} = ${getPackageName(_class.name).replace('.', '_')}_${safeClassName(stripPackageName(_class.name))};\n"
                 }
             }
@@ -612,7 +613,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         tsGlobalExportsSource += "export declare const Java: JavaPolyglotInterface;\n"
         tsGlobalExportsSource += "export interface JavaPolyglotInterface {\n"
         for(_class in this.classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
-            if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+            if(_class.name.matches(allowedPackagesRegex)) {
                 tsGlobalExportsSource += "\ttype(className: \"${_class.name}\"): typeof Packages.${getPackageName(_class.name)}.${safeClassName(stripPackageName(_class.name))};\n"
             }
         }
@@ -635,7 +636,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
         tsInterfaceSource += " {\n"
 
-        val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|(.*?)\\\$(.*?))")
+        val blacklistRegex = Regex("(wait|equals|toString|hashCode|getClass|notify|notifyAll|(.*?)\\\$(.*?))")
         for (_method in _class.methods.sortedWith(compareBy({it.name}, {it.parameterCount}))) {
             if(!Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
                 methodCount++
@@ -674,7 +675,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         }
 
         val countMap = mutableMapOf<String, Int>()
-        val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
+        val blacklistRegex = Regex("(wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
         for (_field in _class.fields.sortedBy { it.name }) {
             var jsFieldName: String = _field.name
 
