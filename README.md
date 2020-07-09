@@ -5,7 +5,7 @@
 ![License](https://img.shields.io/github/license/astorks/ScriptableMC-Engine?style=for-the-badge)
 
 Run JavaScript/TypeScript plugins for Minecraft 1.15 using the GraalJS script engine.<br />
-Supported Minecraft Versions: Bukkit/Spigot/Paper 1.12, 1.13, 1.14, **1.15**<br />
+Supported Minecraft Versions: Bukkit/Spigot/Paper 1.13, 1.14, 1.15, **1.16**<br />
 Untested but should work: 1.8+
 
 **This plugin is in a preview state, there may be breaking changes, missing features, and possibly a few bugs.**<br >
