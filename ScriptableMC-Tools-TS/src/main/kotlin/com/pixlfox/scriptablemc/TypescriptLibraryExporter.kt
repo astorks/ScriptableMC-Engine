@@ -5,9 +5,11 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
+import org.bukkit.Server
 import org.bukkit.plugin.PluginDescriptionFile
 import java.io.File
 import java.lang.reflect.*
+import kotlin.reflect.jvm.jvmErasure
 
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
@@ -159,6 +161,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             com.smc.utils.ItemBuilder::class.java,
             com.smc.utils.MysqlWrapper::class.java,
             com.smc.utils.Http::class.java,
+            com.smc.utils.MinecraftCommand::class.java,
 
             com.smc.version.Version::class.java,
             com.smc.version.MinecraftVersions::class.java,
@@ -616,7 +619,6 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         var source = "declare var Java: any;\n"
         source += generateTypescriptImports(_class)
         source += generateTypescriptInterface(_class)
-
         source += if(_class.isEnum) generateTypescriptEnum(_class as Class<Enum<*>>) else generateTypescriptClass(_class)
 
         return source
@@ -932,6 +934,13 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
+            val test = Server::class
+            val testMembers = test.members
+
+            for (testMember in testMembers) {
+                println(testMember.returnType.jvmErasure.simpleName)
+            }
+
             if(args.contains("--lib-smc")) {
                 TypescriptLibraryExporter(args)
                     .basePath("./lib-smc")

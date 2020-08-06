@@ -34,7 +34,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("commons-io:commons-io:2.6")
     implementation("de.tr7zw:item-nbt-api:2.2.0")
-    implementation("dev.jorel:commandapi-core:3.4")
+    compileOnly("dev.jorel:commandapi-core:3.4")
 
     testImplementation("junit", "junit", "4.12")
 }

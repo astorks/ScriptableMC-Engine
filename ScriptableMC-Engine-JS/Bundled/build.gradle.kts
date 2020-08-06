@@ -36,6 +36,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("commons-io:commons-io:2.6")
+    compileOnly("dev.jorel:commandapi-core:3.4")
 
     testImplementation("junit", "junit", "4.12")
 }
