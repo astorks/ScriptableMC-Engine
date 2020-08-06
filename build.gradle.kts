@@ -1,6 +1,6 @@
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.3.61" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.3.72" apply false
     id("com.github.johnrengelman.shadow") version "5.2.0" apply false
     id("org.jetbrains.gradle.plugin.idea-ext") version "0.7" apply false
 }
@@ -43,6 +43,10 @@ allprojects {
         maven {
             name = "codemc-repo"
             url = uri("https://repo.codemc.org/repository/maven-public/")
+        }
+        maven {
+            name = "mccommandapi"
+            url = uri("https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/1.13CommandAPI/")
         }
     }
 }

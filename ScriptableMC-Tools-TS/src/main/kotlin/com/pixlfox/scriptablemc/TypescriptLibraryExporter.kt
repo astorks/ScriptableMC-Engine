@@ -28,7 +28,8 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         "java.nio",
         "khttp",
         "org.apache.commons.io",
-        "de.tr7zw"
+        "de.tr7zw",
+        "dev.jorel.commandapi"
     )
     private val packageRedirects: MutableMap<String, String> = mutableMapOf(
         "de.tr7zw.changeme" to "com.smc"
@@ -187,8 +188,79 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             de.tr7zw.changeme.nbtapi.NBTFile::class.java,
             de.tr7zw.changeme.nbtapi.NBTContainer::class.java,
 
+            dev.jorel.commandapi.CommandAPI::class.java,
+            dev.jorel.commandapi.CommandAPICommand::class.java,
+            dev.jorel.commandapi.CommandPermission::class.java,
+
+            dev.jorel.commandapi.arguments.Argument::class.java,
+            dev.jorel.commandapi.arguments.AdvancementArgument::class.java,
+            dev.jorel.commandapi.arguments.AxisArgument::class.java,
+            dev.jorel.commandapi.arguments.BiomeArgument::class.java,
+            dev.jorel.commandapi.arguments.BlockStateArgument::class.java,
+            dev.jorel.commandapi.arguments.BooleanArgument::class.java,
+            dev.jorel.commandapi.arguments.ChatArgument::class.java,
+            dev.jorel.commandapi.arguments.ChatColorArgument::class.java,
+            dev.jorel.commandapi.arguments.ChatComponentArgument::class.java,
+            dev.jorel.commandapi.arguments.CommandAPIArgumentType::class.java,
+            dev.jorel.commandapi.arguments.CustomArgument::class.java,
+            dev.jorel.commandapi.arguments.DoubleArgument::class.java,
+            dev.jorel.commandapi.arguments.EnchantmentArgument::class.java,
+            dev.jorel.commandapi.arguments.EntitySelectorArgument::class.java,
+            dev.jorel.commandapi.arguments.EnvironmentArgument::class.java,
+            dev.jorel.commandapi.arguments.EntityTypeArgument::class.java,
+            dev.jorel.commandapi.arguments.FloatArgument::class.java,
+            dev.jorel.commandapi.arguments.FloatRangeArgument::class.java,
+            dev.jorel.commandapi.arguments.FunctionArgument::class.java,
+            dev.jorel.commandapi.arguments.GreedyStringArgument::class.java,
+            dev.jorel.commandapi.arguments.IntegerArgument::class.java,
+            dev.jorel.commandapi.arguments.IntegerRangeArgument::class.java,
+            dev.jorel.commandapi.arguments.ItemStackArgument::class.java,
+            dev.jorel.commandapi.arguments.LiteralArgument::class.java,
+            dev.jorel.commandapi.arguments.Location2DArgument::class.java,
+            dev.jorel.commandapi.arguments.LocationArgument::class.java,
+            dev.jorel.commandapi.arguments.LocationType::class.java,
+            dev.jorel.commandapi.arguments.LongArgument::class.java,
+            dev.jorel.commandapi.arguments.LootTableArgument::class.java,
+            dev.jorel.commandapi.arguments.MathOperationArgument::class.java,
+            dev.jorel.commandapi.arguments.NBTCompoundArgument::class.java,
+            dev.jorel.commandapi.arguments.ObjectiveArgument::class.java,
+            dev.jorel.commandapi.arguments.ObjectiveCriteriaArgument::class.java,
+            dev.jorel.commandapi.arguments.ParticleArgument::class.java,
+            dev.jorel.commandapi.arguments.PlayerArgument::class.java,
+            dev.jorel.commandapi.arguments.PotionEffectArgument::class.java,
+            dev.jorel.commandapi.arguments.RecipeArgument::class.java,
+            dev.jorel.commandapi.arguments.RotationArgument::class.java,
+            dev.jorel.commandapi.arguments.ScoreHolderArgument::class.java,
+            dev.jorel.commandapi.arguments.ScoreboardSlotArgument::class.java,
+            dev.jorel.commandapi.arguments.SoundArgument::class.java,
+            dev.jorel.commandapi.arguments.StringArgument::class.java,
+            dev.jorel.commandapi.arguments.TeamArgument::class.java,
+            dev.jorel.commandapi.arguments.TextArgument::class.java,
+            dev.jorel.commandapi.arguments.TimeArgument::class.java,
+
             java.io.File::class.java
         )
+
+//        addClass("dev.jorel.commandapi", "CommandAPI")
+//        addClass("dev.jorel.commandapi", "CommandAPICommand")
+//        addClass("dev.jorel.commandapi", "CommandPermission")
+//
+//        // dev.jorel.commandapi.arguments.*
+//        addClasses("dev.jorel.commandapi.arguments", arrayOf(
+//            "Argument", "AdvancementArgument", "AxisArgument", "BiomeArgument",
+//            "BlockStateArgument", "BooleanArgument", "ChatArgument", "ChatColorArgument",
+//            "ChatComponentArgument", "CommandAPIArgumentType", "CustomArgument", "DoubleArgument",
+//            "EnchantmentArgument", "EntitySelectorArgument", "EnvironmentArgument",
+//            "EntityTypeArgument", "FloatArgument", "FloatRangeArgument", "FunctionArgument",
+//            "GreedyStringArgument", "IntegerArgument", "IntegerRangeArgument",
+//            "ItemStackArgument", "LiteralArgument", "Location2DArgument", "LocationArgument",
+//            "LocationType", "LongArgument", "LootTableArgument", "MathOperationArgument",
+//            "NBTCompoundArgument", "ObjectiveArgument", "ObjectiveCriteriaArgument",
+//            "ParticleArgument", "PlayerArgument", "PotionEffectArgument", "RecipeArgument",
+//            "RotationArgument", "ScoreHolderArgument", "ScoreboardSlotArgument", "SoundArgument",
+//            "StringArgument", "TeamArgument", "TextArgument", "TimeArgument"
+//        ))
+
         return this
     }
 
@@ -289,7 +361,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             val genericType = _method.genericReturnType
             val className = stripPackageName(returnType.name)
             if(className.equals("List", false) || className.equals("Collection", false)) {
-                if(genericType != null && genericType is ParameterizedType) {
+                if(genericType is ParameterizedType) {
                     val actualTypeArg = genericType.actualTypeArguments.firstOrNull()
                     if(actualTypeArg != null) {
                         when (actualTypeArg) {

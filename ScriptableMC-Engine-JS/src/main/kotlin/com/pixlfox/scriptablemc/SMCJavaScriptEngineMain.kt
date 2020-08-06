@@ -2,6 +2,9 @@ package com.pixlfox.scriptablemc
 
 import co.aikar.commands.PaperCommandManager
 import com.pixlfox.scriptablemc.core.JavaScriptPluginEngine
+import dev.jorel.commandapi.CommandAPI
+import dev.jorel.commandapi.CommandAPICommand
+import dev.jorel.commandapi.CommandPermission
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 
