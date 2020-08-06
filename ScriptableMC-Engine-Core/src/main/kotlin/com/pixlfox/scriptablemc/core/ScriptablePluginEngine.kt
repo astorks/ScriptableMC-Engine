@@ -104,6 +104,14 @@ abstract class ScriptablePluginEngine {
         }
     }
 
+    open fun getPluginInstance(name: String): Value? {
+        return getPluginInstance(scriptablePlugins.firstOrNull { it.pluginName == name })
+    }
+
+    open fun getPluginInstance(pluginContext: ScriptablePluginContext?): Value? {
+        return pluginContext?.pluginInstance
+    }
+
     open fun eval(source: Source): Value {
         return graalContext.eval(source)
     }
@@ -173,7 +181,38 @@ abstract class ScriptablePluginEngine {
         )
     }
 
-    abstract fun loadMainScript(path: String)
+    open fun loadMainScript(path: String) {
+        try {
+            val mainScriptFile = File(path)
+            if(!mainScriptFile.parentFile.exists()) {
+                mainScriptFile.parentFile.mkdirs()
+            }
+
+            if(mainScriptFile.exists()) {
+                val mainReturn = eval(
+                    Source.newBuilder(languageName, mainScriptFile)
+                        .name(mainScriptFile.name)
+                        .mimeType(config.scriptMimeType)
+                        .interactive(false)
+                        .build()
+                )
+
+                // Load all plugin types returned as an array
+                if(mainReturn.hasArrayElements()) {
+                    for (i in 0 until mainReturn.arraySize) {
+                        this.loadPlugin(mainReturn.getArrayElement(i))
+                    }
+                }
+            }
+            else {
+                throw ScriptNotFoundException(mainScriptFile)
+            }
+        }
+        catch(ex: Exception) {
+            startupErrors.add(ex)
+        }
+    }
+
     abstract fun loadPlugin(scriptableClass: Value): ScriptablePluginContext
 
     companion object {

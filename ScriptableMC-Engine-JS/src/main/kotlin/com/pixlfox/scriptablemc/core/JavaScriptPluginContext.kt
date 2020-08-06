@@ -2,12 +2,13 @@ package com.pixlfox.scriptablemc.core
 
 import com.smc.version.Version
 import fr.minuskube.inv.InventoryManager
+import org.bukkit.Material
 import org.bukkit.event.HandlerList
 import org.graalvm.polyglot.Value
 
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class JavaScriptPluginContext(override val engine: ScriptablePluginEngine, override val pluginName: String, override val pluginInstance: Value) : ScriptablePluginContext() {
+class JavaScriptPluginContext(override val engine: ScriptablePluginEngine, override val pluginName: String, override val pluginIcon: Material, override val pluginInstance: Value) : ScriptablePluginContext() {
     override val inventoryManager: InventoryManager
         get() = engine.inventoryManager
 
@@ -48,12 +49,12 @@ class JavaScriptPluginContext(override val engine: ScriptablePluginEngine, overr
     }
 
     companion object {
-        fun newInstance(pluginName: String, engine: ScriptablePluginEngine, pluginInstance: Value): ScriptablePluginContext {
+        fun newInstance(pluginName: String, pluginIcon: Material, engine: ScriptablePluginEngine, pluginInstance: Value): ScriptablePluginContext {
             if(engine.debugEnabled) {
                 engine.bootstrapPlugin.logger.info("[$pluginName] Creating new JavaScript plugin context.")
             }
 
-            return JavaScriptPluginContext(engine, pluginName, pluginInstance)
+            return JavaScriptPluginContext(engine, pluginName, pluginIcon, pluginInstance)
         }
     }
 }

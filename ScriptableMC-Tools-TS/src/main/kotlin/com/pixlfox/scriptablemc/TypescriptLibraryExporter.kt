@@ -14,9 +14,35 @@ import java.lang.reflect.*
 class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
     private var basePath: String = "./lib"
     private val classList = mutableListOf<Class<*>>()
-    private var allowedPackagesRegex: Regex = Regex("(org\\.bukkit|com\\.pixlfox|com\\.smc|fr\\.minuskube\\.inv|com\\.google|java\\.sql|java\\.io|java\\.nio|khttp|org\\.apache\\.commons\\.io)(.*)?")
     private val paranamer: Paranamer = BytecodeReadingParanamer()
     private val isRelease: Boolean = args.contains("--release")
+    private val packageWhitelist: MutableList<String> = mutableListOf(
+        "org.bukkit",
+        "net.md_5.bungee.api",
+        "com.pixlfox.scriptablemc",
+        "com.smc",
+        "fr.minuskube.inv",
+        "com.google",
+        "java.sql",
+        "java.io",
+        "java.nio",
+        "khttp",
+        "org.apache.commons.io",
+        "de.tr7zw"
+    )
+    private val packageRedirects: MutableMap<String, String> = mutableMapOf(
+        "de.tr7zw.changeme" to "com.smc"
+    )
+
+    private val allowedPackagesRegex: Regex
+    get() {
+        val fixedPackages: MutableList<String> = mutableListOf()
+        for(packageName in packageWhitelist) {
+            fixedPackages.add(packageName.replace(".", "\\."))
+        }
+
+        return Regex("(${fixedPackages.joinToString("|")})(.*)?")
+    }
 
     private fun safeName(name: String): String = when {
         name.equals("function", true) -> "_function"
@@ -25,6 +51,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         name.equals("name", true) -> "_name"
         name.equals("<set-?>", true) -> "value"
         name.equals("in", true) -> "_in"
+        name.equals("with", true) -> "_with"
         else -> name
     }
 
@@ -45,11 +72,28 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             return "Array<${javaClassToTypescript(_class.componentType)}>"
         }
 
-        if(className.equals("List", false)) {
+        if(className.equals("List", false) || className.equals("Collection", false)) {
             if(genericType != null && genericType is ParameterizedType) {
                 val actualTypeArg = genericType.actualTypeArguments.firstOrNull()
-                if(actualTypeArg != null && actualTypeArg is Class<*>) {
-                    return "Array<${javaClassToTypescript(actualTypeArg)}>"
+                if(actualTypeArg != null) {
+                    when (actualTypeArg) {
+                        is Class<*> -> {
+                            return "Array<${javaClassToTypescript(actualTypeArg)}>"
+                        }
+                        else -> {
+                            if(actualTypeArg.typeName.startsWith("? extends ")) {
+                                try {
+                                    val extendsClass = javaClass.classLoader.loadClass(actualTypeArg.typeName.substring(10))
+                                    return "Array<${javaClassToTypescript(extendsClass)}>"
+                                } catch(e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                            else {
+                                println("Unknown reflection type ${actualTypeArg.javaClass.name}, name: ${actualTypeArg.typeName}")
+                            }
+                        }
+                    }
                 }
             }
 
@@ -69,8 +113,18 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         else className
     }
 
-    fun allowPackages(regex: String): TypescriptLibraryExporter {
-        this.allowedPackagesRegex = Regex(regex)
+    fun addWhitelistPackage(packageName: String): TypescriptLibraryExporter {
+        packageWhitelist.add(packageName)
+        return this
+    }
+
+    fun removeWhitelistPackage(packageName: String): TypescriptLibraryExporter {
+        packageWhitelist.remove(packageName)
+        return this
+    }
+
+    fun clearWhitelistPackages(): TypescriptLibraryExporter {
+        packageWhitelist.clear()
         return this
     }
 
@@ -89,6 +143,17 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
             com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
             ScriptEngineMain::class.java,
+
+            net.md_5.bungee.api.chat.BaseComponent::class.java,
+            net.md_5.bungee.api.chat.TextComponent::class.java,
+            net.md_5.bungee.api.chat.ComponentBuilder::class.java,
+            net.md_5.bungee.api.chat.ClickEvent::class.java,
+            net.md_5.bungee.api.chat.HoverEvent::class.java,
+            net.md_5.bungee.api.chat.KeybindComponent::class.java,
+            net.md_5.bungee.api.chat.ScoreComponent::class.java,
+            net.md_5.bungee.api.chat.SelectorComponent::class.java,
+            net.md_5.bungee.api.chat.TranslatableComponent::class.java,
+            net.md_5.bungee.api.chat.Keybinds::class.java,
 
             com.smc.utils.ItemBuilder::class.java,
             com.smc.utils.MysqlWrapper::class.java,
@@ -116,6 +181,11 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             khttp.requests.Request::class.java,
             khttp.responses.GenericResponse::class.java,
             khttp.responses.Response::class.java,
+
+            de.tr7zw.changeme.nbtapi.NBTItem::class.java,
+            de.tr7zw.changeme.nbtapi.NBTEntity::class.java,
+            de.tr7zw.changeme.nbtapi.NBTFile::class.java,
+            de.tr7zw.changeme.nbtapi.NBTContainer::class.java,
 
             java.io.File::class.java
         )
@@ -207,7 +277,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         return this
     }
 
-    private fun buildClassList(_class: Class<*>): Array<Class<*>> {
+    private fun buildClassList(_class: Class<*>, ignoreWhitelist: Boolean = false): Array<Class<*>> {
         val classList = mutableListOf<Class<*>>()
 
         for (_method in _class.methods) {
@@ -217,12 +287,32 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             }
 
             val genericType = _method.genericReturnType
-            if(stripPackageName(returnType.name).equals("List", false)) {
+            val className = stripPackageName(returnType.name)
+            if(className.equals("List", false) || className.equals("Collection", false)) {
                 if(genericType != null && genericType is ParameterizedType) {
                     val actualTypeArg = genericType.actualTypeArguments.firstOrNull()
-                    if(actualTypeArg != null && actualTypeArg is Class<*>) {
-                        if (!classList.contains(actualTypeArg)) {
-                            classList.add(actualTypeArg)
+                    if(actualTypeArg != null) {
+                        when (actualTypeArg) {
+                            is Class<*> -> {
+                                if (!classList.contains(actualTypeArg)) {
+                                    classList.add(actualTypeArg)
+                                }
+                            }
+                            else -> {
+                                if(actualTypeArg.typeName.startsWith("? extends ")) {
+                                    try {
+                                        val extendsClass = javaClass.classLoader.loadClass(actualTypeArg.typeName.substring(10))
+                                        if (!classList.contains(extendsClass)) {
+                                            classList.add(extendsClass)
+                                        }
+                                    } catch(e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
+                                else {
+                                    println("Unknown reflection type ${actualTypeArg.javaClass.name}, name: ${actualTypeArg.typeName}")
+                                }
+                            }
                         }
                     }
                 }
@@ -259,7 +349,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             }
         }
 
-        val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
+        val blacklistRegex = Regex("(wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
         for (_field in _class.fields.filter { Modifier.isStatic(it.modifiers) &&Modifier.isPublic(it.modifiers) && !it.name.matches(blacklistRegex) }) {
                 val type = fixClass(_field.type)
                 if (!classList.contains(type) && type.name.matches(allowedPackagesRegex)) {
@@ -267,49 +357,18 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
                 }
         }
 
-        return classList.toTypedArray()
+        return if(ignoreWhitelist) {
+            classList.toTypedArray()
+        } else {
+            classList.filter { allowedPackagesRegex.matches(getPackageName(it.name)) }.toTypedArray()
+        }
     }
 
     private fun buildClassList(_classes: Array<out Class<*>>): Array<Class<*>> {
         val classList = mutableListOf<Class<*>>()
 
         for(_class in _classes) {
-            for (_method in _class.methods) {
-                val returnType = fixClass(_method.returnType)
-                if (!classList.contains(returnType)) {
-                    classList.add(returnType)
-                }
-
-                for (_parameter in _method.parameters) {
-                    val type = fixClass(_parameter.type)
-                    if (!classList.contains(type)) {
-                        classList.add(type)
-                    }
-                }
-            }
-
-            for (_constructor in _class.constructors) {
-                for (_parameter in _constructor.parameters) {
-                    val type = fixClass(_parameter.type)
-                    if (!classList.contains(type) && type.name.matches(allowedPackagesRegex)) {
-                        classList.add(type)
-                    }
-                }
-            }
-
-            for (_interface in _class.interfaces) {
-                if (!classList.contains(_interface)) {
-                    if (_interface.name.matches(allowedPackagesRegex)) {
-                        classList.add(_interface)
-                    }
-                }
-            }
-
-            if (_class.superclass != null && _class.superclass.name.matches(allowedPackagesRegex)) {
-                if (!classList.contains(_class.superclass)) {
-                    classList.add(_class.superclass)
-                }
-            }
+            classList.addAll(buildClassList(_class))
         }
 
         return classList.toTypedArray()
@@ -320,7 +379,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
         for ((packageName, classes) in classList.sortedBy { stripPackageName(it.name) }.groupBy { getPackageName(it.name) }) {
             for (_class in classes) {
-                if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+                if(_class.name.matches(allowedPackagesRegex)) {
                     count++
 
                     val file = File("$basePath/ts/${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
@@ -346,6 +405,18 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             file.createNewFile()
             file.writeText(generateTypescriptGlobalExports())
             println("Exported global.ts.")
+        }
+
+        return this
+    }
+
+    fun exportIndexDefinition(): TypescriptLibraryExporter {
+        val file = File("$basePath/ts/index.ts")
+        if(!file.exists()) {
+            file.parentFile.mkdirs()
+            file.createNewFile()
+            file.writeText(generateTypescriptIndexDefinition())
+            println("Exported index.ts.")
         }
 
         return this
@@ -482,16 +553,23 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
     private fun generateTypescriptImports(_class: Class<*>): String {
         var tsImportsSource = ""
+        val packageFolderUri = File("$basePath/ts/${getPackageName(_class.name).replace('.', '/')}").absoluteFile.toURI()
 
         val classList = buildClassList(_class)
         for(requiredClass in classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
             val packageName = getPackageName(requiredClass.name)
 
             if(!stripPackageName(_class.name).equals(stripPackageName(requiredClass.name), true)) {
-                if (packageName.matches(allowedPackagesRegex) && !requiredClass.name.endsWith("\$Spigot")) {
-                    val upDirCount = getPackageName(_class.name).split('.').count()
+                if (packageName.matches(allowedPackagesRegex)) {
+                    val scriptPathUri = File("$basePath/ts/${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js").absoluteFile.toURI()
+                    val relativeScriptUri = packageFolderUri.relativize(scriptPathUri)
 
-                    tsImportsSource += "import ${safeClassName(stripPackageName(requiredClass.name))} from '${"../".repeat(upDirCount)}${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js'\n"
+                    tsImportsSource += if(!relativeScriptUri.isAbsolute) {
+                        "import ${safeClassName(stripPackageName(requiredClass.name))} from './${relativeScriptUri.path}'\n"
+                    } else {
+                        val upDirCount = getPackageName(_class.name).split('.').count()
+                        "import ${safeClassName(stripPackageName(requiredClass.name))} from '${"../".repeat(upDirCount)}${getPackageName(requiredClass.name).replace('.', '/')}/${stripPackageName(requiredClass.name)}.js'\n"
+                    }
                 }
             }
         }
@@ -507,7 +585,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         var tsGlobalExportsSource = ""
 
         for (_class in classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
-            if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+            if(_class.name.matches(allowedPackagesRegex)) {
                 tsGlobalExportsSource += generateTypescriptImportForClass(_class)
             }
         }
@@ -515,12 +593,45 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         for((packageName, classes) in this.classList.sortedBy { safeClassName(stripPackageName(it.name)) }.groupBy { getPackageName(it.name) }) {
             tsGlobalExportsSource += "export namespace $packageName {\n"
             for (_class in classes) {
-                if(_class.name.matches(allowedPackagesRegex) && !_class.name.endsWith("\$Spigot")) {
+                if(_class.name.matches(allowedPackagesRegex)) {
                     tsGlobalExportsSource += "\texport const ${safeClassName(stripPackageName(_class.name))} = ${getPackageName(_class.name).replace('.', '_')}_${safeClassName(stripPackageName(_class.name))};\n"
                 }
             }
             tsGlobalExportsSource += "}\n"
         }
+
+        return tsGlobalExportsSource + "\n"
+    }
+
+    private fun generateTypescriptIndexDefinition(): String {
+        var tsGlobalExportsSource = ""
+
+        for (_class in classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
+            if(_class.name.matches(allowedPackagesRegex)) {
+                tsGlobalExportsSource += generateTypescriptImportForClass(_class)
+            }
+        }
+
+        for((packageName, classes) in this.classList.sortedBy { safeClassName(stripPackageName(it.name)) }.groupBy { getPackageName(it.name) }) {
+            tsGlobalExportsSource += "export namespace Packages.$packageName {\n"
+            for (_class in classes) {
+                if(_class.name.matches(allowedPackagesRegex)) {
+                    tsGlobalExportsSource += "\texport const ${safeClassName(stripPackageName(_class.name))} = ${getPackageName(_class.name).replace('.', '_')}_${safeClassName(stripPackageName(_class.name))};\n"
+                }
+            }
+            tsGlobalExportsSource += "}\n\n"
+        }
+
+        tsGlobalExportsSource += "export declare const Java: JavaPolyglotInterface;\n"
+        tsGlobalExportsSource += "export interface JavaPolyglotInterface {\n"
+        for(_class in this.classList.sortedBy { safeClassName(stripPackageName(it.name)) }) {
+            if(_class.name.matches(allowedPackagesRegex)) {
+                tsGlobalExportsSource += "\ttype(className: \"${_class.name}\"): typeof Packages.${getPackageName(_class.name)}.${safeClassName(stripPackageName(_class.name))};\n"
+            }
+        }
+        tsGlobalExportsSource += "\ttype(className: string): any;\n"
+        tsGlobalExportsSource += "}\n"
+
 
         return tsGlobalExportsSource + "\n"
     }
@@ -537,7 +648,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
         tsInterfaceSource += " {\n"
 
-        val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|(.*?)\\\$(.*?))")
+        val blacklistRegex = Regex("(wait|equals|toString|hashCode|getClass|notify|notifyAll|(.*?)\\\$(.*?))")
         for (_method in _class.methods.sortedWith(compareBy({it.name}, {it.parameterCount}))) {
             if(!Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
                 methodCount++
@@ -563,7 +674,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         var tsClassSource = "export default class $className {\n"
 
         tsClassSource += "\tpublic static get \$javaClass(): any {\n"
-        tsClassSource += "\t\treturn Java.type('${_class.name}');\n"
+        tsClassSource += "\t\treturn Java.type('${getPackageName(_class.name)}.${stripPackageName(_class.name)}');\n"
         tsClassSource += "\t}\n\n"
 
         for ((index, constructor) in _class.constructors.sortedBy { it.parameterCount }.withIndex()) {
@@ -576,7 +687,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         }
 
         val countMap = mutableMapOf<String, Int>()
-        val blacklistRegex = Regex("(spigot|wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
+        val blacklistRegex = Regex("(wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
         for (_field in _class.fields.sortedBy { it.name }) {
             var jsFieldName: String = _field.name
 
@@ -651,7 +762,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         }
 
         for(_interface in _class.interfaces) {
-            if(_interface.name.startsWith("org.bukkit")) {
+            if(_interface.name.matches(allowedPackagesRegex)) {
                 interfaceNames.add(stripPackageName(_interface.name))
             }
         }
@@ -671,10 +782,10 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
     private fun getParameters(_method: Method): Array<String> {
         val parameterNames = mutableListOf<String>()
-        val paranames = paranamer.lookupParameterNames(_method, false)
+        val parameterNamesLookup = paranamer.lookupParameterNames(_method, false)
 
         for((index, _parameter) in _method.parameters.withIndex()) {
-            parameterNames.add("${safeName(paranames.getOrElse(index) { _parameter.name })}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
+            parameterNames.add("${safeName(parameterNamesLookup.getOrElse(index) { _parameter.name })}: ${safeClassName(javaClassToTypescript(_parameter.type))}")
         }
 
         return parameterNames.toTypedArray()
@@ -712,7 +823,14 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             packages.remove(packages.last())
         }
 
-        return packages.joinToString(".")
+        val packageName = packages.joinToString(".")
+
+        for((oldPackageName, newPackageName) in packageRedirects) {
+            if(packageName.startsWith(oldPackageName))
+                return packageName.replace(oldPackageName, newPackageName)
+        }
+
+        return packageName
     }
 
     private fun fixClass(_class: Class<*>): Class<*> {

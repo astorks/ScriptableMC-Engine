@@ -50,24 +50,12 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: 'ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar'
-    - name: Upload Python Engine Plugin Jar
-      uses: skx/github-action-publish-binaries@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        args: 'ScriptableMC-Engine-PY/build/libs/ScriptableMC-Engine-PY.jar'
     - name: Upload Bundled JavaScript Engine Plugin Jar
       uses: skx/github-action-publish-binaries@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         args: 'ScriptableMC-Engine-JS/Bundled/build/libs/ScriptableMC-Engine-JS-Bundled.jar'
-    - name: Upload Bundled Python Engine Plugin Jar
-      uses: skx/github-action-publish-binaries@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        args: 'ScriptableMC-Engine-PY/Bundled/build/libs/ScriptableMC-Engine-PY-Bundled.jar'
     - name: Upload TypeScript Libraries
       uses: skx/github-action-publish-binaries@master
       env:

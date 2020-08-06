@@ -4,6 +4,7 @@ import com.smc.version.Version
 import fr.minuskube.inv.InventoryManager
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.Server
 import org.bukkit.command.CommandMap
@@ -28,6 +29,7 @@ abstract class ScriptablePluginContext: Listener {
     abstract val pluginInstance: Value
     abstract val inventoryManager: InventoryManager
     abstract val pluginVersion: Version
+    open val pluginIcon: Material = Material.STONE
 
     var isEnabled: Boolean = false
         internal set

@@ -7,14 +7,21 @@ import PluginMessageListenerRegistration from "./org/bukkit/plugin/messaging/Plu
 import OfflinePlayer from "./org/bukkit/OfflinePlayer.js";
 import MysqlWrapper from "./com/smc/utils/MysqlWrapper.js";
 import File from "./java/io/File.js";
+import ScriptablePluginEngine from "./com/pixlfox/scriptablemc/core/ScriptablePluginEngine.js";
+import ScriptEngineConfig from "./com/pixlfox/scriptablemc/ScriptEngineConfig.js";
 
 declare type Type<T> = { new (...args: any[]): T; };
+declare const engine: ScriptablePluginEngine;
 
 export default class JsPlugin {
     public context: ScriptablePluginContext;
 
     get pluginName(): string {
         return this.constructor.name;
+    }
+
+    get engineConfig(): ScriptEngineConfig {
+        return engine.getConfig();
     }
 
     get server(): Server {
@@ -67,6 +74,10 @@ export default class JsPlugin {
 
     setPlaceholders(player: (Player | OfflinePlayer), placeholderText: string): string {
         return this.context.setPlaceholders(player, placeholderText);
+    }
+
+    getPluginInstance<T>(pluginName: string): T {
+        return engine.getPluginInstance(pluginName);
     }
 
     onLoad(): void { console.log("[" + this.pluginName + "] onLoad()"); }
