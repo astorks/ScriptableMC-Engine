@@ -6,7 +6,7 @@
 
 Run JavaScript/TypeScript plugins for Minecraft 1.17 using the GraalJS script engine.<br />
 Supported Minecraft Versions: Bukkit/Spigot/Paper **1.17**<br />
-Previous Minecraft Versions: [Use v1.3.X version of the plugin](https://github.com/astorks/ScriptableMC-Engine/tree/v1.3.0) <br />
+Previous Minecraft Versions: [Use v1.3.X version of the plugin](https://github.com/astorks/ScriptableMC-Engine/tree/1.3.x) <br />
 
 #### New Version Numbering
 **We are switching to a new version numbering to match the supporting minecraft version.**<br />
