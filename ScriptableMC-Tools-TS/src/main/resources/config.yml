@@ -1,0 +1,26 @@
+# Root export folder
+# Example inside plugin folder: ./plugins/ScriptableMC/src
+# Default: ./plugins/ScriptableMC/src
+export_folder: './plugins/ScriptableMC/src'
+
+# Prints some additional debugging messages
+# Default: false
+debug: false
+
+# Package export whitelist
+package_whitelist:
+  - "org.bukkit"
+  - "net.md_5.bungee.api"
+  - "com.pixlfox.scriptablemc"
+  - "com.smc"
+  - "fr.minuskube.inv"
+  - "com.google"
+  - "java.sql"
+  - "java.io"
+  - "java.nio"
+  - "khttp"
+  - "org.apache.commons.io"
+  - "de.tr7zw"
+
+# Package export classes
+export_classes: []

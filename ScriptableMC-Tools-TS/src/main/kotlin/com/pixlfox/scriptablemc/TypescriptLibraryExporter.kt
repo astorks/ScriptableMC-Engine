@@ -5,11 +5,10 @@ import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
 import com.thoughtworks.paranamer.BytecodeReadingParanamer
 import com.thoughtworks.paranamer.Paranamer
-import org.bukkit.Server
 import org.bukkit.plugin.PluginDescriptionFile
+import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.lang.reflect.*
-import kotlin.reflect.jvm.jvmErasure
 
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
@@ -30,8 +29,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         "java.nio",
         "khttp",
         "org.apache.commons.io",
-        "de.tr7zw",
-        "dev.jorel.commandapi"
+        "de.tr7zw"
     )
     private val packageRedirects: MutableMap<String, String> = mutableMapOf(
         "de.tr7zw.changeme" to "com.smc"
@@ -161,7 +159,6 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             com.smc.utils.ItemBuilder::class.java,
             com.smc.utils.MysqlWrapper::class.java,
             com.smc.utils.Http::class.java,
-            com.smc.utils.MinecraftCommand::class.java,
 
             com.smc.version.Version::class.java,
             com.smc.version.MinecraftVersions::class.java,
@@ -191,78 +188,8 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
             de.tr7zw.changeme.nbtapi.NBTFile::class.java,
             de.tr7zw.changeme.nbtapi.NBTContainer::class.java,
 
-            dev.jorel.commandapi.CommandAPI::class.java,
-            dev.jorel.commandapi.CommandAPICommand::class.java,
-            dev.jorel.commandapi.CommandPermission::class.java,
-
-            dev.jorel.commandapi.arguments.Argument::class.java,
-            dev.jorel.commandapi.arguments.AdvancementArgument::class.java,
-            dev.jorel.commandapi.arguments.AxisArgument::class.java,
-            dev.jorel.commandapi.arguments.BiomeArgument::class.java,
-            dev.jorel.commandapi.arguments.BlockStateArgument::class.java,
-            dev.jorel.commandapi.arguments.BooleanArgument::class.java,
-            dev.jorel.commandapi.arguments.ChatArgument::class.java,
-            dev.jorel.commandapi.arguments.ChatColorArgument::class.java,
-            dev.jorel.commandapi.arguments.ChatComponentArgument::class.java,
-            dev.jorel.commandapi.arguments.CommandAPIArgumentType::class.java,
-            dev.jorel.commandapi.arguments.CustomArgument::class.java,
-            dev.jorel.commandapi.arguments.DoubleArgument::class.java,
-            dev.jorel.commandapi.arguments.EnchantmentArgument::class.java,
-            dev.jorel.commandapi.arguments.EntitySelectorArgument::class.java,
-            dev.jorel.commandapi.arguments.EnvironmentArgument::class.java,
-            dev.jorel.commandapi.arguments.EntityTypeArgument::class.java,
-            dev.jorel.commandapi.arguments.FloatArgument::class.java,
-            dev.jorel.commandapi.arguments.FloatRangeArgument::class.java,
-            dev.jorel.commandapi.arguments.FunctionArgument::class.java,
-            dev.jorel.commandapi.arguments.GreedyStringArgument::class.java,
-            dev.jorel.commandapi.arguments.IntegerArgument::class.java,
-            dev.jorel.commandapi.arguments.IntegerRangeArgument::class.java,
-            dev.jorel.commandapi.arguments.ItemStackArgument::class.java,
-            dev.jorel.commandapi.arguments.LiteralArgument::class.java,
-            dev.jorel.commandapi.arguments.Location2DArgument::class.java,
-            dev.jorel.commandapi.arguments.LocationArgument::class.java,
-            dev.jorel.commandapi.arguments.LocationType::class.java,
-            dev.jorel.commandapi.arguments.LongArgument::class.java,
-            dev.jorel.commandapi.arguments.LootTableArgument::class.java,
-            dev.jorel.commandapi.arguments.MathOperationArgument::class.java,
-            dev.jorel.commandapi.arguments.NBTCompoundArgument::class.java,
-            dev.jorel.commandapi.arguments.ObjectiveArgument::class.java,
-            dev.jorel.commandapi.arguments.ObjectiveCriteriaArgument::class.java,
-            dev.jorel.commandapi.arguments.ParticleArgument::class.java,
-            dev.jorel.commandapi.arguments.PlayerArgument::class.java,
-            dev.jorel.commandapi.arguments.PotionEffectArgument::class.java,
-            dev.jorel.commandapi.arguments.RecipeArgument::class.java,
-            dev.jorel.commandapi.arguments.RotationArgument::class.java,
-            dev.jorel.commandapi.arguments.ScoreHolderArgument::class.java,
-            dev.jorel.commandapi.arguments.ScoreboardSlotArgument::class.java,
-            dev.jorel.commandapi.arguments.SoundArgument::class.java,
-            dev.jorel.commandapi.arguments.StringArgument::class.java,
-            dev.jorel.commandapi.arguments.TeamArgument::class.java,
-            dev.jorel.commandapi.arguments.TextArgument::class.java,
-            dev.jorel.commandapi.arguments.TimeArgument::class.java,
-
             java.io.File::class.java
         )
-
-//        addClass("dev.jorel.commandapi", "CommandAPI")
-//        addClass("dev.jorel.commandapi", "CommandAPICommand")
-//        addClass("dev.jorel.commandapi", "CommandPermission")
-//
-//        // dev.jorel.commandapi.arguments.*
-//        addClasses("dev.jorel.commandapi.arguments", arrayOf(
-//            "Argument", "AdvancementArgument", "AxisArgument", "BiomeArgument",
-//            "BlockStateArgument", "BooleanArgument", "ChatArgument", "ChatColorArgument",
-//            "ChatComponentArgument", "CommandAPIArgumentType", "CustomArgument", "DoubleArgument",
-//            "EnchantmentArgument", "EntitySelectorArgument", "EnvironmentArgument",
-//            "EntityTypeArgument", "FloatArgument", "FloatRangeArgument", "FunctionArgument",
-//            "GreedyStringArgument", "IntegerArgument", "IntegerRangeArgument",
-//            "ItemStackArgument", "LiteralArgument", "Location2DArgument", "LocationArgument",
-//            "LocationType", "LongArgument", "LootTableArgument", "MathOperationArgument",
-//            "NBTCompoundArgument", "ObjectiveArgument", "ObjectiveCriteriaArgument",
-//            "ParticleArgument", "PlayerArgument", "PotionEffectArgument", "RecipeArgument",
-//            "RotationArgument", "ScoreHolderArgument", "ScoreboardSlotArgument", "SoundArgument",
-//            "StringArgument", "TeamArgument", "TextArgument", "TimeArgument"
-//        ))
 
         return this
     }
@@ -278,7 +205,28 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
                     val className = bukkitType.string("l")
 
                     try {
-                        this.addClass(classLoader.loadClass("$packageName.$className"))
+                        this.addAllClasses(classLoader.loadClass("$packageName.$className"))
+                    } catch (e: ClassNotFoundException) { }
+                }
+            }
+        }
+
+        return this
+    }
+
+    fun addBukkitClassesFromResource(plugin: JavaPlugin): TypescriptLibraryExporter {
+        val classLoader = javaClass.classLoader
+        val inputStream = plugin.getResource("type-search-index.json") ?: return this
+        val bukkitTypes = Parser.default().parse(inputStream)
+
+        if(bukkitTypes is JsonArray<*>) {
+            for (bukkitType in bukkitTypes) {
+                if(bukkitType is JsonObject) {
+                    val packageName = bukkitType.string("p")
+                    val className = bukkitType.string("l")
+
+                    try {
+                        this.addAllClasses(classLoader.loadClass("$packageName.$className"))
                     } catch (e: ClassNotFoundException) { }
                 }
             }
@@ -289,64 +237,20 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
     fun addClasses(vararg _classes: Class<*>): TypescriptLibraryExporter {
         for (_class in _classes) {
-            addClass(_class)
+            addAllClasses(_class)
         }
 
         return this
     }
 
-    fun addClass(_class: Class<*>): TypescriptLibraryExporter {
-        if (!_class.isArray) {
-            if (!classList.contains(_class) && _class.name.matches(allowedPackagesRegex)) {
-                classList.add(_class)
-            } else {
-                return this
-            }
+    fun addAllClasses(_class: Class<*>): TypescriptLibraryExporter {
+        if(!_class.name.matches(allowedPackagesRegex)) return this
+        if(classList.contains(_class)) return this
 
-            for (_method in _class.methods) {
-                val returnType = fixClass(_method.returnType)
-                if (returnType.name.matches(allowedPackagesRegex)) {
-                    addClass(returnType)
-                }
-
-                for (_parameter in _method.parameters) {
-                    val type = fixClass(_parameter.type)
-                    if (type.name.matches(allowedPackagesRegex)) {
-                        addClass(type)
-                    }
-                }
-            }
-
-            for (_field in _class.fields) {
-                val fieldType = fixClass(_field.type)
-                if (!fieldType.name.endsWith("\$Companion") && fieldType.name.matches(allowedPackagesRegex)) {
-                    addClass(fieldType)
-                }
-            }
-
-            for (_constructor in _class.constructors) {
-                for (_parameter in _constructor.parameters) {
-                    val type = fixClass(_parameter.type)
-                    if (type.name.matches(allowedPackagesRegex)) {
-                        addClass(type)
-                    }
-                }
-            }
-
-
-            for (_interface in _class.interfaces) {
-                if (!classList.contains(_interface)) {
-                    if (_interface.name.matches(allowedPackagesRegex)) {
-                        addClass(_interface)
-                    }
-                }
-            }
-
-            if (_class.superclass != null && _class.superclass.name.matches(allowedPackagesRegex)) {
-                if(!classList.contains(_class.superclass)) {
-                    addClass(_class.superclass)
-                }
-            }
+        classList.add(_class)
+        val cl = buildClassList(_class)
+        for (c in cl) {
+            addAllClasses(c)
         }
 
         return this
@@ -510,7 +414,12 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
     }
 
     fun copyStaticSources(): TypescriptLibraryExporter {
-        File("./src/main/ts/").copyRecursively(File("$basePath/ts/"), true)
+        if(File("./src/main/ts/").exists()) {
+            File("./src/main/ts/").copyRecursively(File("$basePath/ts/"), true)
+        }
+        else if(File("../src/main/ts/").exists()) {
+            File("../src/main/ts/").copyRecursively(File("$basePath/ts/"), true)
+        }
 
         return this
     }
@@ -570,7 +479,11 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
                 "    ]\n" +
                 "}")
 
-        val pluginDescription = PluginDescriptionFile(File("../ScriptableMC-Engine-JS/src/main/resources/plugin.yml").inputStream())
+        var pluginFile = File("../ScriptableMC-Engine-JS/src/main/resources/plugin.yml")
+        if(!pluginFile.exists())
+            pluginFile =  File("../../ScriptableMC-Engine-JS/src/main/resources/plugin.yml")
+
+        val pluginDescription = PluginDescriptionFile(pluginFile.inputStream())
         val githubSha = System.getenv().getOrElse("GITHUB_SHA") { "" }
         val githubTag = System.getenv().getOrElse("GITHUB_REF") { "" }
 
@@ -818,9 +731,35 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         tsEnumSource += "\t}\n\n"
 
         for (enumConstant in _class.enumConstants.sortedBy { it.name }) {
-            tsEnumSource += "\tpublic static get ${enumConstant.name}(): $enumName {\n"
+            tsEnumSource += "\tpublic static get ${safeName(enumConstant.name)}(): $enumName {\n"
             tsEnumSource += "\t\treturn this.\$javaClass.${enumConstant.name};\n"
             tsEnumSource += "\t}\n"
+        }
+
+        val countMap = mutableMapOf<String, Int>()
+        val blacklistRegex = Regex("(wait|equals|toString|hashCode|getClass|notify|notifyAll|Companion)")
+
+        for (_methodGroups in _class.methods.sortedWith(compareBy({it.name}, {it.parameterCount})).filter { e -> Modifier.isStatic(e.modifiers) && !Modifier.isPrivate(e.modifiers) }.groupBy { e -> e.name }) {
+
+            val jsMethodName: String = _methodGroups.key
+
+            for ((index, _method) in _methodGroups.value.withIndex()) {
+                if(!countMap.containsKey(_method.name)) {
+                    countMap[_method.name] = 0
+                }
+                else {
+                    countMap[_method.name] = (countMap[_method.name]!! + 1)
+                }
+
+                if(Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
+                    tsEnumSource += "\tpublic static ${safeName(jsMethodName)}(${getParameters(_method).joinToString(", ")}): ${javaClassToTypescript(_method.returnType, _method.genericReturnType)};\n"
+                    if(index == _methodGroups.value.size - 1) {
+                        tsEnumSource += "\tpublic static ${safeName(jsMethodName)}(...args: any[]): any {\n"
+                        tsEnumSource += "\t\treturn $enumName.\$javaClass.${_method.name}(...args);\n"
+                        tsEnumSource += "\t}\n\n"
+                    }
+                }
+            }
         }
 
         tsEnumSource += "}\n\n"
@@ -934,13 +873,6 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
-            val test = Server::class
-            val testMembers = test.members
-
-            for (testMember in testMembers) {
-                println(testMember.returnType.jvmErasure.simpleName)
-            }
-
             if(args.contains("--lib-smc")) {
                 TypescriptLibraryExporter(args)
                     .basePath("./lib-smc")

@@ -100,7 +100,7 @@ abstract class ScriptablePluginContext: Listener {
         val bukkitCommandMap = Bukkit.getServer().javaClass.getDeclaredField("commandMap")
         bukkitCommandMap.isAccessible = true
         val commandMap = bukkitCommandMap.get(Bukkit.getServer()) as CommandMap
-        commandMap.register(this.pluginName.toLowerCase(), command)
+        commandMap.register(this.pluginName.lowercase(), command)
         commands.add(command)
         bukkitCommandMap.isAccessible = false
     }

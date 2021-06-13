@@ -5,6 +5,8 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
 import co.aikar.commands.annotation.Syntax
+import com.smc.utils.Http
+import com.smc.version.Version
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.PolyglotException
@@ -15,8 +17,6 @@ import org.graalvm.polyglot.PolyglotException
 @Subcommand("javascript|js")
 class SMCJavaScriptEngineCommands(private val basePlugin: SMCJavaScriptEngineMain) : BaseCommand() {
 
-    private val stashMap: MutableMap<CommandSender, MutableList<String>> = mutableMapOf()
-
     @Subcommand("reload|rl")
     @CommandAlias("jsrl")
     @CommandPermission("scriptablemc.js.reload")
@@ -24,33 +24,17 @@ class SMCJavaScriptEngineCommands(private val basePlugin: SMCJavaScriptEngineMai
         basePlugin.reloadScriptEngine(sender)
     }
 
-    @Subcommand("stash|st")
-    @CommandAlias("jss")
-    @CommandPermission("scriptablemc.js.execute")
-    @Syntax("[code]")
-    fun stash(sender: CommandSender, code: String) {
-        val stashList = stashMap.getOrPut(sender, { mutableListOf() })
-        when {
-            code.equals("clear", true) -> {
-                stashList.clear()
-                sender.sendMessage("JavaScript stash cleared!")
-            }
-            else -> {
-                stashList.add(code)
-                for ((index, stashMessage) in stashList.withIndex()) {
-                    sender.sendMessage("[${index + 1}] $stashMessage")
-                }
-            }
+    @Subcommand("pastebin|pb")
+    @CommandAlias("jspb")
+    @CommandPermission("scriptablemc.js.execute.pastebin")
+    @Syntax("<code>")
+    fun executePastebin(sender: CommandSender, code: String) {
+        val response = khttp.get("https://pastebin.com/raw/$code")
+        if(response.statusCode == 200) {
+            executeCode(sender, response.text)
         }
-    }
-
-    @Subcommand("stash|st")
-    @CommandAlias("jss")
-    @CommandPermission("scriptablemc.js.execute")
-    fun stash(sender: CommandSender) {
-        val stashList = stashMap.getOrPut(sender, { mutableListOf() })
-        for ((index, stashMessage) in stashList.withIndex()) {
-            sender.sendMessage("[${index + 1}] $stashMessage")
+        else {
+            sender.sendMessage("${ChatColor.RED}Unable to load pastebin: $code, reason: STATUS_CODE ${response.statusCode}.")
         }
     }
 
@@ -59,57 +43,31 @@ class SMCJavaScriptEngineCommands(private val basePlugin: SMCJavaScriptEngineMai
     @CommandPermission("scriptablemc.js.execute")
     @Syntax("<code>")
     fun execute(sender: CommandSender, code: String) {
-        if(code.equals("stash", true)) {
-            val stashCode = stashMap.getOrPut(sender, { mutableListOf() }).joinToString("\n")
+        executeCode(sender, code)
+    }
 
-            try {
-                val response = basePlugin.scriptEngine!!.evalCommandSender(stashCode, sender)
-                if (!response.isNull) {
-                    sender.sendMessage(response.toString())
-                }
-            } catch (e: PolyglotException) {
-                e.printStackTrace()
+    private fun executeCode(sender: CommandSender, code: String) {
+        try {
+            val response = basePlugin.scriptEngine!!.evalCommandSender(code, sender)
+            if (!response.isNull) {
+                sender.sendMessage(response.toString())
+            }
+        } catch (e: PolyglotException) {
+            e.printStackTrace()
 
-                sender.sendMessage("${ChatColor.RED}$e")
-                for (stackTrace in e.stackTrace) {
-                    if (stackTrace.fileName?.endsWith(".js", true) == true) {
-                        sender.sendMessage("${ChatColor.YELLOW}$stackTrace")
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-
-                sender.sendMessage("${ChatColor.DARK_RED}$e")
-                for (stackTrace in e.stackTrace) {
-                    if (stackTrace.className.startsWith("com.pixlfox.scriptablemc", true)) {
-                        sender.sendMessage("${ChatColor.RED}$stackTrace")
-                    }
+            sender.sendMessage("${ChatColor.RED}$e")
+            for (stackTrace in e.stackTrace) {
+                if (stackTrace.fileName?.endsWith(".js", true) == true) {
+                    sender.sendMessage("${ChatColor.YELLOW}$stackTrace")
                 }
             }
-        }
-        else {
-            try {
-                val response = basePlugin.scriptEngine!!.evalCommandSender(code, sender)
-                if (!response.isNull) {
-                    sender.sendMessage(response.toString())
-                }
-            } catch (e: PolyglotException) {
-                e.printStackTrace()
+        } catch (e: Exception) {
+            e.printStackTrace()
 
-                sender.sendMessage("${ChatColor.RED}$e")
-                for (stackTrace in e.stackTrace) {
-                    if (stackTrace.fileName?.endsWith(".js", true) == true) {
-                        sender.sendMessage("${ChatColor.YELLOW}$stackTrace")
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-
-                sender.sendMessage("${ChatColor.DARK_RED}$e")
-                for (stackTrace in e.stackTrace) {
-                    if (stackTrace.className.startsWith("com.pixlfox.scriptablemc", true)) {
-                        sender.sendMessage("${ChatColor.RED}$stackTrace")
-                    }
+            sender.sendMessage("${ChatColor.DARK_RED}$e")
+            for (stackTrace in e.stackTrace) {
+                if (stackTrace.className.startsWith("com.pixlfox.scriptablemc", true)) {
+                    sender.sendMessage("${ChatColor.RED}$stackTrace")
                 }
             }
         }

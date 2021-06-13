@@ -1,17 +1,20 @@
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.3.72" apply false
-    id("com.github.johnrengelman.shadow") version "5.2.0" apply false
-    id("org.jetbrains.gradle.plugin.idea-ext") version "0.7" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.5.20-RC" apply false
+    id("com.github.johnrengelman.shadow") version "7.0.0" apply false
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.0" apply false
 }
+
+var smcVersion = findProperty("smc.version")!!
+var graalvmVersion = findProperty("graalvm.version")!!
+var spigotmcVersion = findProperty("spigotmc.version")!!
 
 allprojects {
     group = "com.pixlfox.scriptablemc"
-    version = "1.3.0"
+    version = smcVersion
 
     repositories {
         mavenCentral()
-        jcenter()
         maven {
             name = "JitPack"
             url = uri("https://jitpack.io")
@@ -34,7 +37,7 @@ allprojects {
         }
         maven {
             name = "placeholderapi"
-            url = uri("http://repo.extendedclip.com/content/repositories/placeholderapi/")
+            url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/")
         }
         maven {
             name = "aikar-acf"
@@ -44,10 +47,6 @@ allprojects {
             name = "codemc-repo"
             url = uri("https://repo.codemc.org/repository/maven-public/")
         }
-        maven {
-            name = "mccommandapi"
-            url = uri("https://raw.githubusercontent.com/JorelAli/1.13-Command-API/mvn-repo/1.13CommandAPI/")
-        }
     }
 }
 
@@ -56,22 +55,23 @@ tasks.register("shadowJarAll") {
 
     dependsOn(":ScriptableMC-Engine-JS:shadowJar")
     dependsOn(":ScriptableMC-Engine-JS:Bundled:shadowJar")
-//    dependsOn(":ScriptableMC-Engine-PY:shadowJar")
-//    dependsOn(":ScriptableMC-Engine-PY:Bundled:shadowJar")
+
+    dependsOn(":ScriptableMC-Tools-TS:shadowJar")
+    dependsOn(":ScriptableMC-Tools-TS:Standalone:shadowJar")
 
     doFirst {
         if(!file("./build").exists()) file("./build").mkdirs()
         if(file("./build/ScriptableMC-Engine-JS.jar").exists()) file("./build/ScriptableMC-Engine-JS.jar").delete()
         if(file("./build/ScriptableMC-Engine-JS-Bundled.jar").exists()) file("./build/ScriptableMC-Engine-JS-Bundled.jar").delete()
-//        if(file("./build/ScriptableMC-Engine-PY.jar").exists()) file("./build/ScriptableMC-Engine-PY.jar").delete()
-//        if(file("./build/ScriptableMC-Engine-PY-Bundled.jar").exists()) file("./build/ScriptableMC-Engine-PY-Bundled.jar").delete()
+        if(file("./build/ScriptableMC-Tools-TS.jar").exists()) file("./build/ScriptableMC-Tools-TS.jar").delete()
+        if(file("./build/ScriptableMC-Tools-TS-Standalone.jar").exists()) file("./build/ScriptableMC-Tools-TS-Standalone.jar").delete()
     }
 
     doLast {
         file("./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar").copyTo(file("./build/ScriptableMC-Engine-JS.jar"), overwrite = true)
         file("./ScriptableMC-Engine-JS/Bundled/build/libs/ScriptableMC-Engine-JS-Bundled.jar").copyTo(file("./build/ScriptableMC-Engine-JS-Bundled.jar"), overwrite = true)
-//        file("./ScriptableMC-Engine-PY/build/libs/ScriptableMC-Engine-PY.jar").copyTo(file("./build/ScriptableMC-Engine-PY.jar"), overwrite = true)
-//        file("./ScriptableMC-Engine-PY/Bundled/build/libs/ScriptableMC-Engine-PY-Bundled.jar").copyTo(file("./build/ScriptableMC-Engine-PY-Bundled.jar"), overwrite = true)
+        file("./ScriptableMC-Tools-TS/build/libs/ScriptableMC-Tools-TS.jar").copyTo(file("./build/ScriptableMC-Tools-TS.jar"), overwrite = true)
+        file("./ScriptableMC-Tools-TS/Standalone/build/libs/ScriptableMC-Tools-TS-Standalone.jar").copyTo(file("./build/ScriptableMC-Tools-TS-Standalone.jar"), overwrite = true)
     }
 
 }

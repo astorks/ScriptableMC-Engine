@@ -1,0 +1,7 @@
+name: ScriptableMC-Tools-TS
+description: 'ScriptableMC TypeScript tools'
+version: '1.17.0'
+api-version: '1.13'
+author: AStorks
+main: com.pixlfox.scriptablemc.SMCTypeScriptToolsMain
+softdepend: [PlaceholderAPI, CommandAPI]

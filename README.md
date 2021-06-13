@@ -4,9 +4,14 @@
 [![SpigotMC Resource](https://img.shields.io/badge/SpigotMC-Resource-yellow?style=for-the-badge)](https://www.spigotmc.org/resources/scriptablemc-engine.74690/)
 ![License](https://img.shields.io/github/license/astorks/ScriptableMC-Engine?style=for-the-badge)
 
-Run JavaScript/TypeScript plugins for Minecraft 1.15 using the GraalJS script engine.<br />
-Supported Minecraft Versions: Bukkit/Spigot/Paper 1.13, 1.14, 1.15, **1.16**<br />
-Untested but should work: 1.8+
+**New Version Numbering**<br />
+We are switching to a new version numbering to match the minecraft version.<br />
+New v1.17.X builds of this plugin will only work with Minecraft 1.17+<br />
+For Minecraft v1.12-1.16 you should use v1.3.X of this plugin.<br />
+
+Run JavaScript/TypeScript plugins for Minecraft 1.17 using the GraalJS script engine.<br />
+Supported Minecraft Versions: Bukkit/Spigot/Paper **1.17**<br />
+Previous Minecraft Versions: [Use v1.3.X version of the plugin](https://github.com/astorks/ScriptableMC-Engine/tree/v1.3.0) <br />
 
 **This plugin is in a preview state, there may be breaking changes, missing features, and possibly a few bugs.**<br >
 Feel free to create an issue if you find any missing features, bugs, or just have an idea for a great feature to add.

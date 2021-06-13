@@ -10,22 +10,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v2
+    - name: Set up Adopt OpenJDK 11
+      uses: actions/setup-java@v2
       with:
-        java-version: 1.8
-    - name: Set up Node.js 12.14.1
-      uses: actions/setup-node@v1
+        distribution: 'adopt'
+        java-version: '11'
+    - name: Set up Node.js v14
+      uses: actions/setup-node@v2
       with:
-        node-version: 12.14.1
+        node-version: '14'
     - name: Fix gradlew permissions
       run: chmod +x ./gradlew
     - name: Export TypeScript Libraries with Gradle
-      run: ./gradlew :ScriptableMC-Tools-TS:exportTypeScriptLibraries
+      run: ./gradlew :ScriptableMC-Tools-TS:Standalone:exportTypeScriptLibraries
     - name: Compile TypeScript libraries and create archives
       run: |
-        cd ./ScriptableMC-Tools-TS/lib/
+        cd ./ScriptableMC-Tools-TS/Standalone/lib/
         npm install
         npm run compile
         cd ./ts/
@@ -33,14 +34,14 @@ jobs:
         cd ../js/
         zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
         cd ../
-        cp ./ScriptableMC-JavaScript-Lib.zip ../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
+        cp ./ScriptableMC-JavaScript-Lib.zip ../../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
     - name: Export lib-smc with gradle
-      run: ./gradlew :ScriptableMC-Tools-TS:generateLibSMC
+      run: ./gradlew :ScriptableMC-Tools-TS:Standalone:generateLibSMC
     - name: Compile lib-smc, create archive, and publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        cd ./ScriptableMC-Tools-TS/lib-smc/
+        cd ./ScriptableMC-Tools-TS/Standalone/lib-smc/
         npm install
         npm run compile
         npm publish ./js
@@ -52,10 +53,12 @@ jobs:
         mkdir artifacts
         cp ./build/ScriptableMC-Engine-JS.jar ./artifacts/
         cp ./build/ScriptableMC-Engine-JS-Bundled.jar ./artifacts/
-        cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
-        cp ./ScriptableMC-Tools-TS/lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
-        cp ./ScriptableMC-Tools-TS/lib-smc/Lib-SMC.zip ./artifacts/
-    - uses: actions/upload-artifact@v1
+        cp ./build/ScriptableMC-Tools-TS.jar ./artifacts/
+        cp ./build/ScriptableMC-Tools-TS-Standalone.jar ./artifacts/
+        cp ./ScriptableMC-Tools-TS/Standalone/lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
+        cp ./ScriptableMC-Tools-TS/Standalone/lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
+        cp ./ScriptableMC-Tools-TS/Standalone/lib-smc/Lib-SMC.zip ./artifacts/
+    - uses: actions/upload-artifact@v2
       with:
         name: ScriptableMC-Engine-DEV
         path: artifacts/

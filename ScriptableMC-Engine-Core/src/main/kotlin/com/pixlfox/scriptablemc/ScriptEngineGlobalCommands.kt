@@ -30,7 +30,7 @@ class ScriptEngineGlobalCommands(private val basePlugin: ScriptEngineMain) : Bas
                     sender.sendMessage("${ChatColor.GREEN}GraalJS Version: ${scriptEngine?.eval("Graal.versionJS")}")
                 }
                 else {
-                    sender.sendMessage("- ${ChatColor.GREEN}GraalJS Engine Version: v20.1.0")
+                    sender.sendMessage("- ${ChatColor.GREEN}GraalJS Engine Version: v20.3.0")
                 }
                 sender.sendMessage("-----------------------------------------------------")
             }

@@ -22,18 +22,17 @@ idea {
 }
 
 dependencies {
-    implementation(project(":ScriptableMC-Engine-Core"))
-    implementation(project(":ScriptableMC-Engine-JS"))
+    implementation(project(":ScriptableMC-Tools-TS"))
 
     // GraalVM SDK & GraalJS Engine
-    compileOnly("org.graalvm.sdk:graal-sdk:$graalvmVersion")
-    compileOnly("org.graalvm.js:js:$graalvmVersion")
-    compileOnly("org.graalvm.js:js-scriptengine:$graalvmVersion")
-    compileOnly("org.graalvm.truffle:truffle-api:$graalvmVersion")
+    implementation("org.graalvm.sdk:graal-sdk:$graalvmVersion")
+    implementation("org.graalvm.js:js:$graalvmVersion")
+    implementation("org.graalvm.js:js-scriptengine:$graalvmVersion")
+    implementation("org.graalvm.truffle:truffle-api:$graalvmVersion")
 
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
-    compileOnly("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT")
-    compileOnly("net.md-5:bungeecord-api:1.17-R0.1-SNAPSHOT")
+    implementation("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT")
+    implementation("net.md-5:bungeecord-api:1.17-R0.1-SNAPSHOT")
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
     implementation("fr.minuskube.inv:smart-invs:1.2.7")
     implementation("me.clip:placeholderapi:2.10.9")
@@ -41,7 +40,7 @@ dependencies {
     implementation("com.beust:klaxon:5.5")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("commons-io:commons-io:2.6")
-    compileOnly("de.tr7zw:item-nbt-api:2.7.1")
+    implementation("de.tr7zw:item-nbt-api:2.7.1")
 
     testImplementation("junit", "junit", "4.12")
 }
@@ -59,6 +58,29 @@ tasks.jar {
 
 }
 
+tasks.register<JavaExec>("exportTypeScriptLibraries") {
+    dependsOn(":ScriptableMC-Tools-TS:Standalone:shadowJar")
+    group = "libraries"
+    main = "com.pixlfox.scriptablemc.TypescriptLibraryExporter"
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register<JavaExec>("generateLibSMC") {
+    dependsOn(":ScriptableMC-Tools-TS:Standalone:shadowJar")
+    group = "libraries"
+    main = "com.pixlfox.scriptablemc.TypescriptLibraryExporter"
+    args = mutableListOf("--lib-smc")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register<JavaExec>("generateLibSMCRelease") {
+    dependsOn(":ScriptableMC-Tools-TS:Standalone:shadowJar")
+    group = "libraries"
+    main = "com.pixlfox.scriptablemc.TypescriptLibraryExporter"
+    args = mutableListOf("--lib-smc", "--release")
+    classpath = sourceSets["main"].runtimeClasspath
+}
+
 tasks.shadowJar {
     println("---------------------------------------")
     println("- ScriptableMC Version: $smcVersion")
@@ -67,7 +89,7 @@ tasks.shadowJar {
     println("---------------------------------------")
     println("")
 
-    archiveFileName.set("ScriptableMC-Tools-TS.jar")
+    archiveFileName.set("ScriptableMC-Tools-TS-Standalone.jar")
     relocate("co.aikar.commands", "com.pixlfox.scriptablemc.acf")
     relocate("de.tr7zw.changeme.nbtapi", "com.smc.nbtapi")
     mergeServiceFiles()
