@@ -47,7 +47,6 @@ class SMCTypeScriptToolsCommands(private val basePlugin: SMCTypeScriptToolsMain)
             .clean()
             .exportLibraries()
             .exportGlobalLibrary()
-            .copyStaticSources()
             .exportProjectFiles()
     }
 

@@ -9,6 +9,8 @@ import org.bukkit.plugin.PluginDescriptionFile
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.lang.reflect.*
+import java.math.BigInteger
+import java.security.MessageDigest
 
 
 @Suppress("MemberVisibilityCanBePrivate", "UnstableApiUsage", "unused")
@@ -139,6 +141,11 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         return this
     }
 
+    fun printSize(): TypescriptLibraryExporter {
+        println("ClassList Size: ${classList.size}")
+        return this
+    }
+
     fun addHelperClasses(): TypescriptLibraryExporter {
         addClasses(
             com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
@@ -196,7 +203,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
     fun addBukkitClasses(): TypescriptLibraryExporter {
         val classLoader = javaClass.classLoader
-        val bukkitTypes = Parser.default().parse("./type-search-index.json")
+        val bukkitTypes = Parser.default().parse("spigot-type-search-index.json")
 
         if(bukkitTypes is JsonArray<*>) {
             for (bukkitType in bukkitTypes) {
@@ -216,7 +223,7 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
 
     fun addBukkitClassesFromResource(plugin: JavaPlugin): TypescriptLibraryExporter {
         val classLoader = javaClass.classLoader
-        val inputStream = plugin.getResource("type-search-index.json") ?: return this
+        val inputStream = plugin.getResource("spigot-type-search-index.json") ?: return this
         val bukkitTypes = Parser.default().parse(inputStream)
 
         if(bukkitTypes is JsonArray<*>) {
@@ -366,6 +373,52 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
                         file.parentFile.mkdirs()
                         file.createNewFile()
                         file.writeText(generateTypescriptSource(_class))
+                        println("Exported $packageName.${stripPackageName(_class.name)} -> ${file.path}.")
+                    }
+                }
+            }
+        }
+
+        println("Successfully generated $count class libraries.")
+
+        return this
+    }
+
+    private fun sha256(input: String): String {
+        val md = MessageDigest.getInstance("SHA-256")
+        return BigInteger(1, md.digest(input.toByteArray())).toString(16).padStart(32, '0')
+    }
+
+    fun exportLibrariesHashed(): TypescriptLibraryExporter {
+        var count = 0
+
+        for ((packageName, classes) in classList.sortedBy { stripPackageName(it.name) }.groupBy { getPackageName(it.name) }) {
+            for (_class in classes) {
+                if(_class.name.matches(allowedPackagesRegex)) {
+
+                    val newSource = generateTypescriptSource(_class)
+
+                    var fileUpdate = false
+                    val file = File("$basePath/ts/${getPackageName(_class.name).replace('.', '/')}/${stripPackageName(_class.name)}.ts")
+                    if(!file.exists()) {
+                        fileUpdate = true
+                    }
+                    else {
+                        val oldSource = file.readText()
+                        if(sha256(oldSource) != sha256(newSource)) {
+                            fileUpdate = true
+                        }
+                    }
+
+                    if(fileUpdate) {
+                        if(file.exists()) {
+                            file.delete()
+                        }
+
+                        count++
+                        file.parentFile.mkdirs()
+                        file.createNewFile()
+                        file.writeText(newSource)
                         println("Exported $packageName.${stripPackageName(_class.name)} -> ${file.path}.")
                     }
                 }
@@ -636,6 +689,8 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         tsInterfaceSource += " {\n"
 
         val blacklistRegex = Regex("(wait|equals|toString|hashCode|getClass|notify|notifyAll|(.*?)\\\$(.*?))")
+
+        // TODO: Better sorting of methods to prevent changes every export
         for (_method in _class.methods.sortedWith(compareBy({it.name}, {it.parameterCount}))) {
             if(!Modifier.isStatic(_method.modifiers) && Modifier.isPublic(_method.modifiers) && !_method.name.matches(blacklistRegex)) {
                 methodCount++
@@ -873,13 +928,15 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
     companion object {
         @JvmStatic
         fun main(args: Array<String>) {
+
+            // TODO: Editable configuration file and dynamic jar loading
+
             if(args.contains("--lib-smc")) {
                 TypescriptLibraryExporter(args)
                     .basePath("./lib-smc")
                     .addHelperClasses()
                     .addBukkitClasses()
-                    .clean()
-                    .exportLibraries()
+                    .exportLibrariesHashed()
                     .exportIndexLibrary()
                     .copyStaticSources()
                     .exportCommonJSProjectFiles()
@@ -888,11 +945,11 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
                 TypescriptLibraryExporter(args)
                     .addHelperClasses()
                     .addBukkitClasses()
-                    .clean()
-                    .exportLibraries()
-                    .exportGlobalLibrary()
-                    .copyStaticSources()
-                    .exportProjectFiles()
+                    .printSize()
+//                    .exportLibrariesHashed()
+//                    .exportGlobalLibrary()
+//                    .copyStaticSources()
+//                    .exportProjectFiles()
             }
         }
     }

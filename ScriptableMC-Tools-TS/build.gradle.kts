@@ -40,6 +40,7 @@ dependencies {
     implementation("com.thoughtworks.paranamer:paranamer:2.8")
     implementation("com.beust:klaxon:5.5")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("commons-io:commons-io:2.6")
     compileOnly("de.tr7zw:item-nbt-api:2.7.1")
 

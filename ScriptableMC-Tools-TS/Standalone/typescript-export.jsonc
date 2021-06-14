@@ -1,0 +1,114 @@
+{
+    // The base export folder, this is where the generated TypeScript will be stored.
+    "exportFilder": "./lib/",
+
+    // The base plugin folder, the tools will load and plugins or api jars from this folder.
+    "pluginsFolder": "./plugins/",
+
+    // You can add additional packages to this list however be sure to add any classes
+    // you want to the defaultClasses list or add a type search index file this is just
+    // the package whitelist that decides what packages are allowed to be exported.
+    "packageWhitelist": [
+        "org.bukkit",
+        "net.md_5.bungee.api",
+        "com.pixlfox.scriptablemc",
+        "com.smc",
+        "fr.minuskube.inv",
+        "com.google",
+        "java.sql",
+        "java.io",
+        "khttp",
+        "org.apache.commons.io",
+        "de.tr7zw"
+    ],
+
+    // This is mainly for internal packages that are relocated via shadow you probably won't
+    // need to mess with this and you can comment/remove the field to use defaults.
+    "packageRedirects": [
+        { "from": "de.tr7zw.changeme", "to": "com.smc" }
+    ],
+
+
+    // This is used to rename methods/parameters/fields to be TypeScript safe.
+    // You can add any additional safe names to this list or comment/remove the field
+    // to use defaults.
+    "safeNames": [
+        { "from": "function", "to": "_function" },
+        { "from": "yield", "to": "_yield" },
+        { "from": "arguments", "to": "_arguments" },
+        { "from": "name", "to": "_name" },
+        { "from": "<set-?>", "to": "value" },
+        { "from": "in", "to": "_in" },
+        { "from": "with", "to": "_with" }
+    ],
+
+    // This is used to rename classes to be TypeScript safe.
+    // You can add any additional safe class names to this list or comment/remove the field
+    // to use defaults.
+    "safeClassNames": [
+        { "from": "Array", "to": "_Array" }
+    ],
+
+    // This is the default class list to search and build our class list from.
+    // The object format is the same as the individual type search index files below
+    // { 
+    //     "p": "Package Name", // or "package": "Package Name",
+    //     "l": "Class Name", // or "c": "Class Name", // or "class": "Class Name"
+    // }
+    // You can add additional classes to this list just make sure the jar file is placed in
+    // the plugins folder so it can be loaded by the class loader.
+    "defaultClasses": [
+        {"p": "com.pixlfox.scriptablemc.core", "l": "ScriptablePluginContext"},
+        {"p": "com.pixlfox.scriptablemc.core", "l": "ScriptablePluginEngine"},
+        {"p": "com.pixlfox.scriptablemc.core", "l": "ScriptEngineMain"},
+
+        {"p": "net.md_5.bungee.api.chat", "l": "BaseComponent"},
+        {"p": "net.md_5.bungee.api.chat", "l": "TextComponent"},
+        {"p": "net.md_5.bungee.api.chat", "l": "ComponentBuilder"},
+        {"p": "net.md_5.bungee.api.chat", "l": "ClickEvent"},
+        {"p": "net.md_5.bungee.api.chat", "l": "HoverEvent"},
+        {"p": "net.md_5.bungee.api.chat", "l": "KeybindComponent"},
+        {"p": "net.md_5.bungee.api.chat", "l": "ScoreComponent"},
+        {"p": "net.md_5.bungee.api.chat", "l": "SelectorComponent"},
+        {"p": "net.md_5.bungee.api.chat", "l": "TranslatableComponent"},
+        {"p": "net.md_5.bungee.api.chat", "l": "Keybinds"},
+
+        {"p": "com.smc.utils", "l": "ItemBuilder"},
+        {"p": "com.smc.utils", "l": "MysqlWrapper"},
+        {"p": "com.smc.utils", "l": "Http"},
+        {"p": "com.smc.version", "l": "Version"},
+        {"p": "com.smc.version", "l": "MinecraftVersions"},
+        {"p": "fr.minuskube.inv", "l": "SmartInventory"},
+        {"p": "com.smc.smartinvs", "l": "SmartInventoryProvider"},
+        {"p": "com.smc.smartinvs", "l": "SmartInventory"},
+
+        {"p": "org.apache.commons.io", "l": "FileUtils"},
+        {"p": "com.google.common.io", "l": "ByteStreams"},
+        {"p": "khttp.structures.files", "l": "FileLike"},
+        {"p": "khttp.structures.authorization", "l": "Authorization"},
+        {"p": "khttp.structures.authorization", "l": "BasicAuthorization"},
+        {"p": "khttp.structures.cookie", "l": "Cookie"},
+        {"p": "khttp.structures.cookie", "l": "CookieJar"},
+        {"p": "khttp.structures.maps", "l": "CaseInsensitiveMap"},
+        {"p": "khttp.structures.parameters", "l": "Parameters"},
+        {"p": "khttp.requests", "l": "GenericRequest"},
+        {"p": "khttp.requests", "l": "Request"},
+        {"p": "khttp.responses", "l": "GenericResponse"},
+        {"p": "khttp.responses", "l": "Response"},
+        
+        {"p": "de.tr7zw.changeme.nbtapi", "l": "NBTItem"},
+        {"p": "de.tr7zw.changeme.nbtapi", "l": "NBTEntity"},
+        {"p": "de.tr7zw.changeme.nbtapi", "l": "NBTFile"},
+        {"p": "de.tr7zw.changeme.nbtapi", "l": "NBTContainer"}
+    ],
+
+    // This is the type search index files they help build a complete class list and are
+    // generated with javadocs. Older javadocs host the plain json file compressed with
+    // gz however newer javadocs are a bit more complicated since it's a json object inside
+    // a javascript file. You can add additional type search index files to this list just
+    // be sure the plugin or api is in the plugins folder so it can be loaded by the class
+    // loader.
+    "typeSearchIndexFiles": [
+        "./spigot-type-search-index.json"
+    ]
+}
