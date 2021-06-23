@@ -38,6 +38,7 @@ dependencies {
     implementation("me.clip:placeholderapi:2.10.9")
     implementation("com.thoughtworks.paranamer:paranamer:2.8")
     implementation("com.beust:klaxon:5.5")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.3")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("commons-io:commons-io:2.6")

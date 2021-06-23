@@ -1,9 +1,10 @@
 {
     // The base export folder, this is where the generated TypeScript will be stored.
-    "exportFilder": "./lib/",
+    "exportFolder": "./lib/",
 
     // The base plugin folder, the tools will load and plugins or api jars from this folder.
     "pluginsFolder": "./plugins/",
+    "enablePluginLoader": false,
 
     // You can add additional packages to this list however be sure to add any classes
     // you want to the defaultClasses list or add a type search index file this is just
@@ -24,30 +25,30 @@
 
     // This is mainly for internal packages that are relocated via shadow you probably won't
     // need to mess with this and you can comment/remove the field to use defaults.
-    "packageRedirects": [
-        { "from": "de.tr7zw.changeme", "to": "com.smc" }
-    ],
+    "packageRedirects": {
+        "de.tr7zw.changeme": "com.smc"
+    },
 
 
     // This is used to rename methods/parameters/fields to be TypeScript safe.
     // You can add any additional safe names to this list or comment/remove the field
     // to use defaults.
-    "safeNames": [
-        { "from": "function", "to": "_function" },
-        { "from": "yield", "to": "_yield" },
-        { "from": "arguments", "to": "_arguments" },
-        { "from": "name", "to": "_name" },
-        { "from": "<set-?>", "to": "value" },
-        { "from": "in", "to": "_in" },
-        { "from": "with", "to": "_with" }
-    ],
+    "safeNames": {
+        "function": "_function",
+        "yield": "_yield",
+        "arguments": "_arguments",
+        "name": "_name",
+        "<set-?>": "value",
+        "in": "_in",
+        "with": "_with"
+    },
 
     // This is used to rename classes to be TypeScript safe.
     // You can add any additional safe class names to this list or comment/remove the field
     // to use defaults.
-    "safeClassNames": [
-        { "from": "Array", "to": "_Array" }
-    ],
+    "safeClassNames": {
+        "Array": "_Array"
+    },
 
     // This is the default class list to search and build our class list from.
     // The object format is the same as the individual type search index files below
