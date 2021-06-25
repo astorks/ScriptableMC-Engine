@@ -150,7 +150,8 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
         addClasses(
             com.pixlfox.scriptablemc.core.ScriptablePluginContext::class.java,
             com.pixlfox.scriptablemc.core.ScriptablePluginEngine::class.java,
-            ScriptEngineMain::class.java,
+            PluginEngineMain::class.java,
+            PluginEngineConfig::class.java,
 
             net.md_5.bungee.api.chat.BaseComponent::class.java,
             net.md_5.bungee.api.chat.TextComponent::class.java,
@@ -945,11 +946,10 @@ class TypescriptLibraryExporter(args: Array<String> = arrayOf()) {
                 TypescriptLibraryExporter(args)
                     .addHelperClasses()
                     .addBukkitClasses()
-                    .printSize()
-//                    .exportLibrariesHashed()
-//                    .exportGlobalLibrary()
-//                    .copyStaticSources()
-//                    .exportProjectFiles()
+                    .exportLibrariesHashed()
+                    .exportGlobalLibrary()
+                    .copyStaticSources()
+                    .exportProjectFiles()
             }
         }
     }

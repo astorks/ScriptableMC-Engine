@@ -27,7 +27,7 @@ abstract class ScriptablePluginContext: Listener {
     abstract val engine: ScriptablePluginEngine
     abstract val pluginName: String
     abstract val pluginInstance: Value
-    abstract val inventoryManager: InventoryManager
+//    abstract val inventoryManager: InventoryManager
     abstract val pluginVersion: Version
     open val pluginIcon: Material = Material.STONE
 

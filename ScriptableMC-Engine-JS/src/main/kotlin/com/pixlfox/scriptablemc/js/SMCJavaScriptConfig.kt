@@ -1,8 +1,9 @@
-package com.pixlfox.scriptablemc
+package com.pixlfox.scriptablemc.js
 
+import com.pixlfox.scriptablemc.PluginEngineConfig
 import org.bukkit.configuration.file.FileConfiguration
 
-class SMCJavaScriptConfig(config: FileConfiguration) : ScriptEngineConfig(config) {
+class JavaScriptPluginEngineConfig(config: FileConfiguration) : PluginEngineConfig(config) {
     override val mainScriptFiles: List<String>
         get() = readConfigStringList("main_script_files", listOf("\${root_scripts_folder}/main.js"))
 

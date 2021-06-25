@@ -1,12 +1,10 @@
-package com.pixlfox.scriptablemc
+package com.pixlfox.scriptablemc.js
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
 import co.aikar.commands.annotation.Syntax
-import com.smc.utils.Http
-import com.smc.version.Version
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.PolyglotException
@@ -15,7 +13,7 @@ import org.graalvm.polyglot.PolyglotException
 @Suppress("unused")
 @CommandAlias("scriptablemc|smc")
 @Subcommand("javascript|js")
-class SMCJavaScriptEngineCommands(private val basePlugin: SMCJavaScriptEngineMain) : BaseCommand() {
+class JavaScriptPluginEngineCommands(private val basePlugin: JavaScriptPluginEngineMain) : BaseCommand() {
 
     @Subcommand("reload|rl")
     @CommandAlias("jsrl")

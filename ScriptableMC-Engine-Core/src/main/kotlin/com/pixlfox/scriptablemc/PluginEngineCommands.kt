@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender
 
 @Suppress("unused")
 @CommandAlias("scriptablemc|smc")
-class ScriptEngineGlobalCommands(private val basePlugin: ScriptEngineMain) : BaseCommand() {
+class PluginEngineCommands(private val basePlugin: PluginEngineMain) : BaseCommand() {
 
     @Subcommand("info|i")
     @CommandAlias("smci")
@@ -18,7 +18,7 @@ class ScriptEngineGlobalCommands(private val basePlugin: ScriptEngineMain) : Bas
         sender.sendMessage("-----------------------------------------------------")
         sender.sendMessage("- ${ChatColor.DARK_PURPLE}ScriptableMC Version: ${basePlugin.description.version}")
         sender.sendMessage("-----------------------------------------------------")
-        for (scriptEngineMain in ScriptEngineMain.getAllScriptEngines()) {
+        for (scriptEngineMain in PluginEngineMain.getAllScriptEngines()) {
             if (scriptEngineMain.scriptLanguage == "js") {
                 val scriptEngine = scriptEngineMain.scriptEngine
                 val isGraalRuntime = scriptEngine?.eval("if (typeof Graal != 'undefined') { Graal.isGraalRuntime() } else { false }")?.asBoolean() == true
@@ -54,7 +54,7 @@ class ScriptEngineGlobalCommands(private val basePlugin: ScriptEngineMain) : Bas
     @CommandAlias("smcrl")
     @CommandPermission("scriptablemc.reload")
     fun reload(sender: CommandSender) {
-        ScriptEngineMain.reloadAllScriptEngines(sender)
+        PluginEngineMain.reloadAllScriptEngines(sender)
     }
 
 }

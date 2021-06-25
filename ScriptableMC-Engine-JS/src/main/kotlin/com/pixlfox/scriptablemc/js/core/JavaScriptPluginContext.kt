@@ -1,7 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
 import com.smc.version.Version
-import fr.minuskube.inv.InventoryManager
 import org.bukkit.Material
 import org.bukkit.event.HandlerList
 import org.graalvm.polyglot.Value
@@ -9,9 +8,6 @@ import org.graalvm.polyglot.Value
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class JavaScriptPluginContext(override val engine: ScriptablePluginEngine, override val pluginName: String, override val pluginIcon: Material, override val pluginInstance: Value) : ScriptablePluginContext() {
-    override val inventoryManager: InventoryManager
-        get() = engine.inventoryManager
-
     override val pluginVersion: Version
         get() = engine.pluginVersion
 

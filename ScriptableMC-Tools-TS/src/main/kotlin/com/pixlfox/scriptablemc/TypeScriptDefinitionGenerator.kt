@@ -7,9 +7,10 @@ import java.util.*
 import kotlin.reflect.*
 import kotlin.reflect.full.*
 
-@Suppress("unused")
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), private val configuration: Configuration = Configuration()) {
 
+    private val pluginClassLoader: ClassLoader = PluginClassLoader(pluginsFolder)
     private val classList = mutableListOf<KClass<*>>()
     private var loggingLevel: EnumSet<LoggingLevel> = EnumSet.of(
 //        LoggingLevel.DEBUG,
@@ -18,6 +19,10 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
         LoggingLevel.ERROR,
         LoggingLevel.FATAL,
     )
+
+    private val sortedClassList: List<KClass<*>>
+        get() = classList.filter { !isClassBlacklisted(it) }.sortedBy { it.qualifiedName }
+
 
     fun mkdirs(): TypeScriptDefinitionGenerator {
         if(!rootFolder.exists()) {
@@ -37,16 +42,15 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
 
     fun clean(): TypeScriptDefinitionGenerator {
 
-        // TODO: NYI
-        println("NYI")
+        deleteDirectory(exportFolder, true)
 
         return this
     }
 
-    fun generateClassList(): TypeScriptDefinitionGenerator =
-        this.generateDefaultClassList().generateTypeSearchIndexClassList()
+    fun buildClassList(): TypeScriptDefinitionGenerator =
+        this.buildDefaultClassList().buildTypeSearchIndexClassList()
 
-    fun generateDefaultClassList(): TypeScriptDefinitionGenerator {
+    fun buildDefaultClassList(): TypeScriptDefinitionGenerator {
         val classList = mutableListOf<KClass<*>>()
 
         for (classDescription in configuration.defaultClasses) {
@@ -62,7 +66,7 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
         return this
     }
 
-    fun generateTypeSearchIndexClassList(): TypeScriptDefinitionGenerator {
+    fun buildTypeSearchIndexClassList(): TypeScriptDefinitionGenerator {
         val classList = mutableListOf<KClass<*>>()
 
         for (typeSearchIndexFilePath in configuration.typeSearchIndexFiles) {
@@ -81,54 +85,25 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
         return this
     }
 
-    fun generateTypeScriptDefinitions(): TypeScriptDefinitionGenerator {
-        val allClasses = classList.dropWhile { isClassBlacklisted(it) }.sortedBy { stripPackageName(it) }
+    fun exportClassList(): TypeScriptDefinitionGenerator {
+        val file = File(rootFolder, "class-list.json")
+        if(file.exists()) file.delete()
+        file.parentFile.mkdirs()
+        file.createNewFile()
 
-        for (baseClass in allClasses) {
-            val file = File(exportFolder, "${getPackageName(baseClass).replace(".", "/")}/${stripPackageName(baseClass)}.d.ts")
-            if(file.exists()) file.delete()
-            file.parentFile.mkdirs()
-            file.createNewFile()
-
-            file.writeText(generateTypeScriptDefinitionSource(baseClass))
-
-            println(LoggingLevel.INFO, "${baseClass.qualifiedName} -> ${file.path}")
-        }
-
-        println(LoggingLevel.INFO, "Successfully generated ${allClasses.size} classes.")
+        val classDescriptions = sortedClassList.map { ClassDescription(getPackageName(it), stripPackageName(it)) }.toTypedArray()
+        file.writeText(classDescriptions.jsonToString(true))
 
         return this
     }
 
-    fun generateJavaScriptSource(): TypeScriptDefinitionGenerator {
-        val allClasses = classList.dropWhile { isClassBlacklisted(it) }.sortedBy { stripPackageName(it) }
+    fun exportSources(): TypeScriptDefinitionGenerator {
+        val classes = sortedClassList.toTypedArray()
 
-        for (baseClass in allClasses) {
-            val file = File(exportFolder, "${getPackageName(baseClass).replace(".", "/")}/" +
-                    "${stripPackageName(baseClass)}.js")
-            if(file.exists()) file.delete()
-            file.parentFile.mkdirs()
-            file.createNewFile()
+        generateTypeScriptDefinitions(classes)
+        generateJavaScriptSources(classes)
 
-            file.writeText(generateJavaScriptSource(baseClass))
-
-            println(LoggingLevel.INFO, "${baseClass.qualifiedName} -> ${file.path}")
-        }
-        println(LoggingLevel.INFO, "Successfully generated ${allClasses.size} classes.")
-
-        val groupedClasses = allClasses.groupBy { getPackageName(it) }
-        for ((packageName, classes) in groupedClasses) {
-            val file = File(exportFolder, "${packageName.replace(".", "/")}/index.js")
-            if(file.exists()) file.delete()
-            file.parentFile.mkdirs()
-            file.createNewFile()
-
-            file.writeText(generateJavaScriptIndexSource(classes.toTypedArray()))
-
-            println(LoggingLevel.INFO, "$packageName -> ${file.path}")
-        }
-        println(LoggingLevel.INFO, "Successfully generated ${groupedClasses.size} packages.")
-
+        println(LoggingLevel.INFO, "Successfully generated ${classes.size} classes.")
         return this
     }
 
@@ -142,6 +117,37 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
 
         return this
     }
+
+    private fun generateTypeScriptDefinitions(classes: Array<KClass<*>>) {
+        for (baseClass in classes) {
+            val file = File(exportFolder, "${getPackageName(baseClass).replace(".", "/")}/${stripPackageName(baseClass)}.d.ts")
+            if(file.exists()) file.delete()
+            file.parentFile.mkdirs()
+            file.createNewFile()
+
+            file.writeText(generateTypeScriptDefinitionSource(baseClass))
+
+            println(LoggingLevel.INFO, "${baseClass.qualifiedName} -> ${file.path}")
+        }
+    }
+
+    private fun generateJavaScriptSources(classes: Array<KClass<*>>) {
+        for (baseClass in classes) {
+            val file = File(
+                exportFolder, "${getPackageName(baseClass).replace(".", "/")}/" +
+                        "${stripPackageName(baseClass)}.js"
+            )
+            if (file.exists()) file.delete()
+            file.parentFile.mkdirs()
+            file.createNewFile()
+
+            file.writeText(generateJavaScriptSource(baseClass))
+
+            println(LoggingLevel.INFO, "${baseClass.qualifiedName} -> ${file.path}")
+        }
+    }
+
+
 
     private val allowedPackagesRegex: Regex
         get() = Regex("(${configuration.packageWhitelist.joinToString("|") {
@@ -157,21 +163,22 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
     private val pluginsFolder: File
         get() = File(rootFolder, configuration.pluginsFolder)
 
-    private val classLoader: ClassLoader
+    private val systemClassLoader: ClassLoader
         get() = javaClass.classLoader
 
     private fun loadClass(className: String): KClass<*>? {
+        if(className == ".All Classes") return null
         val cachedClass = classList.firstOrNull { it.qualifiedName == className }
         if(cachedClass != null) return cachedClass
 
         try {
-            return classLoader.loadClass(className).kotlin
+            return pluginClassLoader.loadClass(className).kotlin
         }
-        catch (ex: ClassNotFoundException){
-            println(LoggingLevel.DEBUG, ex.toString())
+        catch (ex: ClassNotFoundException) {
+            println(LoggingLevel.WARNING, ex.toString())
         }
         catch (ex: NoClassDefFoundError) {
-            println(LoggingLevel.DEBUG, ex.toString())
+            println(LoggingLevel.WARNING, ex.toString())
         }
         catch (ex: Exception) {
             println(LoggingLevel.ERROR, ex.toString())
@@ -181,7 +188,7 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
     }
 
     private fun loadClass(classDescription: ClassDescription): KClass<*>? =
-        loadClass("${classDescription.packageName}.${classDescription.className}")
+        loadClass("${classDescription.packageName}.${classDescription.className.replace('.', '\$')}")
 
     private fun isClassAllowed(baseClass: KClass<*>): Boolean {
         val qualifiedName = baseClass.qualifiedName ?: return false
@@ -220,28 +227,27 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
         } else false
 
         return when {
-            type == typeOf<Byte>() -> "number/*(Byte)*/"
-            type == typeOf<Short>() -> "number/*(Short)*/"
-            type == typeOf<Int>() -> "number/*(Int)*/"
-            type == typeOf<Long>() -> "number/*(Long)*/"
-            type == typeOf<Float>() -> "number/*(Float)*/"
-            type == typeOf<Double>() -> "number/*(Double)*/"
+            type == typeOf<Byte>() -> if(configuration.commentTypes) "number/*(Byte)*/" else "number"
+            type == typeOf<Short>() -> if(configuration.commentTypes) "number/*(Short)*/" else "number"
+            type == typeOf<Int>() -> if(configuration.commentTypes) "number/*(Int)*/" else "number"
+            type == typeOf<Long>() -> if(configuration.commentTypes) "number/*(Long)*/" else "number"
+            type == typeOf<Float>() -> if(configuration.commentTypes) "number/*(Float)*/" else "number"
+            type == typeOf<Double>() -> if(configuration.commentTypes) "number/*(Double)*/" else "number"
             type == typeOf<String>() -> "string"
             type == typeOf<Unit>() -> "void"
             type == typeOf<Boolean>() -> "boolean"
-            type == typeOf<IntArray>() -> "Array<number/*(Int)*/>"
-            type == typeOf<Char>() -> "string/*(Char)*/"
+            type == typeOf<IntArray>() -> if(configuration.commentTypes) "Array<number/*(Int)*/>" else "Array<number>"
+            type == typeOf<Char>() -> if(configuration.commentTypes) "string/*(Char)*/" else "string"
             isArray -> "Array<${toTypeScriptType(type.arguments.first().type?.classifier)}>"
             else -> toTypeScriptType(type.classifier)
         }
     }
 
     private fun toTypeScriptType(classifier: KClassifier?): String {
-        return if(classifier is KClass<*>) {
-            toTypeScriptType(classifier)
-        }
-        else {
-            "any/*???: ${classifier?.javaClass?.kotlin?.qualifiedName}*/"
+        return when {
+            (classifier is KClass<*>) -> toTypeScriptType(classifier)
+            configuration.commentTypes -> "any/*???: ${classifier?.javaClass?.kotlin?.qualifiedName}*/"
+            else -> "any"
         }
     }
 
@@ -250,19 +256,20 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
 
         return when {
             baseClass.qualifiedName == "kotlin.Unit" -> "void"
-            baseClass.qualifiedName == "kotlin.Byte" -> "number/*(Byte)*/"
-            baseClass.qualifiedName == "Short" -> "number/*(Short)*/"
-            baseClass.qualifiedName == "kotlin.Int" -> "number/*(Int)*/"
-            baseClass.qualifiedName == "kotlin.Long" -> "number/*(Long)*/"
-            baseClass.qualifiedName == "kotlin.Float" -> "number/*(Float)*/"
-            baseClass.qualifiedName == "kotlin.Double" -> "number/*(Double)*/"
+            baseClass.qualifiedName == "kotlin.Byte" -> if(configuration.commentTypes) "number/*(Byte)*/" else "number"
+            baseClass.qualifiedName == "kotlin.Short" -> if(configuration.commentTypes) "number/*(Short)*/" else "number"
+            baseClass.qualifiedName == "kotlin.Int" -> if(configuration.commentTypes) "number/*(Int)*/" else "number"
+            baseClass.qualifiedName == "kotlin.Long" -> if(configuration.commentTypes) "number/*(Long)*/" else "number"
+            baseClass.qualifiedName == "kotlin.Float" -> if(configuration.commentTypes) "number/*(Float)*/" else "number"
+            baseClass.qualifiedName == "kotlin.Double" -> if(configuration.commentTypes) "number/*(Double)*/" else "number"
             baseClass.qualifiedName == "kotlin.String" -> "string"
             baseClass.qualifiedName == "kotlin.Unit" -> "void"
             baseClass.qualifiedName == "kotlin.Boolean" -> "boolean"
-            baseClass.qualifiedName == "kotlin.IntArray" -> "Array<number/*(Int)*/>"
-            baseClass.qualifiedName == "kotlin.Char" -> "string/*(Char)*/"
+            baseClass.qualifiedName == "kotlin.IntArray" -> if(configuration.commentTypes) "Array<number/*(Int)*/>" else "Array<number>"
+            baseClass.qualifiedName == "kotlin.LongArray" -> if(configuration.commentTypes) "Array<number/*(Long)*/>" else "Array<number>"
+            baseClass.qualifiedName == "kotlin.Char" -> if(configuration.commentTypes) "string/*(Char)*/" else "string"
             isClassAllowed(baseClass) -> safeClassName(className)
-            else -> "any/*(${baseClass.qualifiedName})*/"
+            else -> if(configuration.commentTypes)  "any/*(${baseClass.qualifiedName})*/" else "any"
         }
     }
 
@@ -271,11 +278,7 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
     private fun isClassBlacklisted(qualifiedName: String?): Boolean =
         if(qualifiedName.isNullOrEmpty()) true else configuration.classBlacklist.contains(qualifiedName)
 
-    private fun isInnerClass(baseClass: KClass<*>): Boolean {
-        val qualifiedName = baseClass.qualifiedName ?: return false
-        val packageName = qualifiedName.split('.').dropLast(1).joinToString(".")
-        return baseClass.isInner || loadClass(packageName) != null
-    }
+    private fun isInnerClass(baseClass: KClass<*>): Boolean = baseClass.isInner || baseClass.java.isMemberClass
 
     private fun stripPackageName(baseClass: KClass<*>): String {
         val qualifiedName = baseClass.qualifiedName ?: return ""
@@ -623,6 +626,35 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
             val configuration = Klaxon().parse<Configuration>(inputStream)!!
             return TypeScriptDefinitionGenerator(rootFolder, configuration)
         }
+
+        fun Any.jsonToString(prettyPrint: Boolean = true): String {
+            val thisJsonString = Klaxon().toJsonString(this)
+            var result = thisJsonString
+            if(prettyPrint) {
+                result = if(thisJsonString.startsWith("[")){
+                    Klaxon().parseJsonArray(thisJsonString.reader()).toJsonString(true)
+                } else {
+                    Klaxon().parseJsonObject(thisJsonString.reader()).toJsonString(true)
+                }
+            }
+            return result
+        }
+
+        private fun deleteDirectory(directoryToBeDeleted: File, skipThisDir: Boolean = false): Boolean {
+            val allContents = directoryToBeDeleted.listFiles()
+            if (allContents != null) {
+                for (file in allContents) {
+                    deleteDirectory(file)
+                }
+            }
+
+            return if(skipThisDir) {
+                true
+            }
+            else {
+                directoryToBeDeleted.delete()
+            }
+        }
     }
 
     enum class LoggingLevel {
@@ -636,7 +668,7 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
     class Configuration (
         val exportFolder: String = "./lib/",
         val pluginsFolder: String = "./plugins/",
-        val enablePluginLoader: Boolean = false,
+        val commentTypes: Boolean = true,
         val packageWhitelist: Array<String> = arrayOf(
             "java.lang",
             "org.bukkit",
@@ -731,9 +763,9 @@ class TypeScriptDefinitionGenerator(private val rootFolder: File = File("./"), p
     }
 
     class ClassDescription (
-        @Json(name = "p")
+        @Json(name = "p", index = 0)
         val packageName: String = "",
-        @Json(name = "l")
+        @Json(name = "l", index = 1)
         val className: String = "",
     ) {
         companion object {

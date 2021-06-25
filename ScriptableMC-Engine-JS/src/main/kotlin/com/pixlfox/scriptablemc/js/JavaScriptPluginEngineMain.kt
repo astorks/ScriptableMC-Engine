@@ -1,13 +1,15 @@
-package com.pixlfox.scriptablemc
+package com.pixlfox.scriptablemc.js
 
 import co.aikar.commands.PaperCommandManager
+import com.pixlfox.scriptablemc.PluginEngineCommands
+import com.pixlfox.scriptablemc.PluginEngineMain
 import com.pixlfox.scriptablemc.core.JavaScriptPluginEngine
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 
 
 @Suppress("unused")
-class SMCJavaScriptEngineMain : ScriptEngineMain() {
+class JavaScriptPluginEngineMain : PluginEngineMain() {
     override val chatMessagePrefix = "${ChatColor.GRAY}[${ChatColor.DARK_AQUA}ScriptableMC-JS${ChatColor.GRAY}]${ChatColor.RESET}"
     override val scriptLanguage = "js"
 
@@ -19,8 +21,8 @@ class SMCJavaScriptEngineMain : ScriptEngineMain() {
         registerScriptEngine(scriptLanguage, this)
 
         commandManager = PaperCommandManager(this)
-        commandManager?.registerCommand(ScriptEngineGlobalCommands(this))
-        commandManager?.registerCommand(SMCJavaScriptEngineCommands(this), true)
+        commandManager?.registerCommand(PluginEngineCommands(this))
+        commandManager?.registerCommand(JavaScriptPluginEngineCommands(this), true)
 
         saveDefaultConfig()
         loadScriptEngine()
@@ -51,7 +53,7 @@ class SMCJavaScriptEngineMain : ScriptEngineMain() {
         versionCheck()
         patchClassLoader(javaClass) {
             try {
-                scriptEngine = JavaScriptPluginEngine(this, SMCJavaScriptConfig(config))
+                scriptEngine = JavaScriptPluginEngine(this, JavaScriptPluginEngineConfig(config))
                 scriptEngine!!.start()
                 if(scriptEngine!!.startupErrors.any()) {
                     for(error in scriptEngine!!.startupErrors) {
@@ -95,7 +97,7 @@ class SMCJavaScriptEngineMain : ScriptEngineMain() {
     }
 
     companion object {
-        var instance: SMCJavaScriptEngineMain? = null
+        var instance: JavaScriptPluginEngineMain? = null
             private set
     }
 }

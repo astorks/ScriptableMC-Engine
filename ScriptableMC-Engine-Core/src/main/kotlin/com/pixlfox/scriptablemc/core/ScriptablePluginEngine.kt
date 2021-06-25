@@ -1,10 +1,9 @@
 package com.pixlfox.scriptablemc.core
 
-import com.pixlfox.scriptablemc.ScriptEngineConfig
-import com.pixlfox.scriptablemc.ScriptEngineMain
+import com.pixlfox.scriptablemc.PluginEngineConfig
+import com.pixlfox.scriptablemc.PluginEngineMain
 import com.smc.exceptions.ScriptNotFoundException
 import com.smc.version.Version
-import fr.minuskube.inv.InventoryManager
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
@@ -15,16 +14,15 @@ import java.util.*
 abstract class ScriptablePluginEngine {
     abstract val languageName: String
     abstract val languageFileExtension: String
-    abstract val bootstrapPlugin: ScriptEngineMain
+    abstract val bootstrapPlugin: PluginEngineMain
     abstract val debugEnabled: Boolean
 
     abstract val scriptablePlugins: MutableList<ScriptablePluginContext>
-    abstract val inventoryManager: InventoryManager
 
     abstract val graalContext: Context
     abstract val globalBindings: Value
 
-    abstract val config: ScriptEngineConfig
+    abstract val config: PluginEngineConfig
 
     val pluginVersion: Version
         get() = bootstrapPlugin.pluginVersion
@@ -35,7 +33,6 @@ abstract class ScriptablePluginEngine {
     val startupErrors: MutableList<Exception> = mutableListOf()
 
     open fun start() {
-        inventoryManager.init()
         globalBindings.putMember("engine", this)
 
         loadAllHelperClasses()

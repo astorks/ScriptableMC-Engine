@@ -1,16 +1,14 @@
 package com.pixlfox.scriptablemc.core
 
-import com.pixlfox.scriptablemc.SMCJavaScriptConfig
-import com.pixlfox.scriptablemc.ScriptEngineMain
-import com.smc.exceptions.ScriptNotFoundException
+import com.pixlfox.scriptablemc.PluginEngineMain
+import com.pixlfox.scriptablemc.js.JavaScriptPluginEngineConfig
 import com.pixlfox.scriptablemc.utils.UnzipUtility
-import fr.minuskube.inv.InventoryManager
 import org.bukkit.Material
 import org.graalvm.polyglot.*
 import java.io.File
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, override val config: SMCJavaScriptConfig): ScriptablePluginEngine() {
+class JavaScriptPluginEngine(override val bootstrapPlugin: PluginEngineMain, override val config: JavaScriptPluginEngineConfig): ScriptablePluginEngine() {
 
     override val languageName: String = "js"
     override val languageFileExtension: String = "js"
@@ -18,7 +16,7 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: ScriptEngineMain, ove
     override val graalContext: Context
     override val globalBindings: Value
     override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
-    override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
+//    override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
 
     init {
         if(config.extractLibs) {

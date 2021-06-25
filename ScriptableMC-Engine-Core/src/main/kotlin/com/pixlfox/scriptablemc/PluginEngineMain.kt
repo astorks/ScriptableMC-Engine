@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("unused")
-abstract class ScriptEngineMain : JavaPlugin() {
+abstract class PluginEngineMain : JavaPlugin() {
     var scriptEngine: ScriptablePluginEngine? = null
     var commandManager: PaperCommandManager? = null
     abstract val chatMessagePrefix: String
@@ -46,7 +46,7 @@ abstract class ScriptEngineMain : JavaPlugin() {
     }
 
     companion object {
-        private val scriptEngines: MutableMap<String, ScriptEngineMain?> = mutableMapOf()
+        private val scriptEngines: MutableMap<String, PluginEngineMain?> = mutableMapOf()
         /**
          * Patches the bukkit class loader to allow for GraalVM class loading from inside plugin jar.
          * A bit hackish but it works.
@@ -60,7 +60,7 @@ abstract class ScriptEngineMain : JavaPlugin() {
         }
 
         @JvmStatic
-        fun registerScriptEngine(language: String, scriptEngineMain: ScriptEngineMain) {
+        fun registerScriptEngine(language: String, scriptEngineMain: PluginEngineMain) {
             scriptEngines[language] = scriptEngineMain
         }
 
@@ -70,12 +70,12 @@ abstract class ScriptEngineMain : JavaPlugin() {
         }
 
         @JvmStatic
-        fun resolveScriptEngine(language: String): ScriptEngineMain? {
+        fun resolveScriptEngine(language: String): PluginEngineMain? {
             return scriptEngines.getOrDefault(language, null)
         }
 
         @JvmStatic
-        fun getAllScriptEngines(): Array<ScriptEngineMain> {
+        fun getAllScriptEngines(): Array<PluginEngineMain> {
             return scriptEngines.values.filterNotNull().toTypedArray()
         }
 
