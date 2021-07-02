@@ -9,6 +9,7 @@ var smcVersion = findProperty("smc.version")!!
 var graalvmVersion = findProperty("graalvm.version")!!
 var spigotmcVersion = findProperty("spigotmc.version")!!
 
+
 allprojects {
     group = "com.pixlfox.scriptablemc"
     version = smcVersion
@@ -56,22 +57,15 @@ tasks.register("shadowJarAll") {
     dependsOn(":ScriptableMC-Engine-JS:shadowJar")
     dependsOn(":ScriptableMC-Engine-JS:Bundled:shadowJar")
 
-    dependsOn(":ScriptableMC-Tools-TS:shadowJar")
-    dependsOn(":ScriptableMC-Tools-TS:Standalone:shadowJar")
-
     doFirst {
         if(!file("./build").exists()) file("./build").mkdirs()
         if(file("./build/ScriptableMC-Engine-JS.jar").exists()) file("./build/ScriptableMC-Engine-JS.jar").delete()
         if(file("./build/ScriptableMC-Engine-JS-Bundled.jar").exists()) file("./build/ScriptableMC-Engine-JS-Bundled.jar").delete()
-        if(file("./build/ScriptableMC-Tools-TS.jar").exists()) file("./build/ScriptableMC-Tools-TS.jar").delete()
-        if(file("./build/ScriptableMC-Tools-TS-Standalone.jar").exists()) file("./build/ScriptableMC-Tools-TS-Standalone.jar").delete()
     }
 
     doLast {
         file("./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar").copyTo(file("./build/ScriptableMC-Engine-JS.jar"), overwrite = true)
         file("./ScriptableMC-Engine-JS/Bundled/build/libs/ScriptableMC-Engine-JS-Bundled.jar").copyTo(file("./build/ScriptableMC-Engine-JS-Bundled.jar"), overwrite = true)
-        file("./ScriptableMC-Tools-TS/build/libs/ScriptableMC-Tools-TS.jar").copyTo(file("./build/ScriptableMC-Tools-TS.jar"), overwrite = true)
-        file("./ScriptableMC-Tools-TS/Standalone/build/libs/ScriptableMC-Tools-TS-Standalone.jar").copyTo(file("./build/ScriptableMC-Tools-TS-Standalone.jar"), overwrite = true)
     }
 
 }

@@ -8,7 +8,7 @@ Run JavaScript/TypeScript plugins for Minecraft 1.17 using the GraalJS script en
 Supported Minecraft Versions: Bukkit/Spigot/Paper **1.17**<br />
 Previous Minecraft Versions: [Use v1.3.X version of the plugin](https://github.com/astorks/ScriptableMC-Engine/tree/1.3.x) <br />
 
-#### New Version Numbering
+#### New v1.17.X
 **We are switching to a new version numbering to match the supporting minecraft version.**<br />
 **New v1.17.X builds of this plugin will only work with Minecraft 1.17+**<br />
 **For Minecraft v1.12-1.16 you should use v1.3.X of this plugin.**<br />
@@ -42,24 +42,10 @@ You can take the typescript example and compile it, then directly modify the jav
 ##### ScritableMC JavaScript Engine Commands
 | Command       | Alias         | Description                                           | Permission               |
 | ------------- | ------------- |-----------------------------------------------------| ------------------------ |
-| `/scriptablemc javascript reload`   | `/smc rl /jsrl`       | Fully reloads the javascript engine and all script files. | `scriptablemc.js.reload` |
-| `/scriptablemc javascript execute <source>`   | `/smc js ex <source>`       | Executes javascript source and prints the return value. | `scriptablemc.js.execute` |
-| `/scriptablemc javascript execute stash`   | `/smc js ex stash`       | Executes javascript source stored in your stash. | `scriptablemc.js.execute` |
-| `/scriptablemc javascript file <filePath>`   | `/smc js f <filePath>`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
-| `/scriptablemc javascript stash`   | `/smc js st`       | Prints all stored javascript lines in your stash. | `scriptablemc.js.execute` |
-| `/scriptablemc javascript stash <source>`   | `/smc js st <source>`       | Adds a line to your javascript stash. | `scriptablemc.js.execute` |
-| `/scriptablemc javascript stash clear`   | `/smc js st clear`       | Clears your javascript stash. | `scriptablemc.js.execute` |
-
-##### ScritableMC Python Engine Commands
-| Command       | Alias         | Description                                           | Permission               |
-| ------------- | ------------- |-----------------------------------------------------| ------------------------ |
-| `/scriptablemc python reload`   | `/smc rl /pyrl`       | Fully reloads the python script engine and all script files. | `scriptablemc.python.reload` |
-| `/scriptablemc python execute <source>`   | `/smc py ex <source> /pyex`       | Executes python source and prints the return value. | `scriptablemc.python.execute` |
-| `/scriptablemc python execute stash`   | `/smc py ex stash`       | Executes python source stored in your stash. | `scriptablemc.python.execute` |
-| `/scriptablemc python file <filePath>`   | `/smc py f <filePath>`       | Executes python file from the scripts folder. | `scriptablemc.python.execute.file` |
-| `/scriptablemc python stash`   | `/smc py st`       | Prints all stored python lines in your stash. | `scriptablemc.python.execute` |
-| `/scriptablemc python stash <source>`   | `/smc py st <source>`       | Adds a line to your python stash. | `scriptablemc.python.execute` |
-| `/scriptablemc python stash clear`   | `/smc py st clear`       | Clears your python stash. | `scriptablemc.python.execute` |
+| `/scriptablemc javascript reload`   | `/smc js rl` `/jsrl`       | Fully reloads the javascript engine and all script files. | `scriptablemc.js.reload` |
+| `/scriptablemc javascript execute <source>`   | `/smc js ex <source>` `/jsex <source>`       | Executes javascript source and prints the return value. | `scriptablemc.js.execute` |
+| `/scriptablemc javascript file <filePath>`   | `/smc js f <filePath>` `/jsexf`       | Executes javascript file from the scripts folder. | `scriptablemc.js.execute.file` |
+| `/scriptablemc javascript pastebin <filePath>`   | `/smc js pb <filePath>` `/jsexpb`       | Executes javascript source from a pastebin. | `scriptablemc.js.execute.pastebin` |
 
 ### `/smc javascript execute` Command Example
 > `/jsex return 1 + 1` <br>

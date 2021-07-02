@@ -1,7 +1,6 @@
 package com.pixlfox.scriptablemc.core
 
 import com.smc.version.Version
-import fr.minuskube.inv.InventoryManager
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -27,7 +26,6 @@ abstract class ScriptablePluginContext: Listener {
     abstract val engine: ScriptablePluginEngine
     abstract val pluginName: String
     abstract val pluginInstance: Value
-//    abstract val inventoryManager: InventoryManager
     abstract val pluginVersion: Version
     open val pluginIcon: Material = Material.STONE
 
@@ -38,7 +36,7 @@ abstract class ScriptablePluginContext: Listener {
         get() = Bukkit.getServer()
 
     val javaPlugin: JavaPlugin
-        get() = engine.bootstrapPlugin
+        get() = engine.bootstrapper
 
     val servicesManager: ServicesManager
         get() = Bukkit.getServicesManager()
@@ -133,7 +131,7 @@ abstract class ScriptablePluginContext: Listener {
             return PlaceholderAPI.setPlaceholders(player, placeholderText)
         }
 
-        engine.bootstrapPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
+        engine.bootstrapper.logger.warning("[$pluginName] Placeholder API is missing.")
         return placeholderText
     }
 
@@ -142,7 +140,7 @@ abstract class ScriptablePluginContext: Listener {
             return PlaceholderAPI.setPlaceholders(player, placeholderText)
         }
 
-        engine.bootstrapPlugin.logger.warning("[$pluginName] Placeholder API is missing.")
+        engine.bootstrapper.logger.warning("[$pluginName] Placeholder API is missing.")
         return placeholderText
     }
 

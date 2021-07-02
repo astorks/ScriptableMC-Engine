@@ -1,9 +1,10 @@
 package com.pixlfox.scriptablemc.core
 
-import com.pixlfox.scriptablemc.PluginEngineConfig
-import com.pixlfox.scriptablemc.PluginEngineMain
+import com.pixlfox.scriptablemc.ScriptablePluginEngineBootstrapper
+import com.pixlfox.scriptablemc.ScriptablePluginEngineConfig
 import com.smc.exceptions.ScriptNotFoundException
 import com.smc.version.Version
+import fr.minuskube.inv.InventoryManager
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
@@ -14,7 +15,7 @@ import java.util.*
 abstract class ScriptablePluginEngine {
     abstract val languageName: String
     abstract val languageFileExtension: String
-    abstract val bootstrapPlugin: PluginEngineMain
+    abstract val bootstrapper: ScriptablePluginEngineBootstrapper
     abstract val debugEnabled: Boolean
 
     abstract val scriptablePlugins: MutableList<ScriptablePluginContext>
@@ -22,10 +23,13 @@ abstract class ScriptablePluginEngine {
     abstract val graalContext: Context
     abstract val globalBindings: Value
 
-    abstract val config: PluginEngineConfig
+    abstract val config: ScriptablePluginEngineConfig
+
+    val inventoryManager: InventoryManager
+        get() = InventoryManager(bootstrapper)
 
     val pluginVersion: Version
-        get() = bootstrapPlugin.pluginVersion
+        get() = bootstrapper.pluginVersion
 
     var enabledAllPlugins: Boolean = false
         internal set
@@ -62,7 +66,7 @@ abstract class ScriptablePluginEngine {
             }
             catch (e: Exception) {
                 if(!helperClass.startsWith("*")) {
-                    bootstrapPlugin.logger.warning("Failed to load helper class \"$helperClass\" via classloader.")
+                    bootstrapper.logger.warning("Failed to load helper class \"$helperClass\" via classloader.")
                     e.printStackTrace()
                 }
             }
@@ -88,7 +92,7 @@ abstract class ScriptablePluginEngine {
             pluginContext.enable()
         }
         else {
-            bootstrapPlugin.logger.warning("Trying to enable an already-enabled scriptable plugin context.")
+            bootstrapper.logger.warning("Trying to enable an already-enabled scriptable plugin context.")
         }
     }
 
@@ -97,7 +101,7 @@ abstract class ScriptablePluginEngine {
             pluginContext.disable()
         }
         else {
-            bootstrapPlugin.logger.warning("Trying to disabled an already-disabled scriptable plugin context.")
+            bootstrapper.logger.warning("Trying to disabled an already-disabled scriptable plugin context.")
         }
     }
 

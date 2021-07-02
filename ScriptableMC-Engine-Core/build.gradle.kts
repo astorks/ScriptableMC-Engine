@@ -1,6 +1,7 @@
 plugins {
     java
     id("org.jetbrains.kotlin.jvm")
+    id("com.github.johnrengelman.shadow")
     id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
@@ -36,12 +37,19 @@ dependencies {
     // 3rd-Party Libraries
     implementation("com.github.jkcclemens:khttp:-SNAPSHOT")
     implementation("co.aikar:acf-paper:0.5.0-SNAPSHOT")
-    compileOnly("fr.minuskube.inv:smart-invs:1.2.7")
+    implementation("de.tr7zw:item-nbt-api:2.8.0")
+    implementation("fr.minuskube.inv:smart-invs:1.2.7")
     compileOnly("me.clip:placeholderapi:2.10.4")
-    compileOnly("commons-io:commons-io:2.6")
-    compileOnly("de.tr7zw:item-nbt-api:2.7.1")
 
     testImplementation("junit", "junit", "4.12")
+}
+
+tasks.shadowJar {
+    dependencies {
+        exclude(dependency("org.spigotmc:spigot-api"))
+    }
+
+    archiveFileName.set("ScriptableMC-Engine-Core.jar")
 }
 
 tasks.compileKotlin {

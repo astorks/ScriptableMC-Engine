@@ -1,6 +1,8 @@
-package com.pixlfox.scriptablemc.core
+package com.pixlfox.scriptablemc.js.core
 
-import com.pixlfox.scriptablemc.PluginEngineMain
+import com.pixlfox.scriptablemc.ScriptablePluginEngineBootstrapper
+import com.pixlfox.scriptablemc.core.ScriptablePluginContext
+import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.js.JavaScriptPluginEngineConfig
 import com.pixlfox.scriptablemc.utils.UnzipUtility
 import org.bukkit.Material
@@ -8,7 +10,7 @@ import org.graalvm.polyglot.*
 import java.io.File
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class JavaScriptPluginEngine(override val bootstrapPlugin: PluginEngineMain, override val config: JavaScriptPluginEngineConfig): ScriptablePluginEngine() {
+class JavaScriptPluginEngine(override val bootstrapper: ScriptablePluginEngineBootstrapper, override val config: JavaScriptPluginEngineConfig): ScriptablePluginEngine() {
 
     override val languageName: String = "js"
     override val languageFileExtension: String = "js"
@@ -20,11 +22,11 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: PluginEngineMain, ove
 
     init {
         if(config.extractLibs) {
-            val librariesResource = bootstrapPlugin.getResource("libraries.zip")
+            val librariesResource = bootstrapper.getResource("libraries.zip")
             val libFolder = File("${config.rootScriptsFolder}/lib")
             if (librariesResource != null && !libFolder.exists()) {
                 if(debugEnabled) {
-                    bootstrapPlugin.logger.info("Extracting javascript libraries from ScriptableMC-Engine-JS resources to ${libFolder.path}...")
+                    bootstrapper.logger.info("Extracting javascript libraries from ScriptableMC-Engine-JS resources to ${libFolder.path}...")
                 }
                 UnzipUtility.unzip(librariesResource, libFolder)
             }
@@ -42,18 +44,18 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: PluginEngineMain, ove
 
         if(config.commonJsModulesEnabled) {
             if(config.debug) {
-                bootstrapPlugin.logger.info("Enabling CommonJS support...")
+                bootstrapper.logger.info("Enabling CommonJS support...")
             }
 
             if (!File(config.commonJsModulesPath).exists()) {
                 if(config.debug) {
-                    bootstrapPlugin.logger.info("CommonJS creating modules folder: ${config.commonJsModulesPath}")
+                    bootstrapper.logger.info("CommonJS creating modules folder: ${config.commonJsModulesPath}")
                 }
                 File(config.commonJsModulesPath).mkdirs()
             }
             else {
                 if(config.debug) {
-                    bootstrapPlugin.logger.info("CommonJS using modules folder: ${config.commonJsModulesPath}")
+                    bootstrapper.logger.info("CommonJS using modules folder: ${config.commonJsModulesPath}")
                 }
             }
 
@@ -63,18 +65,18 @@ class JavaScriptPluginEngine(override val bootstrapPlugin: PluginEngineMain, ove
 
             if (File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).exists()) {
                 if(config.debug) {
-                    bootstrapPlugin.logger.info("CommonJS using globals: ${File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).path}")
+                    bootstrapper.logger.info("CommonJS using globals: ${File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).path}")
                 }
                 contextBuilder = contextBuilder
                     .option("js.commonjs-global-properties", config.commonJsGlobalsFile)
             }
             else {
                 if(config.debug) {
-                    bootstrapPlugin.logger.warning("CommonJS unable to read globals: ${File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).path}")
+                    bootstrapper.logger.warning("CommonJS unable to read globals: ${File(File(config.commonJsModulesPath), config.commonJsGlobalsFile).path}")
                 }
             }
 
-            bootstrapPlugin.logger.info("CommonJS support enabled.")
+            bootstrapper.logger.info("CommonJS support enabled.")
         }
 
         if(config.debugger.enabled) {

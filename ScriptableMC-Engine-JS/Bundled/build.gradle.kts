@@ -21,7 +21,7 @@ idea {
 }
 
 dependencies {
-    implementation(project(":ScriptableMC-Engine-JS"))
+    implementation(project(":ScriptableMC-Engine-JS", "shadow"))
 
     // GraalVM SDK & GraalJS Engine
     implementation("org.graalvm.sdk:graal-sdk:$graalvmVersion")

@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     java
     id("org.jetbrains.kotlin.jvm")
@@ -5,6 +7,7 @@ plugins {
     id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
+var smcVersion = findProperty("smc.version")
 var graalvmVersion = findProperty("graalvm.version")
 var spigotmcVersion = findProperty("spigotmc.version")
 
@@ -39,22 +42,37 @@ dependencies {
     testImplementation("junit", "junit", "4.12")
 }
 
-tasks.compileKotlin {
-    kotlinOptions.jvmTarget = "11"
-    kotlinOptions.javaParameters = true
-}
-tasks.compileTestKotlin {
-    kotlinOptions.jvmTarget = "11"
-    kotlinOptions.javaParameters = true
-}
+tasks {
+    processResources {
+        expand(
+            "smcVersion" to smcVersion,
+            "graalvmVersion" to graalvmVersion,
+            "spigotmcVersion" to spigotmcVersion,
+        )
+    }
 
-tasks.jar {
+    compileKotlin {
+        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.javaParameters = true
+    }
 
-}
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.javaParameters = true
+    }
 
-tasks.shadowJar {
-    archiveFileName.set("ScriptableMC-Engine-JS.jar")
-    relocate("co.aikar.commands", "com.pixlfox.scriptablemc.acf")
-    relocate("de.tr7zw.changeme.nbtapi", "com.smc.nbtapi")
-    mergeServiceFiles()
+    jar { }
+
+    shadowJar {
+        dependencies {
+            exclude(dependency("org.spigotmc:spigot-api"))
+            exclude(dependency("net.md-5:bungeecord-chat"))
+            exclude(dependency("junit:junit"))
+        }
+
+        archiveFileName.set("ScriptableMC-Engine-JS.jar")
+        relocate("co.aikar.commands", "com.pixlfox.scriptablemc.acf")
+        relocate("de.tr7zw.changeme.nbtapi", "com.smc.nbtapi")
+        mergeServiceFiles()
+    }
 }

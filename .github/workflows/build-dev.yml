@@ -11,53 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Adopt OpenJDK 11
-      uses: actions/setup-java@v2
+    - uses: actions/setup-java@v2
       with:
         distribution: 'adopt'
         java-version: '11'
-    - name: Set up Node.js v14
-      uses: actions/setup-node@v2
+    - uses: actions/setup-node@v2
       with:
         node-version: '14'
     - name: Fix gradlew permissions
       run: chmod +x ./gradlew
-    - name: Export TypeScript Libraries with Gradle
-      run: ./gradlew :ScriptableMC-Tools-TS:Standalone:exportTypeScriptLibraries
-    - name: Compile TypeScript libraries and create archives
-      run: |
-        cd ./ScriptableMC-Tools-TS/Standalone/lib/
-        npm install
-        npm run compile
-        cd ./ts/
-        zip -r ../ScriptableMC-TypeScript-Lib.zip ./*
-        cd ../js/
-        zip -r ../ScriptableMC-JavaScript-Lib.zip ./*
-        cd ../
-        cp ./ScriptableMC-JavaScript-Lib.zip ../../../ScriptableMC-Engine-JS/src/main/resources/libraries.zip
-    - name: Export lib-smc with gradle
-      run: ./gradlew :ScriptableMC-Tools-TS:Standalone:generateLibSMC
-    - name: Compile lib-smc, create archive, and publish
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        cd ./ScriptableMC-Tools-TS/Standalone/lib-smc/
-        npm install
-        npm run compile
-        npm publish ./js
-        zip -r ./Lib-SMC.zip ./*
-    - name: Build All Plugins with Gradle
+    - name: Build plugin jar files with Gradle
       run: ./gradlew :shadowJarAll
     - name: Copy artifacts
       run: |
         mkdir artifacts
         cp ./build/ScriptableMC-Engine-JS.jar ./artifacts/
         cp ./build/ScriptableMC-Engine-JS-Bundled.jar ./artifacts/
-        cp ./build/ScriptableMC-Tools-TS.jar ./artifacts/
-        cp ./build/ScriptableMC-Tools-TS-Standalone.jar ./artifacts/
-        cp ./ScriptableMC-Tools-TS/Standalone/lib/ScriptableMC-TypeScript-Lib.zip ./artifacts/
-        cp ./ScriptableMC-Tools-TS/Standalone/lib/ScriptableMC-JavaScript-Lib.zip ./artifacts/
-        cp ./ScriptableMC-Tools-TS/Standalone/lib-smc/Lib-SMC.zip ./artifacts/
     - uses: actions/upload-artifact@v2
       with:
         name: ScriptableMC-Engine-DEV

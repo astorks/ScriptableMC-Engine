@@ -1,5 +1,7 @@
-package com.pixlfox.scriptablemc.core
+package com.pixlfox.scriptablemc.js.core
 
+import com.pixlfox.scriptablemc.core.ScriptablePluginContext
+import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.smc.version.Version
 import org.bukkit.Material
 import org.bukkit.event.HandlerList
@@ -13,7 +15,7 @@ class JavaScriptPluginContext(override val engine: ScriptablePluginEngine, overr
 
     override fun load() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Loading JavaScript plugin context.")
+            engine.bootstrapper.logger.info("[$pluginName] Loading JavaScript plugin context.")
         }
 
         pluginInstance.invokeMember("onLoad")
@@ -21,7 +23,7 @@ class JavaScriptPluginContext(override val engine: ScriptablePluginEngine, overr
 
     override fun enable() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Enabling JavaScript plugin context.")
+            engine.bootstrapper.logger.info("[$pluginName] Enabling JavaScript plugin context.")
         }
 
         pluginInstance.invokeMember("onEnable")
@@ -30,7 +32,7 @@ class JavaScriptPluginContext(override val engine: ScriptablePluginEngine, overr
 
     override fun disable() {
         if(engine.debugEnabled) {
-            engine.bootstrapPlugin.logger.info("[$pluginName] Disabling JavaScript plugin context.")
+            engine.bootstrapper.logger.info("[$pluginName] Disabling JavaScript plugin context.")
         }
 
         pluginInstance.invokeMember("onDisable")
@@ -47,7 +49,7 @@ class JavaScriptPluginContext(override val engine: ScriptablePluginEngine, overr
     companion object {
         fun newInstance(pluginName: String, pluginIcon: Material, engine: ScriptablePluginEngine, pluginInstance: Value): ScriptablePluginContext {
             if(engine.debugEnabled) {
-                engine.bootstrapPlugin.logger.info("[$pluginName] Creating new JavaScript plugin context.")
+                engine.bootstrapper.logger.info("[$pluginName] Creating new JavaScript plugin context.")
             }
 
             return JavaScriptPluginContext(engine, pluginName, pluginIcon, pluginInstance)
