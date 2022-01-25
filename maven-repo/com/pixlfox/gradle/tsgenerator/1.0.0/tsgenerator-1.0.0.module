@@ -1,0 +1,114 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.pixlfox.gradle",
+    "module": "tsgenerator",
+    "version": "1.0.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.3.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "files": [
+        {
+          "name": "tsgenerator-1.0.0.jar",
+          "url": "tsgenerator-1.0.0.jar",
+          "size": 55852,
+          "sha512": "350701192becb454a2c0a83d2b39261e33e8bbc65f7916c96a3c590fbc8bef04d9830e10253ecd80f78dc44d14f97ad2636e5944d65990bc20f07f97f2a473bb",
+          "sha256": "6b339e980117726d7b3c60219ff5f8f26c9a7548b437c1c416809cdbaf1c318d",
+          "sha1": "1f91bac6bb600c0865e40b0a6d90bdab7d2de1f0",
+          "md5": "a0b9c1aef7b3a1d6d3eb7ecddd13674f"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.6.10"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-reflect",
+          "version": {
+            "requires": "1.6.10"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-core",
+          "version": {
+            "requires": "5.3.13"
+          }
+        },
+        {
+          "group": "com.beust",
+          "module": "klaxon",
+          "version": {
+            "requires": "5.5"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "tsgenerator-1.0.0.jar",
+          "url": "tsgenerator-1.0.0.jar",
+          "size": 55852,
+          "sha512": "350701192becb454a2c0a83d2b39261e33e8bbc65f7916c96a3c590fbc8bef04d9830e10253ecd80f78dc44d14f97ad2636e5944d65990bc20f07f97f2a473bb",
+          "sha256": "6b339e980117726d7b3c60219ff5f8f26c9a7548b437c1c416809cdbaf1c318d",
+          "sha1": "1f91bac6bb600c0865e40b0a6d90bdab7d2de1f0",
+          "md5": "a0b9c1aef7b3a1d6d3eb7ecddd13674f"
+        }
+      ]
+    },
+    {
+      "name": "shadowRuntimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "shadowed",
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "tsgenerator-1.0.0-all.jar",
+          "url": "tsgenerator-1.0.0-all.jar",
+          "size": 78583114,
+          "sha512": "42a12776eb55e67c7352df4cb12802844de7d1aee5696752db64f90c2a6207a15e2b4839dbb1f3e981316449602c1f8cad9845457a4f4420b83d9004797beafe",
+          "sha256": "da27cdefae2c9162bd9199754310e58f0edef548687ff694cf5cfbbb60cdc71c",
+          "sha1": "4c3b62a5e52a7395cf1b0c11f8c5de11147ee6ad",
+          "md5": "2252d190b3aa9daff12c78681b735e6c"
+        }
+      ]
+    }
+  ]
+}

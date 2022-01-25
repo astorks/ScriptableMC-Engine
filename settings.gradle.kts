@@ -3,7 +3,13 @@ rootProject.name = "ScriptableMC-Engine"
 include("ScriptableMC-Engine-Core")
 include("ScriptableMC-Engine-JS")
 include("ScriptableMC-Engine-JS:Bundled")
-//include("ScriptableMC-Engine-PY")
-//include("ScriptableMC-Engine-PY:Bundled")
-//include("ScriptableMC-Tools-TS")
-//include("ScriptableMC-Tools-TS:Standalone")
+
+pluginManagement {
+    repositories {
+        maven {
+            name = "LocalMavenFS"
+            url = uri("./maven-repo")
+        }
+        gradlePluginPortal()
+    }
+}

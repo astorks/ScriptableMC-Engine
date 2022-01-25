@@ -1,12 +1,21 @@
+import com.pixlfox.gradle.typeScriptDefinition
+
 plugins {
     java
     id("org.jetbrains.kotlin.jvm")
     id("com.github.johnrengelman.shadow")
     id("org.jetbrains.gradle.plugin.idea-ext")
+    id("com.pixlfox.gradle.tsgenerator")
 }
 
 var graalvmVersion = findProperty("graalvm.version")
 var spigotmcVersion = findProperty("spigotmc.version")
+
+typeScriptDefinition {
+    commentTypes = true
+    debug = true
+    debugCopyArtifacts = true
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
