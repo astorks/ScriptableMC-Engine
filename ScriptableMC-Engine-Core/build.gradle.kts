@@ -1,20 +1,22 @@
-import com.pixlfox.gradle.typeScriptDefinition
+import com.pixlfox.scriptablemc.smc
 
 plugins {
     java
     id("org.jetbrains.kotlin.jvm")
     id("com.github.johnrengelman.shadow")
     id("org.jetbrains.gradle.plugin.idea-ext")
-    id("com.pixlfox.gradle.tsgenerator")
+    id("com.pixlfox.scriptablemc.buildtools")
 }
 
 var graalvmVersion = findProperty("graalvm.version")
 var spigotmcVersion = findProperty("spigotmc.version")
 
-typeScriptDefinition {
-    commentTypes = true
-    debug = true
-    debugCopyArtifacts = true
+smc {
+    typescript {
+        commentTypes = true
+        debug = true
+        debugCopyArtifacts = true
+    }
 }
 
 java {

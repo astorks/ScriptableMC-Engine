@@ -7,8 +7,8 @@ include("ScriptableMC-Engine-JS:Bundled")
 pluginManagement {
     repositories {
         maven {
-            name = "LocalMavenFS"
-            url = uri("./maven-repo")
+            name = "SMCBuildTools"
+            url = uri("https://raw.githubusercontent.com/astorks/ScriptableMC-Tools/maven")
         }
         gradlePluginPortal()
     }

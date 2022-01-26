@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.6.10" apply false
     id("com.github.johnrengelman.shadow") version "7.0.0" apply false
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.1" apply false
-    id("com.pixlfox.gradle.tsgenerator") version "1.0.0" apply false
+    id("com.pixlfox.scriptablemc.buildtools") version "1.0.3" apply false
 }
 
 var smcVersion = findProperty("smc.version")!!
