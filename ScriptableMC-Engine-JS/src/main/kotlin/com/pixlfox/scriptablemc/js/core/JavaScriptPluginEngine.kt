@@ -5,9 +5,11 @@ import com.pixlfox.scriptablemc.core.ScriptablePluginContext
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.js.JavaScriptPluginEngineConfig
 import com.pixlfox.scriptablemc.utils.UnzipUtility
+import fr.minuskube.inv.InventoryManager
 import org.bukkit.Material
 import org.graalvm.polyglot.*
 import java.io.File
+
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class JavaScriptPluginEngine(override val bootstrapper: ScriptablePluginEngineBootstrapper, override val config: JavaScriptPluginEngineConfig): ScriptablePluginEngine() {
@@ -18,7 +20,6 @@ class JavaScriptPluginEngine(override val bootstrapper: ScriptablePluginEngineBo
     override val graalContext: Context
     override val globalBindings: Value
     override val scriptablePlugins: MutableList<ScriptablePluginContext> = mutableListOf()
-//    override val inventoryManager: InventoryManager = InventoryManager(bootstrapPlugin)
 
     init {
         if(config.extractLibs) {
@@ -40,7 +41,11 @@ class JavaScriptPluginEngine(override val bootstrapper: ScriptablePluginEngineBo
             .allowHostClassLoading(true)
             .allowIO(true)
             .allowCreateThread(true)
-            .option("js.ecmascript-version", "2020")
+            .option("js.ecmascript-version", "latest")
+            .option("engine.WarnInterpreterOnly", "false")
+            .option("log.file", "logs/script-engine.log")
+            .option("js.esm-eval-returns-exports", "true")
+            .fileSystem(JavaScriptPluginFileSystem(this))
 
         if(config.commonJsModulesEnabled) {
             if(config.debug) {
@@ -107,19 +112,33 @@ class JavaScriptPluginEngine(override val bootstrapper: ScriptablePluginEngineBo
         val pluginInstance = scriptableClass.newInstance()
         val pluginName = pluginInstance.getMember("pluginName").asString()
         var pluginIcon = Material.STONE
-        if(pluginInstance.hasMember("pluginIcon")) {
+        var pluginPriority = 0
+        if(pluginInstance.hasMember("icon")) {
             try {
-                pluginIcon = pluginInstance.getMember("pluginIcon").`as`(Material::class.java)
+                pluginIcon = pluginInstance.getMember("icon").`as`(Material::class.java)
             }
-            catch(e: Exception) {
-                e.printStackTrace()
-            }
+            catch(_: Exception) { }
         }
-        val pluginContext = JavaScriptPluginContext.newInstance(pluginName, pluginIcon, this, pluginInstance)
+        if(pluginInstance.hasMember("priority")) {
+            try {
+                pluginPriority = pluginInstance.getMember("priority").asInt()
+            }
+            catch(_: Exception) { }
+        }
+        val pluginContext = JavaScriptPluginContext.newInstance(pluginName, pluginPriority, pluginIcon, this, pluginInstance)
         pluginInstance.putMember("context", pluginContext)
         scriptablePlugins.add(pluginContext)
         pluginContext.load()
         return pluginContext
+    }
+
+    override fun unloadPlugin(pluginContext: ScriptablePluginContext) {
+        if(pluginContext.isEnabled) {
+            pluginContext.disable()
+        }
+
+        pluginContext.unload()
+        scriptablePlugins.remove(pluginContext)
     }
 
     companion object {

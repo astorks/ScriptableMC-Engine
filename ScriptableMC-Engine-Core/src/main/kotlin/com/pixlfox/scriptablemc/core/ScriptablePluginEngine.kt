@@ -37,6 +37,8 @@ abstract class ScriptablePluginEngine {
     val startupErrors: MutableList<Exception> = mutableListOf()
 
     open fun start() {
+        startupErrors.clear()
+
         globalBindings.putMember("engine", this)
 
         loadAllHelperClasses()
@@ -44,18 +46,11 @@ abstract class ScriptablePluginEngine {
         for(mainScriptFile in config.mainScriptFiles) {
             loadMainScript(mainScriptFile)
         }
-
-        if(!enabledAllPlugins && config.autoEnablePlugins) {
-            enableAllPlugins()
-        }
     }
 
     open fun close() {
-        for(scriptablePlugin in scriptablePlugins) {
-            scriptablePlugin.disable()
-        }
-        scriptablePlugins.clear()
-
+        disableAllPlugins()
+        unloadAllPlugins()
         graalContext.close(true)
     }
 
@@ -74,17 +69,29 @@ abstract class ScriptablePluginEngine {
     }
 
     open fun enableAllPlugins() {
-        for (pluginContext in scriptablePlugins.filter { !it.isEnabled }) {
+        val scriptablePlugins = scriptablePlugins.toList()
+
+        for (pluginContext in scriptablePlugins.filter { !it.isEnabled }.sortedByDescending { it.pluginPriority }) {
             enablePlugin(pluginContext)
         }
         enabledAllPlugins = true
     }
 
     open fun disableAllPlugins() {
-        for (pluginContext in scriptablePlugins.filter { it.isEnabled }) {
+        val scriptablePlugins = scriptablePlugins.toList()
+
+        for (pluginContext in scriptablePlugins.filter { it.isEnabled }.sortedBy { it.pluginPriority }) {
             disablePlugin(pluginContext)
         }
         enabledAllPlugins = false
+    }
+
+    open fun unloadAllPlugins() {
+        val scriptablePlugins = scriptablePlugins.toList()
+
+        for (pluginContext in scriptablePlugins.sortedBy { it.pluginPriority }) {
+            unloadPlugin(pluginContext)
+        }
     }
 
     open fun enablePlugin(pluginContext: ScriptablePluginContext) {
@@ -120,22 +127,8 @@ abstract class ScriptablePluginEngine {
     open fun evalCommandSender(source: String, sender: CommandSender): Value {
         val tempScriptFile = File("${config.rootScriptsFolder}/${UUID.randomUUID()}.$languageFileExtension")
         try {
-            tempScriptFile.writeText(config.executeCommandTemplate.replace("%SOURCE%", source))
-
-            var evalReturn = evalFile(tempScriptFile)
-
-            if(evalReturn.canInstantiate()) {
-                evalReturn = evalReturn.newInstance()
-            }
-
-            if(evalReturn.hasMember("execute") && evalReturn.canInvokeMember("execute")) {
-                evalReturn.putMember("sender", sender)
-                evalReturn.putMember("server", Bukkit.getServer())
-                evalReturn.putMember("servicesManager", Bukkit.getServicesManager())
-                return evalReturn.invokeMember("execute", sender, Bukkit.getServer(), Bukkit.getServicesManager())
-            }
-
-            return evalReturn
+            tempScriptFile.writeText(source)
+            return evalFile(tempScriptFile)
         }
         finally {
             tempScriptFile.delete()
@@ -184,6 +177,10 @@ abstract class ScriptablePluginEngine {
 
     open fun loadMainScript(path: String) {
         try {
+            if(config.debug) {
+                bootstrapper.logger.info("Loading main script file: $path")
+            }
+
             val mainScriptFile = File(path)
             if(!mainScriptFile.parentFile.exists()) {
                 mainScriptFile.parentFile.mkdirs()
@@ -195,14 +192,13 @@ abstract class ScriptablePluginEngine {
                         .name(mainScriptFile.name)
                         .mimeType(config.scriptMimeType)
                         .interactive(false)
+                        .cached(false)
                         .build()
                 )
 
-                // Load all plugin types returned as an array
-                if(mainReturn.hasArrayElements()) {
-                    for (i in 0 until mainReturn.arraySize) {
-                        this.loadPlugin(mainReturn.getArrayElement(i))
-                    }
+                // Load exported JsPlugins
+                for(key in mainReturn.memberKeys) {
+                    this.loadPlugin(mainReturn.getMember(key))
                 }
             }
             else {
@@ -215,6 +211,7 @@ abstract class ScriptablePluginEngine {
     }
 
     abstract fun loadPlugin(scriptableClass: Value): ScriptablePluginContext
+    abstract fun unloadPlugin(pluginContext: ScriptablePluginContext)
 
     companion object {
         val preLoadClasses: Array<String> = arrayOf(
@@ -223,7 +220,6 @@ abstract class ScriptablePluginEngine {
 
             "com.smc.utils.ItemBuilder",
             "com.smc.utils.MysqlWrapper",
-            "com.smc.utils.Http",
 
             "com.smc.smartinvs.SmartInventory",
             "com.smc.smartinvs.SmartInventoryProvider",

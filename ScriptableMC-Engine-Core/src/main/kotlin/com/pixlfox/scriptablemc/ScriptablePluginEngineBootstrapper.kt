@@ -9,8 +9,8 @@ import org.bukkit.plugin.java.JavaPlugin
 
 @Suppress("unused")
 abstract class ScriptablePluginEngineBootstrapper : JavaPlugin() {
-    var scriptEngine: ScriptablePluginEngine? = null
-    var commandManager: PaperCommandManager? = null
+    lateinit var scriptEngine: ScriptablePluginEngine
+    lateinit var commandManager: PaperCommandManager
     abstract val chatMessagePrefix: String
     abstract val scriptLanguage: String
 
@@ -20,29 +20,29 @@ abstract class ScriptablePluginEngineBootstrapper : JavaPlugin() {
     abstract fun reloadScriptEngine(sender: CommandSender? = null)
 
     fun versionCheck(sender: CommandSender? = null) {
-        if(config.getBoolean("version_check", true)) {
-            khttp.async.get("https://api.github.com/repos/astorks/ScriptableMC-Engine/releases/latest") {
-                val githubReleaseInfo = this.jsonObject
-                val latestReleaseVersion = Version.parse(githubReleaseInfo.getString("tag_name"))
-                val currentVersion = Version.parse("v${description.version}")
-                val releaseLink = githubReleaseInfo.getString("html_url")
-
-                if (currentVersion.isBefore(latestReleaseVersion)) {
-                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.YELLOW}An update was found.")
-                    sender?.sendMessage("$chatMessagePrefix CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion.")
-                    sender?.sendMessage("$chatMessagePrefix Download Page: $releaseLink")
-                    logger.warning("An update was found. CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
-                    logger.fine("Download Page: $releaseLink")
-                }
-                else {
-                    sender?.sendMessage("$chatMessagePrefix No updates found.")
-                    sender?.sendMessage("$chatMessagePrefix CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
-                    if (config.getBoolean("debug", false)) {
-                        logger.info("No updates found. CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
-                    }
-                }
-            }
-        }
+//        if(config.getBoolean("version_check", true)) {
+//            khttp.async.get("https://api.github.com/repos/astorks/ScriptableMC-Engine/releases/latest") {
+//                val githubReleaseInfo = this.jsonObject
+//                val latestReleaseVersion = Version.parse(githubReleaseInfo.getString("tag_name"))
+//                val currentVersion = Version.parse("v${description.version}")
+//                val releaseLink = githubReleaseInfo.getString("html_url")
+//
+//                if (currentVersion.isBefore(latestReleaseVersion)) {
+//                    sender?.sendMessage("$chatMessagePrefix ${ChatColor.YELLOW}An update was found.")
+//                    sender?.sendMessage("$chatMessagePrefix CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion.")
+//                    sender?.sendMessage("$chatMessagePrefix Download Page: $releaseLink")
+//                    logger.warning("An update was found. CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
+//                    logger.fine("Download Page: $releaseLink")
+//                }
+//                else {
+//                    sender?.sendMessage("$chatMessagePrefix No updates found.")
+//                    sender?.sendMessage("$chatMessagePrefix CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
+//                    if (config.getBoolean("debug", false)) {
+//                        logger.info("No updates found. CurrentVersion: $currentVersion, LatestRelease: $latestReleaseVersion")
+//                    }
+//                }
+//            }
+//        }
     }
 
     companion object {

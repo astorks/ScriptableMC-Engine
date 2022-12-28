@@ -19,7 +19,7 @@ class JavaScriptPluginEngineConfig(config: FileConfiguration) : ScriptablePlugin
         get() = readConfigString("script_mime_type", "application/javascript+module")
 
     val commonJsModulesEnabled: Boolean
-        get() = readConfigBoolean("common_js.modules_enabled", true)
+        get() = readConfigBoolean("common_js.enabled", false)
 
     val commonJsModulesPath: String
         get() = readConfigString("common_js.modules_path", "\${root_scripts_folder}/node_modules")

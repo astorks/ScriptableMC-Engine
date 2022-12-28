@@ -5,6 +5,8 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Subcommand
 import co.aikar.commands.annotation.Syntax
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.result.success
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.PolyglotException
@@ -15,11 +17,18 @@ import org.graalvm.polyglot.PolyglotException
 @Subcommand("javascript|js")
 class JavaScriptPluginEngineCommands(private val bootstrapper: JavaScriptPluginEngineBootstrapper) : BaseCommand() {
 
+//    @Subcommand("fullreload|frl")
+//    @CommandAlias("jsfrl")
+//    @CommandPermission("scriptablemc.js.fullreload")
+//    fun fullReload(sender: CommandSender) {
+//        bootstrapper.fullReloadScriptEngine(sender)
+//    }
+
     @Subcommand("reload|rl")
     @CommandAlias("jsrl")
     @CommandPermission("scriptablemc.js.reload")
     fun reload(sender: CommandSender) {
-        bootstrapper.reloadScriptEngine(sender)
+        bootstrapper.fullReloadScriptEngine(sender)
     }
 
     @Subcommand("pastebin|pb")
@@ -27,12 +36,9 @@ class JavaScriptPluginEngineCommands(private val bootstrapper: JavaScriptPluginE
     @CommandPermission("scriptablemc.js.execute.pastebin")
     @Syntax("<code>")
     fun executePastebin(sender: CommandSender, code: String) {
-        val response = khttp.get("https://pastebin.com/raw/$code")
-        if(response.statusCode == 200) {
-            executeCode(sender, response.text)
-        }
-        else {
-            sender.sendMessage("${ChatColor.RED}Unable to load pastebin: $code, reason: STATUS_CODE ${response.statusCode}.")
+        val (_, _, result) = "https://pastebin.com/raw/$code".httpGet().responseString()
+        result.success {
+            executeCode(sender, it)
         }
     }
 
@@ -46,9 +52,10 @@ class JavaScriptPluginEngineCommands(private val bootstrapper: JavaScriptPluginE
 
     private fun executeCode(sender: CommandSender, code: String) {
         try {
-            val response = bootstrapper.scriptEngine!!.evalCommandSender(code, sender)
-            if (!response.isNull) {
-                sender.sendMessage(response.toString())
+            val response = bootstrapper.scriptEngine.evalCommandSender(code, sender)
+
+            for (key in response.memberKeys) {
+                sender.sendMessage("$key: ${response.getMember(key)}")
             }
         } catch (e: PolyglotException) {
             e.printStackTrace()
@@ -82,9 +89,10 @@ class JavaScriptPluginEngineCommands(private val bootstrapper: JavaScriptPluginE
         }
 
         try {
-            val response = bootstrapper.scriptEngine!!.evalFile(filePath)
-            if (!response.isNull) {
-                sender.sendMessage(response.toString())
+            val response = bootstrapper.scriptEngine.evalFile(filePath)
+
+            for (key in response.memberKeys) {
+                sender.sendMessage("$key: ${response.getMember(key)}")
             }
         }
         catch (e: Exception) {

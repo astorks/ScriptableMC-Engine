@@ -4,7 +4,7 @@
 root_scripts_folder: './scripts'
 
 # Script MIME type
-# ES2020 Module: application/javascript+module
+# JavaScript Module: application/javascript+module
 # Pure JavaScript: application/javascript
 # Default: application/javascript+module
 script_mime_type: 'application/javascript+module'
@@ -44,10 +44,8 @@ extract_libs: true
 # as well as set returnedObject.sender, returnedObject.server, and returnedObject.servicesManager
 # you can also add additional methods, vars to the template source below
 # Otherwise the script engine will return last execute code
-# %SOURCE% will be replaced with with the command source.
+# %SOURCE% will be replaced with the command source.
 execute_command_template: "
-import * as lib from './lib/global.js';
-
 new (class EvalCommandSenderContext {
   execute(sender, server, servicesManager) {
     %SOURCE%
@@ -57,8 +55,8 @@ new (class EvalCommandSenderContext {
 common_js:
   # Enable CommonJS `require()` support
   # Allows the use of CommonJS NPM modules
-  # Default: true
-  enabled: true
+  # Default: false
+  enabled: false
 
   # CommonJS modules path
   # The default path to load CommonJS modules from.

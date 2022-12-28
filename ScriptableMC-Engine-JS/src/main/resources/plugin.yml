@@ -1,7 +1,7 @@
 name: ScriptableMC-Engine-JS
-description: 'Run JavaScript/TypeScript plugins for Bukkit/Spigot/Paper Minecraft 1.17'
+description: 'Run JavaScript/TypeScript plugins for Bukkit/Spigot/Paper Minecraft 1.19'
 version: '${smcVersion}'
 api-version: '1.13'
 author: AStorks
-main: com.pixlfox.scriptablemc.js.JavaScriptPluginEngineMain
+main: com.pixlfox.scriptablemc.js.JavaScriptPluginEngineBootstrapper
 softdepend: [PlaceholderAPI, CommandAPI]

@@ -27,7 +27,10 @@ abstract class ScriptablePluginContext: Listener {
     abstract val pluginName: String
     abstract val pluginInstance: Value
     abstract val pluginVersion: Version
+    abstract val logger: ScriptablePluginLogger
+    abstract val scheduler: ScriptablePluginScheduler
     open val pluginIcon: Material = Material.STONE
+    open val pluginPriority: Int = 0
 
     var isEnabled: Boolean = false
         internal set
@@ -48,6 +51,8 @@ abstract class ScriptablePluginContext: Listener {
     abstract fun enable()
 
     abstract fun disable()
+
+    abstract fun unload()
 
     fun registerEvent(eventClass: Class<out Event>, executor: EventExecutor) {
         Bukkit.getServer().pluginManager.registerEvent(eventClass, this, EventPriority.NORMAL, executor, javaPlugin)
