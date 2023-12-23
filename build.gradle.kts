@@ -1,13 +1,14 @@
 plugins {
     java
-    id("org.jetbrains.kotlin.jvm") version "1.7.21" apply false
-    id("com.github.johnrengelman.shadow") version "7.1.2" apply false
-    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.6" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.9.22" apply false
+//    id("com.github.johnrengelman.shadow") version "8.1.1" apply false
+    id("io.github.goooler.shadow") version "8.1.2" apply false
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7" apply false
 }
 
 allprojects {
     group = project.findProperty("maven_group") ?: "com.pixlfox.scriptablemc"
-    version = project.findProperty("plugin_version") ?: "1.0.0-SNAPSHOT"
+    version = project.findProperty("plugin.version") ?: "2.0.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -54,16 +55,13 @@ tasks.register("shadowJarAll") {
     dependsOn(":ScriptableMC-Engine-JS:shadowJarEngine")
 
     doFirst {
-        if(!file("./build").exists()) file("./build").mkdirs()
-        if(file("./build/ScriptableMC-Engine-Core.jar").exists()) file("./build/ScriptableMC-Engine-Core.jar").delete()
-        if(file("./build/ScriptableMC-Engine-JS.jar").exists()) file("./build/ScriptableMC-Engine-JS.jar").delete()
-        if(file("./build/ScriptableMC-Engine-JS-Bundled.jar").exists()) file("./build/ScriptableMC-Engine-JS-Bundled.jar").delete()
+        if(!file("./build/libs").exists()) file("./build/libs").mkdirs()
     }
 
     doLast {
-        file("./ScriptableMC-Engine-Core/build/libs/ScriptableMC-Engine-Core.jar").copyTo(file("./build/ScriptableMC-Engine-Core.jar"), overwrite = true)
-        file("./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar").copyTo(file("./build/ScriptableMC-Engine-JS.jar"), overwrite = true)
-        file("./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS-Bundled.jar").copyTo(file("./build/ScriptableMC-Engine-JS-Bundled.jar"), overwrite = true)
+        file("./ScriptableMC-Engine-Core/build/libs/ScriptableMC-Engine-Core.jar").copyTo(file("./build/libs/ScriptableMC-Engine-Core.jar"), overwrite = true)
+        file("./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS.jar").copyTo(file("./build/libs/ScriptableMC-Engine-JS.jar"), overwrite = true)
+        file("./ScriptableMC-Engine-JS/build/libs/ScriptableMC-Engine-JS-Bundled.jar").copyTo(file("./build/libs/ScriptableMC-Engine-JS-Bundled.jar"), overwrite = true)
     }
 
 }

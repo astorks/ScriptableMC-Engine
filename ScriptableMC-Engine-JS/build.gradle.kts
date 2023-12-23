@@ -1,20 +1,25 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.apache.tools.ant.filters.ReplaceTokens
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 
 plugins {
     java
     id("org.jetbrains.kotlin.jvm")
-    id("com.github.johnrengelman.shadow")
+//    id("com.github.johnrengelman.shadow")
+    id("io.github.goooler.shadow")
     id("org.jetbrains.gradle.plugin.idea-ext")
 }
 
-var pluginVersion = findProperty("plugin.version") ?: "1.0.0-SNAPSHOT"
-var graalvmVersion = findProperty("dependencies.graalvm.version") ?: "22.3.0"
-var spigotmcVersion = findProperty("dependencies.spigotmc.version") ?: "1.19.2-R0.1-SNAPSHOT"
+var pluginVersion = findProperty("plugin.version") ?: "2.0.0-dev"
+var graalvmVersion = findProperty("dependencies.graalvm.version") ?: "23.0.2"
+var spigotmcVersion = findProperty("dependencies.spigotmc.version") ?: "1.20.4-R0.1-SNAPSHOT"
+
+version = pluginVersion
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility  = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility  = JavaVersion.VERSION_17
+
 }
 
 idea {
@@ -24,8 +29,8 @@ idea {
     }
 }
 
-val baseShadow by configurations.creating
-val engineShadow by configurations.creating
+val baseShadow: Configuration by configurations.creating
+val engineShadow: Configuration by configurations.creating
 
 dependencies {
     implementation(project(":ScriptableMC-Engine-Core"))
@@ -40,7 +45,6 @@ dependencies {
     compileOnly("co.aikar:acf-paper:0.5.1-SNAPSHOT")
     compileOnly("com.github.kittinunf.fuel:fuel:2.3.1")
     compileOnly("com.github.kittinunf.fuel:fuel-json:2.3.1")
-    compileOnly("fr.minuskube.inv:smart-invs:1.2.7")
 
     baseShadow(project)
     baseShadow("org.graalvm.sdk:graal-sdk:$graalvmVersion")
@@ -48,7 +52,6 @@ dependencies {
     baseShadow("com.github.kittinunf.fuel:fuel:2.3.1")
     baseShadow("com.github.kittinunf.fuel:fuel-json:2.3.1")
     baseShadow("co.aikar:acf-paper:0.5.1-SNAPSHOT")
-    baseShadow("de.tr7zw:item-nbt-api:2.8.0")
     baseShadow("fr.minuskube.inv:smart-invs:1.2.7")
 
     engineShadow("org.graalvm.js:js:$graalvmVersion")
@@ -69,21 +72,29 @@ tasks {
     }
 
     compileKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "17"
         kotlinOptions.javaParameters = true
     }
 
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "17"
         kotlinOptions.javaParameters = true
     }
 
-    jar { }
+    jar {
+        archiveBaseName.set("smcjs-classes")
+    }
+
+    shadowJar {
+        enabled = false
+        dependsOn("shadowJarBase")
+        dependsOn("shadowJarEngine")
+    }
 
     register("shadowJarBase", ShadowJar::class.java) {
         group = "shadow"
         configurations = listOf(baseShadow)
-        archiveFileName.set("ScriptableMC-Engine-JS.jar")
+        archiveFileName.set("smcjs-$pluginVersion.jar")
 
         dependencies {
             exclude(dependency("org.spigotmc:spigot-api"))
@@ -105,7 +116,7 @@ tasks {
     register("shadowJarEngine", ShadowJar::class.java) {
         group = "shadow"
         configurations = listOf(baseShadow, engineShadow)
-        archiveFileName.set("ScriptableMC-Engine-JS-Bundled.jar")
+        archiveFileName.set("smcjs-bundle-$pluginVersion.jar")
 
         dependencies {
             exclude(dependency("org.spigotmc:spigot-api"))

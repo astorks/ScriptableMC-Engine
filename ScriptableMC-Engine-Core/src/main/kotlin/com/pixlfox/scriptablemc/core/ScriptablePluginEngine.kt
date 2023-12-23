@@ -4,8 +4,6 @@ import com.pixlfox.scriptablemc.ScriptablePluginEngineBootstrapper
 import com.pixlfox.scriptablemc.ScriptablePluginEngineConfig
 import com.smc.exceptions.ScriptNotFoundException
 import com.smc.version.Version
-import fr.minuskube.inv.InventoryManager
-import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.graalvm.polyglot.*
 import java.io.File
@@ -24,9 +22,6 @@ abstract class ScriptablePluginEngine {
     abstract val globalBindings: Value
 
     abstract val config: ScriptablePluginEngineConfig
-
-    val inventoryManager: InventoryManager
-        get() = InventoryManager(bootstrapper)
 
     val pluginVersion: Version
         get() = bootstrapper.pluginVersion
@@ -217,14 +212,9 @@ abstract class ScriptablePluginEngine {
         val preLoadClasses: Array<String> = arrayOf(
             "com.smc.version.Version",
             "com.smc.version.MinecraftVersions",
-
             "com.smc.utils.ItemBuilder",
             "com.smc.utils.MysqlWrapper",
-
-            "com.smc.smartinvs.SmartInventory",
-            "com.smc.smartinvs.SmartInventoryProvider",
-            "org.apache.commons.io.FileUtils",
-
+            "*org.apache.commons.io.FileUtils",
             "*me.clip.placeholderapi.PlaceholderAPI"
         )
     }

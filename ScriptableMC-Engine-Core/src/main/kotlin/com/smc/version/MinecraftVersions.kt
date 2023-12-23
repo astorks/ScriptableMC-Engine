@@ -35,6 +35,18 @@ import java.util.regex.Pattern
 class MinecraftVersions private constructor(){
     companion object {
         /**
+         * Version 1.20
+         */
+        @JvmField
+        val v1_20 = parse("1.20")
+
+        /**
+         * Version 1.19.3 - the update the broke a ton of plugins...
+         */
+        @JvmField
+        val v1_19_3 = parse("1.19.3")
+
+        /**
          * Version 1.19
          */
         @JvmField

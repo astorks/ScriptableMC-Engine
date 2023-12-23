@@ -5,9 +5,9 @@ import com.pixlfox.scriptablemc.core.ScriptablePluginContext
 import com.pixlfox.scriptablemc.core.ScriptablePluginEngine
 import com.pixlfox.scriptablemc.js.JavaScriptPluginEngineConfig
 import com.pixlfox.scriptablemc.utils.UnzipUtility
-import fr.minuskube.inv.InventoryManager
 import org.bukkit.Material
 import org.graalvm.polyglot.*
+import org.graalvm.polyglot.io.IOAccess
 import java.io.File
 
 
@@ -39,13 +39,12 @@ class JavaScriptPluginEngine(override val bootstrapper: ScriptablePluginEngineBo
             .allowExperimentalOptions(true)
             .allowHostAccess(HostAccess.ALL)
             .allowHostClassLoading(true)
-            .allowIO(true)
+            .allowIO(IOAccess.ALL)
             .allowCreateThread(true)
             .option("js.ecmascript-version", "latest")
             .option("engine.WarnInterpreterOnly", "false")
             .option("log.file", "logs/script-engine.log")
             .option("js.esm-eval-returns-exports", "true")
-            .fileSystem(JavaScriptPluginFileSystem(this))
 
         if(config.commonJsModulesEnabled) {
             if(config.debug) {

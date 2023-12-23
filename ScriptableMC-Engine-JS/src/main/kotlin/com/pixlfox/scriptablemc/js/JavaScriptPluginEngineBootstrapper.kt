@@ -1,23 +1,30 @@
 package com.pixlfox.scriptablemc.js
 
 import co.aikar.commands.PaperCommandManager
-import com.pixlfox.scriptablemc.ScriptablePluginEngineCommands
+import com.google.common.base.Charsets
 import com.pixlfox.scriptablemc.ScriptablePluginEngineBootstrapper
+import com.pixlfox.scriptablemc.ScriptablePluginEngineCommands
 import com.pixlfox.scriptablemc.js.core.JavaScriptPluginEngine
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
+import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.file.YamlConfiguration
+import java.io.File
+import java.io.InputStreamReader
 
 
 @Suppress("unused")
 class JavaScriptPluginEngineBootstrapper : ScriptablePluginEngineBootstrapper() {
     override val chatMessagePrefix = "${ChatColor.GRAY}[${ChatColor.DARK_AQUA}ScriptableMC-JS${ChatColor.GRAY}]${ChatColor.RESET}"
     override val scriptLanguage = "js"
-
+    private var newConfig: YamlConfiguration? = null
+    lateinit var jsConfigFile: File
     lateinit var jsConfig: JavaScriptPluginEngineConfig
 
     override fun onLoad() {
+        super.onLoad()
+        jsConfigFile = File(sharedDataFolder, "config_js.yml")
         instance = this
-        registerScriptEngine(scriptLanguage, this)
         saveDefaultConfig()
     }
 
@@ -29,7 +36,6 @@ class JavaScriptPluginEngineBootstrapper : ScriptablePluginEngineBootstrapper() 
         server.scheduler.scheduleSyncDelayedTask(this, Runnable {
             fullLoadScriptEngine()
             enableScriptEngine()
-            server.dispatchCommand(server.consoleSender, "minecraft:reload")
         })
     }
 
@@ -37,6 +43,26 @@ class JavaScriptPluginEngineBootstrapper : ScriptablePluginEngineBootstrapper() 
         releaseScriptEngine(scriptLanguage)
         commandManager.unregisterCommands()
         unloadScriptEngine()
+    }
+
+    override fun saveDefaultConfig() {
+        super.saveDefaultConfig()
+        if (!jsConfigFile.exists()) {
+            saveResource("config_js.yml", false)
+        }
+    }
+
+    override fun reloadConfig() {
+        newConfig = YamlConfiguration.loadConfiguration(jsConfigFile)
+        val defConfigStream = getResource("config_js.yml") ?: return
+        newConfig?.setDefaults(YamlConfiguration.loadConfiguration(InputStreamReader(defConfigStream, Charsets.UTF_8)))
+    }
+
+    override fun getConfig(): FileConfiguration {
+        if (newConfig == null) {
+            reloadConfig()
+        }
+        return newConfig!!
     }
 
     private fun fullUnloadScriptEngine(sender: CommandSender? = null) {

@@ -31,12 +31,49 @@ class JavaScriptPluginEngineCommands(private val bootstrapper: JavaScriptPluginE
         bootstrapper.fullReloadScriptEngine(sender)
     }
 
-    @Subcommand("pastebin|pb")
-    @CommandAlias("jsexpb")
-    @CommandPermission("scriptablemc.js.execute.pastebin")
-    @Syntax("<code>")
-    fun executePastebin(sender: CommandSender, code: String) {
-        val (_, _, result) = "https://pastebin.com/raw/$code".httpGet().responseString()
+//    @Subcommand("pastebin|pb")
+//    @CommandAlias("jsexpb")
+//    @CommandPermission("scriptablemc.js.execute.pastebin")
+//    @Syntax("<code>")
+//    fun executePastebin(sender: CommandSender, code: String) {
+//        val (_, _, result) = "https://pastebin.com/raw/$code".httpGet().responseString()
+//        result.success {
+//            executeCode(sender, it)
+//        }
+//    }
+
+    @Subcommand("exhttp|exh")
+    @CommandAlias("jsexh")
+    @CommandPermission("scriptablemc.js.execute.http")
+    @Syntax("<url>")
+    fun executeHttp(sender: CommandSender, url: String) {
+        var pixlfoxRegex = Regex("https://paste.pixlfox.net/([a-zA-Z0-9]*?)\$")
+        val pastebinRegex = Regex("https://pastebin.com/(.*?)\$")
+
+        var parsedUrl = url
+
+
+        if(url.matches(pixlfoxRegex)) {
+            val match = pixlfoxRegex.matchEntire(url)
+            if(match != null) {
+                val pasteCode = match.groups[1]?.value
+                if(pasteCode != null) {
+                    parsedUrl = "https://paste.pixlfox.net/$pasteCode/raw"
+                }
+            }
+        }
+
+        if(url.matches(pastebinRegex)) {
+            val match = pastebinRegex.matchEntire(url)
+            if(match != null) {
+                val pastebinCode = match.groups[1]?.value
+                if(pastebinCode != null) {
+                    parsedUrl = "https://pastebin.com/raw/$pastebinCode"
+                }
+            }
+        }
+
+        val (_, _, result) = parsedUrl.httpGet().responseString()
         result.success {
             executeCode(sender, it)
         }
